@@ -56,22 +56,28 @@
 <script>
 (function waitForGlow() {
   if (window.Glowbit && window.Blockly) {
-    const startBlocks = {
-      "blocks": {
-        "languageVersion": 0,
-        "blocks": [
-          { "type": "show_text", "x": 20, "y": 20, "fields": { "TEXT": "Smart Robot" } }
-        ]
-      }
-    };
+    const startXml = `
+      <xml xmlns="https://developers.google.com/blockly/xml">
+        <block type="on_start" deletable="false">
+          <statement name="DO">
+            <block type="show_text">
+              <field name="TEXT">Smart Robot</field>
+            </block>
+          </statement>
+        </block>
+      </xml>
+    `;
+
     const lesson = Glowbit.createLessonUI('glowbit-step1', {
       title: '',
       instructions: '',
       pixelSize: 28,
-      defaultJson: startBlocks
+      defaultXml: startXml   // 🔄 fixed key
     });
+
     window._lesson_step1 = lesson;
 
+    // Sidebar override stays unchanged...
     function overrideSidebar() {
       const container = document.querySelector('#glowbit-step1');
       if (!container) return;
@@ -97,9 +103,11 @@
           '<div class="didyouknow">💡 <strong>Did you know?</strong> Robots in real life often use screens or lights to share messages, and now you’ll get to try it too.</div>';
       }
     }
+
     overrideSidebar();
     const sid = setInterval(overrideSidebar, 500);
     setTimeout(() => clearInterval(sid), 10000);
+
     if (typeof Glowbit.showIcon === 'function') Glowbit.showIcon('smile');
   } else {
     setTimeout(waitForGlow, 120);
@@ -109,3 +117,4 @@
 <!-- 🔼 End embed -->
 </body>
 </html>
+
