@@ -20,7 +20,7 @@
 
     const state = {
       canvases: {},
-      eventHandlers: { A: [], B: [], shake: [] },
+      eventHandlers: { A: [], B: [], shake: [] }
     };
 
     function createCanvas(id, size = 8, pixelSize = 30) {
@@ -62,11 +62,12 @@
                         <block type="show_text"></block>
                       </category>
                     </xml>`,
-          media: "lib/media/",
+          media: "lib/media/"
         });
 
-        if (opts.defaultJson)
+        if (opts.defaultJson) {
           Blockly.serialization.workspaces.load(opts.defaultJson, workspace);
+        }
 
         const sim = document.createElement("canvas");
         sim.id = containerId + "-canvas";
@@ -89,9 +90,10 @@
 
       trigger(event) {
         (state.eventHandlers[event] || []).forEach((fn) => fn());
-      },
+      }
     };
 
     console.log("✅ Glowbit Global Script Initialized");
   });
 })();
+
