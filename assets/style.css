@@ -1,0 +1,21 @@
+/* ---------- Glowbit UI Styles ---------- */
+.glowbit-lesson { display:flex; gap:18px; align-items:flex-start; font-family: Inter, Arial, sans-serif; }
+.glowbit-left { flex:0 0 30%; background:#fff; border-radius:12px; padding:14px; box-shadow:0 6px 18px rgba(0,0,0,0.06); }
+.glowbit-right { flex:1 1 70%; background:linear-gradient(180deg,#f7fbff,#ffffff); padding:12px; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.04); }
+.glowbit-title { font-size:20px; margin:0 0 8px 0; color:#0b2340; }
+.glowbit-instructions { font-size:14px; color:#334155; line-height:1.45; }
+.glowbit-editor-wrap { display:flex; flex-direction:column; gap:12px; }
+.glowbit-editor { height:520px; border-radius:8px; overflow:hidden; border:1px solid #e6eef7; background: #fff; }
+.glowbit-controls { display:flex; gap:10px; align-items:center; justify-content:center; margin-top:6px; flex-wrap:wrap; }
+.glowbit-btn { background:#00A1D6; color:white; border:none; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:600; box-shadow:0 6px 14px rgba(0,161,214,0.16); }
+.glowbit-btn.secondary { background:#6B7280; }
+.glowbit-btn.event { background:#FFA857; color:#061826; }
+.glowbit-canvas-wrap { display:flex; flex-direction:column; align-items:center; gap:8px; margin-top:6px; overflow:visible; } /* overflow visible so glow not clipped */
+.glowbit-canvas { background:#000; border-radius:10px; box-shadow: 0 0 26px 6px rgba(0,255,0,0.65); } /* green glow on all sides */
+.glowbit-sim-text { color:#0f0; font-family:monospace; margin-top:4px; min-height:18px; }
+.glowbit-note { font-size:12px; color:#64748b; margin-top:8px; }
+.blocklySvg { height:100% !important; } /* ensure workspace fills editor */
+@media (max-width:900px) {
+  .glowbit-lesson { flex-direction:column; }
+  .glowbit-left, .glowbit-right { width:100%; }
+}
