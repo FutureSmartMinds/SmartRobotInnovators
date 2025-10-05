@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GlowBit Step 4 – Pause & Clear</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Blockly core + global Glowbit engine -->
+  <script src="lib/blockly_compressed.js"></script>
+  <script src="lib/blocks_compressed.js"></script>
+  <script src="lib/javascript_compressed.js"></script>
+  <script src="lib/msg/en.js"></script>
+  <script src="assets/global.js"></script>
+
+  <!-- Styling (same theme as previous steps) -->
+  <style>
+    .gb-wrapper { max-width:1100px; margin:0 auto; font-family:"Segoe UI", Roboto, Arial, sans-serif; }
+    .gb-header {
+      text-align:center; background:#e6f9ff; color:#00A1D6;
+      font-size:22px; font-weight:800; padding:6px 10px;
+      border-radius:8px; margin-bottom:8px; box-shadow:0 1px 4px rgba(0,0,0,0.08);
+    }
+    .gb-header .highlight { color:#7B2CBF; }
+    .gb-intro {
+      text-align:center; font-size:14px; line-height:1.4; margin:0 0 10px;
+      color:#374151; background:#e0f2fe; border-radius:6px; padding:8px 10px;
+      box-shadow:0 1px 3px rgba(0,0,0,0.06);
+    }
+    #glowbit-step4 .glowbit-playground { max-height:500px; overflow-y:auto !important; border-radius:6px; }
+    .didyouknow {
+      margin-top:18px; background:#fef9c3; border:2px solid #facc15;
+      padding:10px 12px; border-radius:12px; color:#713f12;
+      font-size:13px; font-weight:600; position:relative; box-shadow:0 2px 5px rgba(0,0,0,0.06);
+    }
+    .didyouknow::before {
+      content:""; position:absolute; top:-10px; left:20px;
+      border-width:0 10px 10px 10px; border-style:solid;
+      border-color:transparent transparent #fef9c3 transparent;
+    }
+
+    /* Check Setup button */
+    .check-setup-btn {
+      display:inline-block; background:#0284C7; color:white;
+      border:none; border-radius:8px; padding:10px 16px;
+      font-weight:700; margin:10px auto; cursor:pointer;
+      box-shadow:0 2px 5px rgba(0,0,0,0.15);
+    }
+    .check-setup-btn:hover { background:#0369A1; }
+  </style>
+</head>
+
+<body>
+  <div class="gb-wrapper">
+    <div class="gb-header">
+      🌟 <span class="highlight">Step 4</span>: Pause & Clear — Give <span class="highlight">GlowBit</span> a Breather
+    </div>
+
+    <p class="gb-intro">
+      GlowBit can pause between messages and then clear the screen so new messages are easy to read.
+      In this step, you'll show a message, pause briefly, and clear the LED grid.
+    </p>
+
+    <div id="glowbit-step4"></div>
+
+    <!-- Optional “Check Your Setup” button -->
+    <div style="text-align:center;">
+      <button id="checkSetupBtn" class="check-setup-btn">✅ Check Your Setup</button>
+    </div>
+  </div>
+
+  <!-- Step 4 Script -->
+  <script>
+  /* ===============================================================
+     Glowbit Step 4 — Pause & Clear (GitHub Pages Adapted)
+     Includes “Check Your Setup” preview button
+     =============================================================== */
+  function initStep4() {
+    if (!window.Glowbit || !window.Blockly) {
+      console.log("⌛ Waiting for Glowbit or Blockly...");
+      return setTimeout(initStep4,150);
+    }
+
+    const container=document.getElementById('glowbit-step4');
+    if(!container){
+      console.log("⌛ Waiting for #glowbit-step4 container...");
+      return setTimeout(initStep4,100);
+    }
+
+    console.log("✅ Glowbit, Blockly, and container ready. Initializing Step 4.");
+
+    // --- Default example program for setup check ---
+    const defaultJson={
+      "blocks":{
+        "languageVersion":0,
+        "blocks":[
+          {
+            "type":"on_start",
+            "x":20,"y":20,
+            "inputs":{
+              "DO":{
+                "block":{
+                  "type":"show_text",
+                  "fields":{"TEXT":"Hello!"},
+                  "next":{
+                    "block":{
+                      "type":"pause",
+                      "fields":{"MS":300},
+                      "next":{
+                        "block":{"type":"clear_screen"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    };
+
+    // --- Create main editable workspace (EMPTY at start) ---
+    const lesson=Glowbit.createLessonUI('glowbit-step4',{
+      title:'',
+      instructions:'',
+      pixelSize:28,
+      defaultJson:null // students start with empty workspace
+    });
+    window._lesson_step4=lesson;
+
+    // --- “Check Your Setup” button handler ---
+    const checkBtn=document.getElementById('checkSetupBtn');
+    if(checkBtn){
+      checkBtn.addEventListener('click',()=>{
+        if(!window.Blockly){
+          alert("Blockly not ready yet!");
+          return;
+        }
+        // Confirm before overwriting workspace
+        if(confirm("This will show the correct example setup. Continue?")){
+          Blockly.serialization.workspaces.load(defaultJson,lesson.workspace);
+          alert("✅ Correct setup loaded — compare your work!");
+        }
+      });
+    }
+
+    // --- Sidebar customization ---
+    function overrideSidebar(){
+      const sidebar=Array.from(container.querySelectorAll('*')).find(el =>
+        el.innerText && (
+          el.innerText.includes("GlowBit Lesson") ||
+          el.innerText.includes("Follow the steps on the right")
+        )
+      );
+      if(!sidebar)return;
+
+      sidebar.style.background='#e6f9ff';
+      sidebar.style.borderRadius='10px';
+      sidebar.style.padding='12px';
+      sidebar.style.color='#00A1D6';
+      sidebar.style.fontSize='14px';
+      sidebar.style.fontWeight='500';
+      sidebar.style.boxShadow='0 0 8px rgba(0,0,0,0.08)';
+
+      const stepCard='margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;font-weight:600;';
+
+      sidebar.innerHTML=
+        '<h3 style="color:#00A1D6;font-weight:800;font-size:16px;margin-bottom:10px;text-align:center;">🌟 Follow These Steps 🌟</h3>'+
+        '<div style="'+stepCard+'">🧩 From <strong>Basic</strong>, drag a <strong>Show Text</strong> block and type a short message.</div>'+
+        '<div style="'+stepCard+'">⏸️ Add a <strong>Pause (ms)</strong> block right after. Set it to <strong>300</strong>.</div>'+
+        '<div style="'+stepCard+'">🧹 Add a <strong>Clear Screen</strong> block next — this wipes the LEDs clean.</div>'+
+        '<div style="'+stepCard+'">📦 Wrap all three blocks inside <strong>on start</strong>.</div>'+
+        '<div style="'+stepCard+'">▶️ Run your program — your GlowBit says hello, waits, and clears!</div>'+
+        '<div class="didyouknow">💡 <strong>Did you know?</strong> Robots often pause and reset displays to manage memory and readability.</div>';
+    }
+
+    overrideSidebar();
+    const sid=setInterval(overrideSidebar,500);
+    setTimeout(()=>clearInterval(sid),10000);
+
+    if(typeof Glowbit.showIcon==='function') Glowbit.showIcon('pause');
+    console.log("✅ Step 4 fully initialized.");
+  }
+
+  window.addEventListener('DOMContentLoaded',()=>{
+    console.log("🔥 Step 4 script loaded; DOMContentLoaded fired.");
+    setTimeout(initStep4,300);
+  });
+  </script>
+</body>
+</html>
