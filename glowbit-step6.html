@@ -10,10 +10,9 @@
   <script src="lib/blocks_compressed.js"></script>
   <script src="lib/javascript_compressed.js"></script>
   <script src="lib/msg/en.js"></script>
-  <script src="lib/blockly_xml_patch.js"></script> <!-- ✅ universal patch -->
+  <script src="lib/blockly_xml_patch.js"></script>
   <script src="assets/global.js"></script>
 
-  <!-- Styling -->
   <style>
     .gb-wrapper { max-width:1100px; margin:0 auto; font-family:"Segoe UI", Roboto, Arial, sans-serif; }
     .gb-header { text-align:center; background:#e6f9ff; color:#00A1D6; font-size:22px; font-weight:800;
@@ -22,26 +21,22 @@
     .gb-intro { text-align:center; font-size:16px; line-height:1.5; margin:0 0 10px; color:#374151;
                 background:#e0f2fe; border-radius:6px; padding:10px 12px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
     #glowbit-step6 .glowbit-playground { max-height:540px; overflow-y:auto!important; border-radius:6px; }
-    .didyouknow { margin-top:18px; background:#fef9c3; border:2px solid #facc15; padding:10px 12px; border-radius:12px;
-                  color:#713f12; font-size:13px; font-weight:600; position:relative; box-shadow:0 2px 5px rgba(0,0,0,0.06); }
-    .didyouknow::before { content:""; position:absolute; top:-10px; left:20px; border-width:0 10px 10px 10px;
-                           border-style:solid; border-color:transparent transparent #fef9c3 transparent; }
-
-    /* Solution modal */
+    .didyouknow { margin-top:18px; background:#fef9c3; border:2px solid #facc15; padding:10px 12px;
+                  border-radius:12px; color:#713f12; font-size:13px; font-weight:600; position:relative;
+                  box-shadow:0 2px 5px rgba(0,0,0,0.06); }
+    .didyouknow::before { content:""; position:absolute; top:-10px; left:20px;
+                          border-width:0 10px 10px 10px; border-style:solid;
+                          border-color:transparent transparent #fef9c3 transparent; }
+    /* Modal */
     #solutionModal6 { display:none; position:fixed; top:60px; right:20px; width:640px; max-width:42%;
                       background:#fff; border-radius:10px; box-shadow:0 6px 20px rgba(0,0,0,0.28);
                       z-index:12000; overflow:hidden; user-select:none; }
     #solutionHeader6 { cursor:move; padding:10px 12px; background:#00A1D6; color:#fff; font-weight:700;
                        border-radius:10px 10px 0 0; display:flex; justify-content:space-between; align-items:center; }
-    #solutionTitle6 { font-size:15px; }
-    #solutionClose6 { cursor:pointer; font-size:20px; line-height:1; padding:2px 8px; border-radius:6px;
-                      color:#fff; background:transparent; border:none; }
     #solutionWorkspace6 { height:360px; width:100%; border-top:1px solid #eee; background:#fafafa; }
     #solutionFooter6 { text-align:center; padding:12px; background:#fff; }
-    #solutionFooter6 button { background:#00A1D6; color:#fff; border:none; border-radius:8px; padding:8px 18px;
-                              cursor:pointer; font-weight:700; }
-    @media (max-width:900px){ #solutionModal6{ left:10px; right:10px; width:auto; max-width:calc(100% - 20px);
-                                              top:40px;} #solutionWorkspace6{ height:260px;} }
+    #solutionFooter6 button { background:#00A1D6; color:#fff; border:none; border-radius:8px;
+                              padding:8px 18px; cursor:pointer; font-weight:700; }
   </style>
 </head>
 
@@ -61,102 +56,73 @@
   <!-- Solution modal -->
   <div id="solutionModal6" aria-hidden="true" role="dialog">
     <div id="solutionHeader6">
-      <div id="solutionTitle6">✅ Correct Setup — Step 6</div>
+      <div>✅ Correct Setup — Step 6</div>
       <button id="solutionClose6" title="Close">✕</button>
     </div>
-    <div id="solutionWorkspace6" aria-label="Correct solution workspace"></div>
-    <div id="solutionFooter6">
-      <button id="solutionCloseBtn6">Close</button>
-    </div>
+    <div id="solutionWorkspace6"></div>
+    <div id="solutionFooter6"><button id="solutionCloseBtn6">Close</button></div>
   </div>
 
-  <!-- Script -->
   <script>
   (function waitForGlow(){
-    if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow, 120);
+    if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow,120);
 
-    /* ✅ Correct solution JSON */
+    /* ✅ Correct solution JSON with Clear Screen first and pause_block */
     const solutionJson = {
       "blocks": {
         "languageVersion": 0,
-        "blocks": [
-          {
-            "type": "forever",
-            "x": 20,
-            "y": 20,
-            "inputs": {
-              "DO": {
-                "block": {
-                  "type": "clear_screen",
-                  "next": {
-                    "block": {
-                      "type": "set_pixel",
-                      "fields": { "X": 0, "Y": 2 },
-                      "next": {
-                        "block": {
-                          "type": "set_pixel",
-                          "fields": { "X": 1, "Y": 2 },
-                          "next": {
-                            "block": {
-                              "type": "set_pixel",
-                              "fields": { "X": 2, "Y": 2 },
-                              "next": {
-                                "block": {
-                                  "type": "set_pixel",
-                                  "fields": { "X": 3, "Y": 2 },
-                                  "next": {
-                                    "block": {
-                                      "type": "set_pixel",
-                                      "fields": { "X": 4, "Y": 2 },
-                                      "next": {
-                                        "block": {
-                                          "type": "pause_block",
-                                          "fields": { "MS": 500 },
-                                          "next": {
-                                            "block": { "type": "clear_screen" }
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
+        "blocks": [{
+          "type": "forever",
+          "x": 20,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "clear_screen",
+                "next": {
+                  "block": {
+                    "type": "set_pixel","fields":{ "X":0,"Y":2 },
+                    "next": { "block": {
+                      "type": "set_pixel","fields":{ "X":1,"Y":2 },
+                      "next": { "block": {
+                        "type": "set_pixel","fields":{ "X":2,"Y":2 },
+                        "next": { "block": {
+                          "type": "set_pixel","fields":{ "X":3,"Y":2 },
+                          "next": { "block": {
+                            "type": "set_pixel","fields":{ "X":4,"Y":2 },
+                            "next": { "block": {
+                              "type": "pause_block","fields":{ "MS":500 },
+                              "next": { "block": { "type":"clear_screen" } }
+                            }}
+                          }}
+                        }}
+                      }}
+                    }}
                   }
                 }
               }
             }
           }
-        ]
+        }]
       }
     };
 
     /* Main workspace */
-    const lesson = Glowbit.createLessonUI('glowbit-step6', {
-      title:'',
-      instructions:'',
-      pixelSize:28,
-      defaultJson:solutionJson
+    const lesson = Glowbit.createLessonUI('glowbit-step6',{
+      title:'', instructions:'', pixelSize:28, defaultJson:solutionJson
     });
     window._lesson_step6 = lesson;
 
-    /* Sidebar override (unchanged from LW) */
+    /* Sidebar */
     function overrideSidebar(){
       const container=document.querySelector('#glowbit-step6');
       if(!container)return;
-      let sidebar=[...container.querySelectorAll('div')].find(el=>
-        el.innerText && (
-          el.innerText.includes('GlowBit Lesson') ||
-          el.innerText.includes('Follow the steps') ||
-          /^Step\s*\d+:/.test(el.innerText.trim())
-        )
+      const sidebar=[...container.querySelectorAll('div')].find(el=>
+        el.innerText && (el.innerText.includes('GlowBit Lesson')||
+                         el.innerText.includes('Follow the steps')||
+                         /^Step\s*\d+:/.test(el.innerText.trim()))
       );
       if(!sidebar)return;
-
       sidebar.style.background='#e6f9ff';
       sidebar.style.borderRadius='10px';
       sidebar.style.padding='12px';
@@ -164,22 +130,20 @@
       sidebar.style.fontSize='14px';
       sidebar.style.fontWeight='500';
       sidebar.style.boxShadow='0 0 8px rgba(0,0,0,0.08)';
-
-      const stepCard='margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;font-weight:600;';
-      sidebar.innerHTML =
+      const card='margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;font-weight:600;';
+      sidebar.innerHTML=
         '<h3 style="color:#00A1D6;font-weight:800;font-size:16px;margin-bottom:10px;text-align:center;">🌟 Follow These Steps 🌟</h3>'+
-        '<div style="'+stepCard+'">🧩 From the <strong>Basic</strong> tab, drag a <strong>forever</strong> loop to the workspace.</div>'+
-        '<div style="'+stepCard+'">💡 From the <strong>LED</strong> tab, drag 5 <strong>Set Pixel (x,y)</strong> blocks inside the loop. Use row y=2, x=0→4.</div>'+
-        '<div style="'+stepCard+'">🧹 Add a <strong>Clear Screen</strong> block before your Set Pixel blocks.</div>'+
-        '<div style="'+stepCard+'">⏸️ From the <strong>Basic</strong> tab, add a <strong>pause</strong> block set to 500, then add another <strong>clear screen</strong> block.</div>'+
-        '<div style="'+stepCard+'">▶️ Click <strong>Run Program</strong>. GlowBit flashes the row on/off — like dancing lights!</div>'+
+        '<div style="'+card+'">🧩 From the <strong>Basic</strong> tab, drag a <strong>forever</strong> loop to the workspace.</div>'+
+        '<div style="'+card+'">🧹 Add a <strong>Clear Screen</strong> block inside the loop before anything else.</div>'+
+        '<div style="'+card+'">💡 From the <strong>LED</strong> tab, drag 5 <strong>Set Pixel (x,y)</strong> blocks after Clear Screen. Use row y=2, x=0→4.</div>'+
+        '<div style="'+card+'">⏸️ From the <strong>Basic</strong> tab, add a <strong>pause</strong> block set to 500, then add another <strong>clear screen</strong> block.</div>'+
+        '<div style="'+card+'">▶️ Click <strong>Run Program</strong>. GlowBit flashes the row on/off — like dancing lights!</div>'+
         '<button id="check-setup-btn6" style="display:block;margin:12px auto 6px;padding:8px 14px;border:none;border-radius:6px;background:#00A1D6;color:#fff;font-weight:700;cursor:pointer;">✅ Check Your Setup</button>'+
         '<div class="didyouknow">💡 <strong>Did you know?</strong> Loops are everywhere in robotics — from blinking lights to endless monitoring sensors!</div>';
     }
-
     overrideSidebar();
-    const interval=setInterval(overrideSidebar,400);
-    setTimeout(()=>clearInterval(interval),10000);
+    const sid=setInterval(overrideSidebar,400);
+    setTimeout(()=>clearInterval(sid),10000);
 
     /* Modal logic */
     const modal=document.getElementById('solutionModal6');
