@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GlowBit Step 3 – Show Text + Number</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Blockly core + global Glowbit engine -->
+  <script src="lib/blockly_compressed.js"></script>
+  <script src="lib/blocks_compressed.js"></script>
+  <script src="lib/javascript_compressed.js"></script>
+  <script src="lib/msg/en.js"></script>
+  <script src="assets/global.js"></script>
+
+  <!-- Styling (consistent with previous steps) -->
+  <style>
+    .gb-wrapper { max-width:1100px; margin:0 auto; font-family:"Segoe UI",Roboto,Arial,sans-serif; }
+    .gb-header {
+      text-align:center; background:#e6f9ff; color:#00A1D6;
+      font-size:22px; font-weight:800; padding:6px 10px;
+      border-radius:8px; margin-bottom:8px; box-shadow:0 1px 4px rgba(0,0,0,0.08);
+    }
+    .gb-header .highlight { color:#7B2CBF; }
+    .gb-intro {
+      text-align:center; font-size:14px; line-height:1.4; margin:0 0 10px;
+      color:#374151; background:#e0f2fe; border-radius:6px; padding:8px 10px;
+      box-shadow:0 1px 3px rgba(0,0,0,0.06);
+    }
+    #glowbit-step3 .glowbit-playground { max-height:500px; overflow-y:auto !important; border-radius:6px; }
+    .didyouknow {
+      margin-top:18px; background:#fef9c3; border:2px solid #facc15;
+      padding:10px 12px; border-radius:12px; color:#713f12;
+      font-size:13px; font-weight:600; position:relative; box-shadow:0 2px 5px rgba(0,0,0,0.06);
+    }
+    .didyouknow::before {
+      content:""; position:absolute; top:-10px; left:20px;
+      border-width:0 10px 10px 10px; border-style:solid;
+      border-color:transparent transparent #fef9c3 transparent;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="gb-wrapper">
+    <div class="gb-header">
+      🌟 <span class="highlight">Step 3</span>: Show Text + Number — Combine Words and Data on <span class="highlight">GlowBit</span>!
+    </div>
+
+    <p class="gb-intro">
+      Now let’s combine text and numbers. You’ll make <span class="highlight">GlowBit</span> first show a word like “Score”
+      and then display a number. This is a common trick in games — robots and computers use text for labels and numbers for data!
+    </p>
+
+    <div id="glowbit-step3"></div>
+  </div>
+
+  <!-- Step 3 Script -->
+  <script>
+  /* ===============================================================
+     Glowbit Step 3 — Show Text + Number (GitHub Pages Adapted)
+     Starts with EMPTY editor for learners to build from scratch
+     =============================================================== */
+  function initStep3() {
+    if (!window.Glowbit || !window.Blockly) {
+      console.log("⌛ Waiting for Glowbit or Blockly...");
+      return setTimeout(initStep3,150);
+    }
+
+    const container=document.getElementById('glowbit-step3');
+    if(!container){
+      console.log("⌛ Waiting for #glowbit-step3 container...");
+      return setTimeout(initStep3,100);
+    }
+
+    console.log("✅ Glowbit, Blockly, and container ready. Initializing Step 3.");
+
+    // Empty workspace — no defaultJson blocks this time
+    const lesson=Glowbit.createLessonUI('glowbit-step3',{
+      title:'',
+      instructions:'',
+      pixelSize:28,
+      defaultJson:null
+    });
+    window._lesson_step3=lesson;
+
+    // --- Sidebar text override ---
+    function overrideSidebar(){
+      const sidebar=Array.from(container.querySelectorAll('*')).find(el =>
+        el.innerText && (
+          el.innerText.includes("GlowBit Lesson") ||
+          el.innerText.includes("Follow the steps on the right")
+        )
+      );
+      if(!sidebar)return;
+
+      sidebar.style.background='#e6f9ff';
+      sidebar.style.borderRadius='10px';
+      sidebar.style.padding='12px';
+      sidebar.style.color='#00A1D6';
+      sidebar.style.fontSize='14px';
+      sidebar.style.fontWeight='500';
+      sidebar.style.boxShadow='0 0 8px rgba(0,0,0,0.08)';
+
+      const stepCardStyle='margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;font-weight:600;';
+
+      sidebar.innerHTML =
+        '<h3 style="color:#00A1D6;font-weight:800;font-size:16px;margin-bottom:10px;text-align:center;">🌟 Follow These Steps 🌟</h3>'+
+        '<div style="'+stepCardStyle+'">🧩 <strong>Go to the Basic tab</strong>. Drag a <strong>Show Text</strong> block and type “Score”.</div>'+
+        '<div style="'+stepCardStyle+'">🔢 <strong>Go to Basic again</strong>. Drag a <strong>Show Number</strong> block and attach a <strong>Number</strong> block (from Math).</div>'+
+        '<div style="'+stepCardStyle+'">📦 <strong>Place both blocks inside an <strong>on start</strong> block</strong>, one under the other.</div>'+
+        '<div style="'+stepCardStyle+'">▶️ <strong>Click Run Program</strong>. GlowBit shows “Score” and then your number!</div>'+
+        '<div class="didyouknow">💡 <strong>Did you know?</strong> Video games use this same trick: text labels + numbers to show lives, points, and timers.</div>';
+    }
+
+    overrideSidebar();
+    const sid=setInterval(overrideSidebar,500);
+    setTimeout(()=>clearInterval(sid),10000);
+
+    if(typeof Glowbit.showIcon==='function') Glowbit.showIcon('smile');
+    console.log("✅ Step 3 fully initialized.");
+  }
+
+  window.addEventListener('DOMContentLoaded',()=>{
+    console.log("🔥 Step 3 script loaded; DOMContentLoaded fired.");
+    setTimeout(initStep3,300);
+  });
+  </script>
+</body>
+</html>
