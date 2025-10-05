@@ -861,7 +861,28 @@
     } catch (e) {
       console.error("Glowbit: generator registration failed", e);
     }
+// ---------- Ensure If-Then-Else logic block is defined ----------
+Blockly.defineBlocksWithJsonArray([
+  {
+    "type": "controls_ifelse",
+    "message0": "if %1 then %2 else %3",
+    "args0": [
+      { "type": "input_value", "name": "IF", "check": "Boolean" },
+      { "type": "input_statement", "name": "DO0" },
+      { "type": "input_statement", "name": "ELSE" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 210
+  }
+]);
 
+Blockly.JavaScript["controls_ifelse"] = function (block) {
+  const cond = Blockly.JavaScript.valueToCode(block, "IF", Blockly.JavaScript.ORDER_NONE) || "false";
+  const thenBranch = Blockly.JavaScript.statementToCode(block, "DO0") || "";
+  const elseBranch = Blockly.JavaScript.statementToCode(block, "ELSE") || "";
+  return `if (${cond}) {\n${thenBranch}} else {\n${elseBranch}}\n`;
+};
     // ---------- Expose API ----------
     window.Glowbit = GlowbitAPI;
     console.log("✅ Glowbit Global.js loaded and ready.");
