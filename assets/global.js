@@ -550,7 +550,7 @@
             <sep></sep>
             <category name="Logic" colour="#5C81A6">
               <block type="controls_if"></block>
-              <block type="controls_ifelse"></block>
+              <block type="controls_if"></block>
               <block type="logic_compare"></block>
               <block type="logic_boolean"></block>
             </category>
