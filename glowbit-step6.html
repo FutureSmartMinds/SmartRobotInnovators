@@ -5,12 +5,12 @@
   <title>GlowBit Step 6 – Make Lights Loop</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Blockly core + Global Glowbit setup -->
+  <!-- Blockly core + Glowbit setup -->
   <script src="lib/blockly_compressed.js"></script>
   <script src="lib/blocks_compressed.js"></script>
   <script src="lib/javascript_compressed.js"></script>
   <script src="lib/msg/en.js"></script>
-  <script src="lib/blockly_xml_patch.js"></script> <!-- ✅ universal Check Setup fix -->
+  <script src="lib/blockly_xml_patch.js"></script> <!-- ✅ universal patch -->
   <script src="assets/global.js"></script>
 
   <!-- Styling -->
@@ -52,8 +52,7 @@
     </div>
 
     <p class="gb-intro">
-      Let’s code a <strong>loop</strong> to make GlowBit LEDs flash in a pattern — like a dancing robot!
-      You’ll use <strong>forever</strong>, <strong>set pixel</strong>, <strong>pause</strong>, and <strong>clear screen</strong> blocks.
+      Let’s code a loop to keep your GlowBit LEDs flashing in a pattern. It’s like programming GlowBit to dance, powered by AI!
     </p>
 
     <div id="glowbit-step6"></div>
@@ -66,7 +65,9 @@
       <button id="solutionClose6" title="Close">✕</button>
     </div>
     <div id="solutionWorkspace6" aria-label="Correct solution workspace"></div>
-    <div id="solutionFooter6"><button id="solutionCloseBtn6">Close</button></div>
+    <div id="solutionFooter6">
+      <button id="solutionCloseBtn6">Close</button>
+    </div>
   </div>
 
   <!-- Script -->
@@ -74,40 +75,48 @@
   (function waitForGlow(){
     if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow, 120);
 
-    /* ✅ Correct Setup JSON */
+    /* ✅ Correct solution JSON */
     const solutionJson = {
       "blocks": {
         "languageVersion": 0,
         "blocks": [
           {
             "type": "forever",
-            "x": 20, "y": 20,
+            "x": 20,
+            "y": 20,
             "inputs": {
               "DO": {
                 "block": {
-                  "type": "set_pixel",
-                  "fields": { "X": 0, "Y": 2, "COLOUR": "#00FF00" },
+                  "type": "clear_screen",
                   "next": {
                     "block": {
                       "type": "set_pixel",
-                      "fields": { "X": 1, "Y": 2, "COLOUR": "#00FF00" },
+                      "fields": { "X": 0, "Y": 2 },
                       "next": {
                         "block": {
                           "type": "set_pixel",
-                          "fields": { "X": 2, "Y": 2, "COLOUR": "#00FF00" },
+                          "fields": { "X": 1, "Y": 2 },
                           "next": {
                             "block": {
                               "type": "set_pixel",
-                              "fields": { "X": 3, "Y": 2, "COLOUR": "#00FF00" },
+                              "fields": { "X": 2, "Y": 2 },
                               "next": {
                                 "block": {
                                   "type": "set_pixel",
-                                  "fields": { "X": 4, "Y": 2, "COLOUR": "#00FF00" },
+                                  "fields": { "X": 3, "Y": 2 },
                                   "next": {
                                     "block": {
-                                      "type": "pause",
-                                      "fields": { "MS": 500 },
-                                      "next": { "block": { "type": "clear_screen" } }
+                                      "type": "set_pixel",
+                                      "fields": { "X": 4, "Y": 2 },
+                                      "next": {
+                                        "block": {
+                                          "type": "pause_block",
+                                          "fields": { "MS": 500 },
+                                          "next": {
+                                            "block": { "type": "clear_screen" }
+                                          }
+                                        }
+                                      }
                                     }
                                   }
                                 }
@@ -126,23 +135,27 @@
       }
     };
 
-    /* Initialize main GlowBit lesson */
+    /* Main workspace */
     const lesson = Glowbit.createLessonUI('glowbit-step6', {
-      title: '',
-      instructions: '',
-      pixelSize: 28,
-      defaultJson: null
+      title:'',
+      instructions:'',
+      pixelSize:28,
+      defaultJson:solutionJson
     });
     window._lesson_step6 = lesson;
 
-    /* Sidebar override */
+    /* Sidebar override (unchanged from LW) */
     function overrideSidebar(){
-      const container = document.querySelector('#glowbit-step6');
-      if(!container) return;
-      const sidebar = Array.from(container.querySelectorAll('div')).find(el =>
-        el.innerText && (el.innerText.includes('GlowBit Lesson') || el.innerText.includes('Follow the steps') || /^Step\s*\d+:/.test(el.innerText.trim()))
+      const container=document.querySelector('#glowbit-step6');
+      if(!container)return;
+      let sidebar=[...container.querySelectorAll('div')].find(el=>
+        el.innerText && (
+          el.innerText.includes('GlowBit Lesson') ||
+          el.innerText.includes('Follow the steps') ||
+          /^Step\s*\d+:/.test(el.innerText.trim())
+        )
       );
-      if(!sidebar) return;
+      if(!sidebar)return;
 
       sidebar.style.background='#e6f9ff';
       sidebar.style.borderRadius='10px';
@@ -155,39 +168,37 @@
       const stepCard='margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;font-weight:600;';
       sidebar.innerHTML =
         '<h3 style="color:#00A1D6;font-weight:800;font-size:16px;margin-bottom:10px;text-align:center;">🌟 Follow These Steps 🌟</h3>'+
-        '<div style="'+stepCard+'">🧩 From the <strong>Basic</strong> tab, drag a <strong>forever</strong> block into the workspace.</div>'+
-        '<div style="'+stepCard+'">💡 From the <strong>LED</strong> tab, drag several <strong>Set Pixel (x,y,color)</strong> blocks inside the loop. Use <strong>y=2</strong> and change <strong>x</strong> from 0→4.</div>'+
-        '<div style="'+stepCard+'">🎨 Try setting each pixel to a different color code (like #00FF00, #FF0000, #0000FF).</div>'+
-        '<div style="'+stepCard+'">⏸️ Add a <strong>pause</strong> block set to 500, then a <strong>clear screen</strong> block to blink the lights.</div>'+
-        '<div style="'+stepCard+'">▶️ Click <strong>Run Program</strong> — GlowBit loops the flashing row forever!</div>'+
+        '<div style="'+stepCard+'">🧩 From the <strong>Basic</strong> tab, drag a <strong>forever</strong> loop to the workspace.</div>'+
+        '<div style="'+stepCard+'">💡 From the <strong>LED</strong> tab, drag 5 <strong>Set Pixel (x,y)</strong> blocks inside the loop. Use row y=2, x=0→4.</div>'+
+        '<div style="'+stepCard+'">🧹 Add a <strong>Clear Screen</strong> block before your Set Pixel blocks.</div>'+
+        '<div style="'+stepCard+'">⏸️ From the <strong>Basic</strong> tab, add a <strong>pause</strong> block set to 500, then add another <strong>clear screen</strong> block.</div>'+
+        '<div style="'+stepCard+'">▶️ Click <strong>Run Program</strong>. GlowBit flashes the row on/off — like dancing lights!</div>'+
         '<button id="check-setup-btn6" style="display:block;margin:12px auto 6px;padding:8px 14px;border:none;border-radius:6px;background:#00A1D6;color:#fff;font-weight:700;cursor:pointer;">✅ Check Your Setup</button>'+
-        '<div class="didyouknow">💡 <strong>Did you know?</strong> Robots use loops to repeat patterns endlessly — from lights to motion!</div>';
+        '<div class="didyouknow">💡 <strong>Did you know?</strong> Loops are everywhere in robotics — from blinking lights to endless monitoring sensors!</div>';
     }
 
     overrideSidebar();
-    const interval = setInterval(overrideSidebar, 400);
-    setTimeout(()=>clearInterval(interval), 10000);
+    const interval=setInterval(overrideSidebar,400);
+    setTimeout(()=>clearInterval(interval),10000);
 
     /* Modal logic */
-    const modal = document.getElementById('solutionModal6');
-    document.addEventListener('click', e=>{
+    const modal=document.getElementById('solutionModal6');
+    document.addEventListener('click',function(e){
       if(e.target.id==='check-setup-btn6'){
         modal.style.display='block';
         if(!window._solutionWorkspace6){
-          const wsDiv = document.getElementById('solutionWorkspace6');
-          window._solutionWorkspace6 = Blockly.inject(wsDiv, { readOnly:true, scrollbars:true, toolbox:null });
+          const wsDiv=document.getElementById('solutionWorkspace6');
+          window._solutionWorkspace6=Blockly.inject(wsDiv,{readOnly:true,scrollbars:true,toolbox:null});
           Blockly.serialization.workspaces.load(solutionJson, window._solutionWorkspace6);
         }
       }
-      if(e.target.id==='solutionClose6' || e.target.id==='solutionCloseBtn6'){
+      if(e.target.id==='solutionClose6'||e.target.id==='solutionCloseBtn6'){
         modal.style.display='none';
       }
     });
 
-    document.addEventListener('keydown', ev=>{
-      if(ev.key==='Escape'){
-        modal.style.display='none';
-      }
+    document.addEventListener('keydown',ev=>{
+      if(ev.key==='Escape') modal.style.display='none';
     });
 
     if(typeof Glowbit.showIcon==='function') Glowbit.showIcon('loop');
