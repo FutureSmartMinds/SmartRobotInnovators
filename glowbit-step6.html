@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GlowBit Step 6 – Make Lights Loop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Blockly core + Global Glowbit setup -->
+  <script src="lib/blockly_compressed.js"></script>
+  <script src="lib/blocks_compressed.js"></script>
+  <script src="lib/javascript_compressed.js"></script>
+  <script src="lib/msg/en.js"></script>
+  <script src="lib/blockly_xml_patch.js"></script> <!-- ✅ universal Check Setup fix -->
+  <script src="assets/global.js"></script>
+
+  <!-- Styling -->
+  <style>
+    .gb-wrapper { max-width:1100px; margin:0 auto; font-family:"Segoe UI", Roboto, Arial, sans-serif; }
+    .gb-header { text-align:center; background:#e6f9ff; color:#00A1D6; font-size:22px; font-weight:800;
+                 padding:6px 10px; border-radius:8px; margin-bottom:8px; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+    .gb-header .highlight { color:#7B2CBF; }
+    .gb-intro { text-align:center; font-size:16px; line-height:1.5; margin:0 0 10px; color:#374151;
+                background:#e0f2fe; border-radius:6px; padding:10px 12px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+    #glowbit-step6 .glowbit-playground { max-height:540px; overflow-y:auto!important; border-radius:6px; }
+    .didyouknow { margin-top:18px; background:#fef9c3; border:2px solid #facc15; padding:10px 12px; border-radius:12px;
+                  color:#713f12; font-size:13px; font-weight:600; position:relative; box-shadow:0 2px 5px rgba(0,0,0,0.06); }
+    .didyouknow::before { content:""; position:absolute; top:-10px; left:20px; border-width:0 10px 10px 10px;
+                           border-style:solid; border-color:transparent transparent #fef9c3 transparent; }
+
+    /* Solution modal */
+    #solutionModal6 { display:none; position:fixed; top:60px; right:20px; width:640px; max-width:42%;
+                      background:#fff; border-radius:10px; box-shadow:0 6px 20px rgba(0,0,0,0.28);
+                      z-index:12000; overflow:hidden; user-select:none; }
+    #solutionHeader6 { cursor:move; padding:10px 12px; background:#00A1D6; color:#fff; font-weight:700;
+                       border-radius:10px 10px 0 0; display:flex; justify-content:space-between; align-items:center; }
+    #solutionTitle6 { font-size:15px; }
+    #solutionClose6 { cursor:pointer; font-size:20px; line-height:1; padding:2px 8px; border-radius:6px;
+                      color:#fff; background:transparent; border:none; }
+    #solutionWorkspace6 { height:360px; width:100%; border-top:1px solid #eee; background:#fafafa; }
+    #solutionFooter6 { text-align:center; padding:12px; background:#fff; }
+    #solutionFooter6 button { background:#00A1D6; color:#fff; border:none; border-radius:8px; padding:8px 18px;
+                              cursor:pointer; font-weight:700; }
+    @media (max-width:900px){ #solutionModal6{ left:10px; right:10px; width:auto; max-width:calc(100% - 20px);
+                                              top:40px;} #solutionWorkspace6{ height:260px;} }
+  </style>
+</head>
+
+<body>
+  <div class="gb-wrapper">
+    <div class="gb-header">
+      🌟 <span class="highlight">Step 6</span>: Make Lights Loop — <span class="highlight">GlowBit</span>’s Dance!
+    </div>
+
+    <p class="gb-intro">
+      Let’s code a <strong>loop</strong> to make GlowBit LEDs flash in a pattern — like a dancing robot!
+      You’ll use <strong>forever</strong>, <strong>set pixel</strong>, <strong>pause</strong>, and <strong>clear screen</strong> blocks.
+    </p>
+
+    <div id="glowbit-step6"></div>
+  </div>
+
+  <!-- Solution modal -->
+  <div id="solutionModal6" aria-hidden="true" role="dialog">
+    <div id="solutionHeader6">
+      <div id="solutionTitle6">✅ Correct Setup — Step 6</div>
+      <button id="solutionClose6" title="Close">✕</button>
+    </div>
+    <div id="solutionWorkspace6" aria-label="Correct solution workspace"></div>
+    <div id="solutionFooter6"><button id="solutionCloseBtn6">Close</button></div>
+  </div>
+
+  <!-- Script -->
+  <script>
+  (function waitForGlow(){
+    if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow, 120);
+
+    /* ✅ Correct Setup JSON */
+    const solutionJson = {
+      "blocks": {
+        "languageVersion": 0,
+        "blocks": [
+          {
+            "type": "forever",
+            "x": 20, "y": 20,
+            "inputs": {
+              "DO": {
+                "block": {
+                  "type": "set_pixel",
+                  "fields": { "X": 0, "Y": 2, "COLOUR": "#00FF00" },
+                  "next": {
+                    "block": {
+                      "type": "set_pixel",
+                      "fields": { "X": 1, "Y": 2, "COLOUR": "#00FF00" },
+                      "next": {
+                        "block": {
+                          "type": "set_pixel",
+                          "fields": { "X": 2, "Y": 2, "COLOUR": "#00FF00" },
+                          "next": {
+                            "block": {
+                              "type": "set_pixel",
+                              "fields": { "X": 3, "Y": 2, "COLOUR": "#00FF00" },
+                              "next": {
+                                "block": {
+                                  "type": "set_pixel",
+                                  "fields": { "X": 4, "Y": 2, "COLOUR": "#00FF00" },
+                                  "next": {
+                                    "block": {
+                                      "type": "pause",
+                                      "fields": { "MS": 500 },
+                                      "next": { "block": { "type": "clear_screen" } }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    };
+
+    /* Initialize main GlowBit lesson */
+    const lesson = Glowbit.createLessonUI('glowbit-step6', {
+      title: '',
+      instructions: '',
+      pixelSize: 28,
+      defaultJson: null
+    });
+    window._lesson_step6 = lesson;
+
+    /* Sidebar override */
+    function overrideSidebar(){
+      const container = document.querySelector('#glowbit-step6');
+      if(!container) return;
+      const sidebar = Array.from(container.querySelectorAll('div')).find(el =>
+        el.innerText && (el.innerText.includes('GlowBit Lesson') || el.innerText.includes('Follow the steps') || /^Step\s*\d+:/.test(el.innerText.trim()))
+      );
+      if(!sidebar) return;
+
+      sidebar.style.background='#e6f9ff';
+      sidebar.style.borderRadius='10px';
+      sidebar.style.padding='12px';
+      sidebar.style.color='#00A1D6';
+      sidebar.style.fontSize='14px';
+      sidebar.style.fontWeight='500';
+      sidebar.style.boxShadow='0 0 8px rgba(0,0,0,0.08)';
+
+      const stepCard='margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;font-weight:600;';
+      sidebar.innerHTML =
+        '<h3 style="color:#00A1D6;font-weight:800;font-size:16px;margin-bottom:10px;text-align:center;">🌟 Follow These Steps 🌟</h3>'+
+        '<div style="'+stepCard+'">🧩 From the <strong>Basic</strong> tab, drag a <strong>forever</strong> block into the workspace.</div>'+
+        '<div style="'+stepCard+'">💡 From the <strong>LED</strong> tab, drag several <strong>Set Pixel (x,y,color)</strong> blocks inside the loop. Use <strong>y=2</strong> and change <strong>x</strong> from 0→4.</div>'+
+        '<div style="'+stepCard+'">🎨 Try setting each pixel to a different color code (like #00FF00, #FF0000, #0000FF).</div>'+
+        '<div style="'+stepCard+'">⏸️ Add a <strong>pause</strong> block set to 500, then a <strong>clear screen</strong> block to blink the lights.</div>'+
+        '<div style="'+stepCard+'">▶️ Click <strong>Run Program</strong> — GlowBit loops the flashing row forever!</div>'+
+        '<button id="check-setup-btn6" style="display:block;margin:12px auto 6px;padding:8px 14px;border:none;border-radius:6px;background:#00A1D6;color:#fff;font-weight:700;cursor:pointer;">✅ Check Your Setup</button>'+
+        '<div class="didyouknow">💡 <strong>Did you know?</strong> Robots use loops to repeat patterns endlessly — from lights to motion!</div>';
+    }
+
+    overrideSidebar();
+    const interval = setInterval(overrideSidebar, 400);
+    setTimeout(()=>clearInterval(interval), 10000);
+
+    /* Modal logic */
+    const modal = document.getElementById('solutionModal6');
+    document.addEventListener('click', e=>{
+      if(e.target.id==='check-setup-btn6'){
+        modal.style.display='block';
+        if(!window._solutionWorkspace6){
+          const wsDiv = document.getElementById('solutionWorkspace6');
+          window._solutionWorkspace6 = Blockly.inject(wsDiv, { readOnly:true, scrollbars:true, toolbox:null });
+          Blockly.serialization.workspaces.load(solutionJson, window._solutionWorkspace6);
+        }
+      }
+      if(e.target.id==='solutionClose6' || e.target.id==='solutionCloseBtn6'){
+        modal.style.display='none';
+      }
+    });
+
+    document.addEventListener('keydown', ev=>{
+      if(ev.key==='Escape'){
+        modal.style.display='none';
+      }
+    });
+
+    if(typeof Glowbit.showIcon==='function') Glowbit.showIcon('loop');
+    console.log("✅ Step 6 initialized.");
+  })();
+  </script>
+</body>
+</html>
