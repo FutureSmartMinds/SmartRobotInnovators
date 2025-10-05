@@ -1,18 +1,13 @@
 /* =====================================================================
    Smart Robot Innovators – Glowbit + Blockly Global Engine (GitHub)
-   - Standalone JS (no HTML wrappers)
+   - Preserves working behavior; adds blocks & polyfills requested
    - Supports defaultJson + defaultXml preloads
    - 8×8 LED simulator, scrolling text, icons, handlers, tones
-   - Blocks: on_start, forever, repeat_loop, show_text, show_number,
-             set_pixel, unplot, show_leds, set_brightness, change_color,
-             pause_block, clear_screen, on_button_pressed, on_shake,
-             on_gesture, sound_level, play_tone, pick_random,
-             plus Math/Logic/Loops/Variables essentials
    ===================================================================== */
 
 (function () {
   // ---------- Guard: wait for Blockly ----------
-  function waitForBlockly(cb, timeout = 15000) {
+  function waitForBlockly(cb, timeout = 20000) {
     const start = Date.now();
     (function check() {
       if (window.Blockly && Blockly.inject && Blockly.JavaScript) return cb();
@@ -34,24 +29,65 @@
 
     // ---------- Internal state ----------
     const state = {
-      canvases: {}, // id -> { canvas, ctx, pixelSize, padding, gridSize, pixels }
+      canvases: {},     // id -> { canvas, ctx, pixelSize, padding, gridSize, pixels }
       queue: [],
       running: false,
       eventHandlers: {
         A: [], B: [],
         shake: [],
-        tilt_up: [], tilt_down: [], tilt_left: [], tilt_right: []
+        tilt_up: [], tilt_down: [], tilt_left: [], tilt_right: [],
+        screen_up: [], screen_down: []
       },
       defaultColor: "#00ff00",
-      brightness: 255
+      brightness: 255,
+      tempoBPM: 120,         // for beats → ms (music)
+      lastGesture: null,     // updated when gestures are triggered
+      count: 0               // simple counter reporter
     };
+
+    // ---------- Polyfill missing fields (avoid registry warnings) ----------
+    try {
+      const reg = Blockly.fieldRegistry || Blockly.registry; // v10/v11 compat
+      // field_colour
+      if (!reg || !reg.get || !reg.get('field_colour', 'field')) {
+        // Minimal colour field using text input (accepts #RRGGBB)
+        const Base = Blockly.FieldTextInput || function(){};
+        function validateHex(txt) {
+          return /^#([0-9a-f]{6})$/i.test(txt) ? txt.toUpperCase() : "#00FF00";
+        }
+        class FieldColourLite extends Base {
+          constructor(text) { super(validateHex(text || "#00FF00")); }
+          static fromJson(options) { return new FieldColourLite(options.colour || options.color || "#00FF00"); }
+        }
+        if (Blockly.fieldRegistry && Blockly.fieldRegistry.register) {
+          Blockly.fieldRegistry.register('field_colour', FieldColourLite);
+        } else if (Blockly.registry && Blockly.registry.register) {
+          Blockly.registry.register('field', 'field_colour', FieldColourLite);
+        }
+      }
+      // field_multilinetext
+      if (!reg || !reg.get || !reg.get('field_multilinetext', 'field')) {
+        // Minimal multi-line field based on FieldTextInput
+        const Base = Blockly.FieldTextInput || function(){};
+        class FieldMultilineLite extends Base {
+          constructor(text) { super(text || ""); }
+          static fromJson(options) { return new FieldMultilineLite(options.text || ""); }
+        }
+        if (Blockly.fieldRegistry && Blockly.fieldRegistry.register) {
+          Blockly.fieldRegistry.register('field_multilinetext', FieldMultilineLite);
+        } else if (Blockly.registry && Blockly.registry.register) {
+          Blockly.registry.register('field', 'field_multilinetext', FieldMultilineLite);
+        }
+      }
+    } catch (e) {
+      console.warn("Glowbit: field polyfill skipped", e);
+    }
 
     // ---------- Font (5×7) + icons (8×8) ----------
     const FONT5x7 = makeFont5x7();
     const ICONS = makeIcons();
 
     function makeFont5x7() {
-      // Subset + essentials; extend as needed.
       return {
         "A":["01110","10001","10001","11111","10001","10001","10001"],
         "B":["11110","10001","10001","11110","10001","10001","11110"],
@@ -120,14 +156,84 @@
           [0,0,0,0,0,0,0,0]
         ],
         arrow_right: [
+          [0,0,0,0,0,0,0,0],
           [0,0,0,0,1,0,0,0],
           [0,0,0,0,1,1,0,0],
           [0,0,0,0,1,1,1,0],
-          [0,1,1,1,1,1,1,1],
+          [1,1,1,1,1,1,1,1],
           [0,0,0,0,1,1,1,0],
           [0,0,0,0,1,1,0,0],
-          [0,0,0,0,1,0,0,0],
-          [0,0,0,0,0,0,0,0]
+          [0,0,0,0,1,0,0,0]
+        ],
+        arrow_left: [
+          [0,0,0,0,0,0,0,0],
+          [0,0,1,0,0,0,0,0],
+          [0,1,1,0,0,0,0,0],
+          [1,1,1,0,0,0,0,0],
+          [1,1,1,1,1,1,1,1],
+          [1,1,1,0,0,0,0,0],
+          [0,1,1,0,0,0,0,0],
+          [0,0,1,0,0,0,0,0]
+        ],
+        arrow_up: [
+          [0,0,0,1,0,0,0,0],
+          [0,0,1,1,1,0,0,0],
+          [0,1,0,1,0,1,0,0],
+          [1,0,0,1,0,0,1,0],
+          [0,0,0,1,0,0,0,0],
+          [0,0,0,1,0,0,0,0],
+          [0,0,0,1,0,0,0,0],
+          [0,0,0,1,0,0,0,0]
+        ],
+        arrow_down: [
+          [0,0,0,1,0,0,0,0],
+          [0,0,0,1,0,0,0,0],
+          [0,0,0,1,0,0,0,0],
+          [0,0,0,1,0,0,0,0],
+          [1,0,0,1,0,0,1,0],
+          [0,1,0,1,0,1,0,0],
+          [0,0,1,1,1,0,0,0],
+          [0,0,0,1,0,0,0,0]
+        ],
+        arrow_ne: [
+          [0,0,0,0,0,0,1,0],
+          [0,0,0,0,0,1,1,0],
+          [0,0,0,0,1,1,0,0],
+          [0,0,0,1,1,0,0,0],
+          [0,0,1,1,0,0,0,0],
+          [0,1,1,0,0,0,0,0],
+          [1,1,0,0,0,0,0,0],
+          [1,0,0,0,0,0,0,0]
+        ],
+        arrow_nw: [
+          [0,1,0,0,0,0,0,0],
+          [0,1,1,0,0,0,0,0],
+          [0,0,1,1,0,0,0,0],
+          [0,0,0,1,1,0,0,0],
+          [0,0,0,0,1,1,0,0],
+          [0,0,0,0,0,1,1,0],
+          [0,0,0,0,0,0,1,1],
+          [0,0,0,0,0,0,0,1]
+        ],
+        arrow_se: [
+          [1,0,0,0,0,0,0,0],
+          [1,1,0,0,0,0,0,0],
+          [0,1,1,0,0,0,0,0],
+          [0,0,1,1,0,0,0,0],
+          [0,0,0,1,1,0,0,0],
+          [0,0,0,0,1,1,0,0],
+          [0,0,0,0,0,1,1,0],
+          [0,0,0,0,0,0,1,1]
+        ],
+        arrow_sw: [
+          [0,0,0,0,0,0,0,1],
+          [0,0,0,0,0,0,1,1],
+          [0,0,0,0,0,1,1,0],
+          [0,0,0,0,1,1,0,0],
+          [0,0,0,1,1,0,0,0],
+          [0,0,1,1,0,0,0,0],
+          [0,1,1,0,0,0,0,0],
+          [1,1,0,0,0,0,0,0]
         ]
       };
     }
@@ -168,12 +274,9 @@
       const { ctx, pixelSize, padding } = o;
       const gx = padding + x * pixelSize;
       const gy = padding + y * pixelSize;
-      // background
       ctx.fillStyle = "#000";
       ctx.fillRect(gx, gy, pixelSize, pixelSize);
-
       if (color) {
-        // Apply brightness scale
         const scaled = applyBrightness(color, state.brightness);
         ctx.fillStyle = scaled;
         ctx.shadowColor = scaled;
@@ -185,7 +288,6 @@
     }
 
     function applyBrightness(hex, val) {
-      // hex like #RRGGBB, val 0-255
       if (!hex || hex[0] !== "#" || hex.length !== 7) return hex || "#00ff00";
       const r = parseInt(hex.slice(1, 3), 16);
       const g = parseInt(hex.slice(3, 5), 16);
@@ -201,9 +303,8 @@
     function drawPixelsFromMatrix(canvasId, matrix, color) {
       const o = state.canvases[canvasId];
       if (!o) return;
-      const n = o.gridSize;
-      for (let y = 0; y < n; y++) {
-        for (let x = 0; x < n; x++) {
+      for (let y = 0; y < 8; y++) {
+        for (let x = 0; x < 8; x++) {
           const on = matrix[y] && matrix[y][x];
           drawPixel(canvasId, x, y, on ? (color || state.defaultColor) : null);
         }
@@ -220,13 +321,13 @@
         for (let c = 0; c < pattern[0].length; c++) {
           const col = [];
           for (let r = 0; r < pattern.length; r++) col.push(pattern[r][c] === "1" ? 1 : 0);
-          col.push(0); // expand to 8 rows
+          col.push(0); // pad to 8 rows
           charCols.push(col);
         }
         for (let cc of charCols) cols.push(cc);
-        cols.push([0, 0, 0, 0, 0, 0, 0, 0]); // spacer
+        cols.push([0,0,0,0,0,0,0,0]); // space
       }
-      return cols.length ? cols : [[0, 0, 0, 0, 0, 0, 0, 0]];
+      return cols.length ? cols : [[0,0,0,0,0,0,0,0]];
     }
 
     // ---------- Queue ----------
@@ -297,7 +398,7 @@
                 const gain = actx.createGain();
                 osc.type = "sine";
                 osc.frequency.value = cmd.freq || 600;
-                gain.gain.value = 0.05;
+                gain.gain.value = 0.08;
                 osc.connect(gain); gain.connect(actx.destination);
                 osc.start();
                 setTimeout(() => { osc.stop(); actx.close(); resolve(); }, cmd.duration || 200);
@@ -330,7 +431,7 @@
         container.innerHTML = "";
         container.classList.add("glowbit-lesson");
 
-        // basic styles if host page didn't include them
+        // basic styles
         injectBaseStylesOnce();
 
         // left (title/instructions)
@@ -345,11 +446,11 @@
         const editorBox = el("div", "glowbit-editor"); editorBox.id = containerId + "-editor";
 
         const controls = el("div", "glowbit-controls");
-        const runBtn = button("Run Program", "glowbit-btn");
-        const stopBtn = button("Stop", "glowbit-btn secondary");
-        const btnA = button("Button A", "glowbit-btn event");
-        const btnB = button("Button B", "glowbit-btn event");
-        const shakeBtn = button("Shake", "glowbit-btn secondary");
+        const runBtn = button("Run Program", "glowbit-btn gb-button-start");
+        const stopBtn = button("Stop", "glowbit-btn secondary gb-button-stop");
+        const btnA = button("Button A", "glowbit-btn event gb-button-a");
+        const btnB = button("Button B", "glowbit-btn event gb-button-b");
+        const shakeBtn = button("Shake", "glowbit-btn secondary gb-button-shake");
         controls.append(runBtn, stopBtn, btnA, btnB, shakeBtn);
 
         const canvasWrap = el("div", "glowbit-canvas-wrap");
@@ -361,7 +462,7 @@
         right.appendChild(editorWrap);
         container.append(left, right);
 
-        // workspace + canvas
+        // canvas + workspace
         this.attachCanvas(canvas.id, { pixelSize: options.pixelSize || 26, padding: options.padding || 6 });
         const workspace = this.createWorkspace(editorBox.id, options.toolboxXml);
 
@@ -374,26 +475,23 @@
           } else if (options.defaultJson && Blockly.serialization && Blockly.serialization.workspaces && Blockly.serialization.workspaces.load) {
             Blockly.serialization.workspaces.load(options.defaultJson, workspace);
             console.log("✅ Glowbit: defaultJson loaded.");
-          } else {
-            // nothing to preload
           }
         } catch (e) {
           console.error("❌ Glowbit preload failed", e);
         }
 
         // run/stop + events
-        runBtn.addEventListener("click", () => {
+        const runProgram = () => {
           try {
             resetRuntime();
             const code = Blockly.JavaScript.workspaceToCode(workspace);
             new Function(code)();
             console.log("✅ Glowbit: program loaded, event handlers active");
           } catch (e) { console.error("Glowbit.run error", e); }
-        });
-
+        };
+        runBtn.addEventListener("click", runProgram);
         stopBtn.addEventListener("click", () => {
           try {
-            // stop queue + scrolling + clear screen
             state.queue.length = 0;
             state.running = false;
             if (Glowbit._scrollTicker) { clearInterval(Glowbit._scrollTicker); Glowbit._scrollTicker = null; }
@@ -401,7 +499,6 @@
             console.log("🛑 Glowbit: program stopped.");
           } catch (e) { console.error("Glowbit.stop error", e); }
         });
-
         btnA.addEventListener("click", () => Glowbit.trigger("A"));
         btnB.addEventListener("click", () => Glowbit.trigger("B"));
         shakeBtn.addEventListener("click", () => Glowbit.trigger("shake"));
@@ -423,6 +520,7 @@
               <block type="change_color"></block>
             </category>
             <category name="LED" colour="#8B5CF6">
+              <block type="plot"></block>
               <block type="set_pixel"></block>
               <block type="unplot"></block>
               <block type="show_leds"></block>
@@ -432,10 +530,22 @@
               <block type="on_button_pressed"></block>
               <block type="on_shake"></block>
               <block type="on_gesture"></block>
+              <block type="is_gesture"></block>
               <block type="sound_level"></block>
             </category>
             <category name="Music" colour="#F97316">
               <block type="play_tone"></block>
+              <block type="play_tone_note"></block>
+              <block type="play_until_done">
+                <value name="NOTES">
+                  <shadow type="text"><field name="TEXT">C4:1, D4:1, E4:2</field></shadow>
+                </value>
+              </block>
+              <block type="set_tempo"></block>
+            </category>
+            <category name="Icons" colour="#22C55E">
+              <block type="show_icon"></block>
+              <block type="show_arrow"></block>
             </category>
             <sep></sep>
             <category name="Logic" colour="#5C81A6">
@@ -451,14 +561,13 @@
               <block type="math_number"></block>
               <block type="math_arithmetic"></block>
               <block type="pick_random"></block>
+              <block type="count_reporter"></block>
+              <block type="count_reset"></block>
+              <block type="count_increment"></block>
             </category>
             <category name="Variables" custom="VARIABLE" colour="#A65C81"></category>
           </xml>
         `;
-        // Ensure variables toolbox works
-        if (Blockly && Blockly.Variables && Blockly.Variables.flyoutCategory) {
-          // OK
-        }
         const workspace = Blockly.inject(blocklyDivId, {
           toolbox: toolboxXml || defaultToolbox,
           trashcan: true,
@@ -475,7 +584,7 @@
 
       enqueue: function (cmd) { state.queue.push(cmd); if (!state.running) processQueue(); },
 
-      // Output helpers
+      // Outputs
       showText: function (text, speed, color, canvasId) {
         this.enqueue({ type: "text", text: String(text || ""), speed: speed || 120, color: color || state.defaultColor, canvasId });
       },
@@ -487,8 +596,7 @@
         this.enqueue({ type: "setPixel", x: Number(x), y: Number(y), color: color || state.defaultColor, canvasId });
       },
       playSound: function (nameOrFreq, duration, canvasId) {
-        // Accept names or numeric frequencies
-        const tones = { beep: 600, boop: 900, ding: 1200 };
+        const tones = { beep: 600, boop: 900, ding: 1200, C4:261.63, D4:293.66, E4:329.63, F4:349.23, G4:392.00, A4:440.00, B4:493.88, C5:523.25 };
         const freq = (typeof nameOrFreq === "number") ? nameOrFreq : (tones[nameOrFreq] || 700);
         this.enqueue({ type: "sound", freq, duration: duration || 200, canvasId });
       },
@@ -500,6 +608,7 @@
         state.eventHandlers[evt].push(handler);
       },
       trigger: function (evt) {
+        state.lastGesture = evt; // for is_gesture reporter
         const handlers = (state.eventHandlers[evt] || []);
         if (!handlers.length) console.log("⚠️ Glowbit: No handlers registered for", evt);
         handlers.forEach(fn => {
@@ -513,7 +622,13 @@
       state.queue.length = 0;
       state.running = false;
       if (Glowbit._scrollTicker) { clearInterval(Glowbit._scrollTicker); Glowbit._scrollTicker = null; }
-      state.eventHandlers = { A: [], B: [], shake: [], tilt_up: [], tilt_down: [], tilt_left: [], tilt_right: [] };
+      state.eventHandlers = {
+        A: [], B: [],
+        shake: [],
+        tilt_up: [], tilt_down: [], tilt_left: [], tilt_right: [],
+        screen_up: [], screen_down: []
+      };
+      state.lastGesture = null;
     }
 
     // ---------- Utilities ----------
@@ -544,7 +659,7 @@
       const s = document.createElement("style"); s.textContent = css; document.head.appendChild(s);
     }
 
-    // ---------- Custom Blocks ----------
+    // ---------- Custom Blocks (original + added) ----------
     try {
       Blockly.defineBlocksWithJsonArray([
         // Program structure
@@ -555,20 +670,49 @@
         // Display / LED
         { "type":"show_text","message0":"show text %1","args0":[{"type":"field_input","name":"TEXT","text":"Hello"}],"previousStatement":null,"nextStatement":null,"colour":160 },
         { "type":"show_number","message0":"show number %1","args0":[{"type":"input_value","name":"NUM"}],"previousStatement":null,"nextStatement":null,"colour":160 },
+
+        { "type":"plot","message0":"plot x %1 y %2","args0":[{"type":"field_number","name":"X","value":0,"min":0,"max":7},{"type":"field_number","name":"Y","value":0,"min":0,"max":7}],"previousStatement":null,"nextStatement":null,"colour":290 },
         { "type":"set_pixel","message0":"set pixel x %1 y %2 color %3","args0":[{"type":"field_number","name":"X","value":0,"min":0,"max":7},{"type":"field_number","name":"Y","value":0,"min":0,"max":7},{"type":"field_colour","name":"COL","colour":"#00FF00"}],"previousStatement":null,"nextStatement":null,"colour":290 },
         { "type":"unplot","message0":"unplot x %1 y %2","args0":[{"type":"field_number","name":"X","value":0,"min":0,"max":7},{"type":"field_number","name":"Y","value":0,"min":0,"max":7}],"previousStatement":null,"nextStatement":null,"colour":290 },
-        { "type":"show_leds","message0":"show leds %1","args0":[{"type":"field_multilinetext","name":"MATRIX","text":"# . . . #\n. # . # .\n. . # . .\n. # . # .\n# . . . #"}],"previousStatement":null,"nextStatement":null,"colour":20 },
+
+        // 8×8 multi-line entry (# or .), 8 lines of 8 cells each
+        { "type":"show_leds","message0":"show leds 8×8 %1","args0":[{"type":"field_multilinetext","name":"MATRIX","text":"# . . . . . . #\n. # . . . . # .\n. . # . . # . .\n. . . # # . . .\n. . . # # . . .\n. . # . . # . .\n. # . . . . # .\n# . . . . . . #"}],"previousStatement":null,"nextStatement":null,"colour":20 },
+
         { "type":"set_brightness","message0":"set brightness %1","args0":[{"type":"field_number","name":"VAL","value":255,"min":0,"max":255}],"previousStatement":null,"nextStatement":null,"colour":230 },
         { "type":"change_color","message0":"set color %1","args0":[{"type":"field_colour","name":"COL","colour":"#00FF00"}],"previousStatement":null,"nextStatement":null,"colour":230 },
         { "type":"pause_block","message0":"pause (ms) %1","args0":[{"type":"field_number","name":"MS","value":300,"min":0}],"previousStatement":null,"nextStatement":null,"colour":120 },
         { "type":"clear_screen","message0":"clear screen","previousStatement":null,"nextStatement":null,"colour":0 },
 
-        // Events / Input / Sound
+        // Icons / Arrows
+        { "type":"show_icon","message0":"show icon %1","args0":[{"type":"field_dropdown","name":"ICON","options":[["heart","heart"],["smile","smile"]]}],"previousStatement":null,"nextStatement":null,"colour":22 },
+        { "type":"show_arrow","message0":"show arrow %1","args0":[{"type":"field_dropdown","name":"ARROW","options":[["N","arrow_up"],["S","arrow_down"],["E","arrow_right"],["W","arrow_left"],["NE","arrow_ne"],["NW","arrow_nw"],["SE","arrow_se"],["SW","arrow_sw"]]}],"previousStatement":null,"nextStatement":null,"colour":22 },
+
+        // Input / Events / Gestures
         { "type":"on_button_pressed","message0":"on button %1 do %2","args0":[{"type":"field_dropdown","name":"BTN","options":[["A","A"],["B","B"]]},{"type":"input_statement","name":"DO"}],"colour":20,"previousStatement":null,"nextStatement":null },
         { "type":"on_shake","message0":"on shake do %1","args0":[{"type":"input_statement","name":"DO"}],"colour":20,"previousStatement":null,"nextStatement":null },
-        { "type":"on_gesture","message0":"on gesture %1 do %2","args0":[{"type":"field_dropdown","name":"GEST","options":[["tilt up","tilt_up"],["tilt down","tilt_down"],["tilt left","tilt_left"],["tilt right","tilt_right"]]},{"type":"input_statement","name":"DO"}],"colour":20,"previousStatement":null,"nextStatement":null },
+        { "type":"on_gesture","message0":"on gesture %1 do %2","args0":[{"type":"field_dropdown","name":"GEST","options":[["tilt up","tilt_up"],["tilt down","tilt_down"],["tilt left","tilt_left"],["tilt right","tilt_right"],["screen up","screen_up"],["screen down","screen_down"]]},{"type":"input_statement","name":"DO"}],"colour":20,"previousStatement":null,"nextStatement":null },
+        { "type":"is_gesture","message0":"is %1","args0":[{"type":"field_dropdown","name":"GEST","options":[["screen up","screen_up"],["screen down","screen_down"],["tilt up","tilt_up"],["tilt down","tilt_down"]]}],"output":"Boolean","colour":200 },
+
+        // Sensors
         { "type":"sound_level","message0":"sound level","output":"Number","colour":60 },
-        { "type":"play_tone","message0":"play tone %1 Hz for %2 ms","args0":[{"type":"field_number","name":"FREQ","value":440,"min":50,"max":2000},{"type":"field_number","name":"DUR","value":200,"min":50,"max":2000}],"previousStatement":null,"nextStatement":null,"colour":60 }
+
+        // Music
+        { "type":"play_tone","message0":"play tone %1 Hz for %2 ms","args0":[{"type":"field_number","name":"FREQ","value":440,"min":50,"max":2000},{"type":"field_number","name":"DUR","value":200,"min":50,"max":2000}],"previousStatement":null,"nextStatement":null,"colour":60 },
+
+        // note + beats
+        { "type":"play_tone_note","message0":"play tone %1 for %2 beat(s)","args0":[{"type":"field_dropdown","name":"NOTE","options":[["Middle C (C4)","C4"],["D4","D4"],["E4","E4"],["F4","F4"],["G4","G4"],["A4","A4"],["B4","B4"],["High C (C5)","C5"]]},{"type":"field_number","name":"BEATS","value":1,"min":0.25,"max":8,"precision":0.25}],"previousStatement":null,"nextStatement":null,"colour":60 },
+
+        { "type":"set_tempo","message0":"set tempo (BPM) %1","args0":[{"type":"field_number","name":"BPM","value":120,"min":20,"max":300}],"previousStatement":null,"nextStatement":null,"colour":60 },
+
+        { "type":"play_until_done","message0":"play until done notes %1","args0":[{"type":"input_value","name":"NOTES"}],"previousStatement":null,"nextStatement":null,"colour":60 },
+
+        // Math
+        { "type":"pick_random","message0":"pick random %1 to %2","args0":[{"type":"input_value","name":"FROM","check":"Number"},{"type":"input_value","name":"TO","check":"Number"}],"output":"Number","colour":230 },
+
+        // Count helpers
+        { "type":"count_reporter","message0":"count","output":"Number","colour":230 },
+        { "type":"count_reset","message0":"reset count","previousStatement":null,"nextStatement":null,"colour":230 },
+        { "type":"count_increment","message0":"change count by %1","args0":[{"type":"field_number","name":"DELTA","value":1,"min":-100,"max":100}],"previousStatement":null,"nextStatement":null,"colour":230 }
       ]);
     } catch (e) {
       console.warn("Glowbit: blocks may already be defined", e);
@@ -577,141 +721,137 @@
     // ---------- Generators ----------
     try {
       const G = Blockly.JavaScript;
-
-      function reg(name, fn) {
-        if (G.forBlock) G.forBlock[name] = fn;
-        G[name] = fn;
-      }
+      function reg(name, fn) { if (G.forBlock) G.forBlock[name] = fn; G[name] = fn; }
 
       // Structure
-      reg("on_start", (b) => {
-        const body = G.statementToCode(b, "DO") || "";
-        return `${body}\n`;
-      });
-      reg("forever", (b) => {
-        const body = G.statementToCode(b, "DO") || "";
-        return `setInterval(function(){\n${body}}, 400);\n`;
-      });
-      reg("repeat_loop", (b) => {
-        const n = Number(b.getFieldValue("COUNT") || 1);
-        const body = G.statementToCode(b, "DO") || "";
-        return `for(let i=0;i<${n};i++){\n${body}}\n`;
-      });
+      reg("on_start", (b) => { const body = G.statementToCode(b, "DO") || ""; return `${body}\n`; });
+      reg("forever", (b) => { const body = G.statementToCode(b, "DO") || ""; return `setInterval(function(){\n${body}}, 400);\n`; });
+      reg("repeat_loop", (b) => { const n = Number(b.getFieldValue("COUNT") || 1); const body = G.statementToCode(b, "DO") || ""; return `for(let i=0;i<${n};i++){\n${body}}\n`; });
 
       // Display / LED
-      reg("show_text", (b) => {
-        const t = b.getFieldValue("TEXT") || "";
-        return `Glowbit.showText(${JSON.stringify(t)}, 120);\n`;
-      });
-      reg("show_number", (b) => {
-        const v = G.valueToCode(b, "NUM", G.ORDER_NONE) || 0;
-        return `Glowbit.showText(String(${v}), 120);\n`;
-      });
-      reg("set_pixel", (b) => {
-        const x = Number(b.getFieldValue("X") || 0);
-        const y = Number(b.getFieldValue("Y") || 0);
-        const c = b.getFieldValue("COL") || "#00ff00";
-        return `Glowbit.setPixel(${x}, ${y}, ${JSON.stringify(c)});\n`;
-      });
-      reg("unplot", (b) => {
-        const x = b.getFieldValue("X") || 0;
-        const y = b.getFieldValue("Y") || 0;
-        return `Glowbit.setPixel(${x}, ${y}, null);\n`;
-      });
+      reg("show_text", (b) => { const t = b.getFieldValue("TEXT") || ""; return `Glowbit.showText(${JSON.stringify(t)}, 120);\n`; });
+      reg("show_number", (b) => { const v = G.valueToCode(b, "NUM", G.ORDER_NONE) || 0; return `Glowbit.showText(String(${v}), 120);\n`; });
+      reg("plot", (b) => { const x = Number(b.getFieldValue("X")||0), y = Number(b.getFieldValue("Y")||0); return `Glowbit.setPixel(${x}, ${y}, Glowbit._state.defaultColor);\n`; });
+      reg("set_pixel", (b) => { const x = Number(b.getFieldValue("X")||0), y = Number(b.getFieldValue("Y")||0), c = b.getFieldValue("COL")||"#00ff00"; return `Glowbit.setPixel(${x}, ${y}, ${JSON.stringify(c)});\n`; });
+      reg("unplot", (b) => { const x=b.getFieldValue("X")||0, y=b.getFieldValue("Y")||0; return `Glowbit.setPixel(${x}, ${y}, null);\n`; });
+
       reg("show_leds", (b) => {
-        const matrix = (b.getFieldValue("MATRIX") || "").trim().split(/[\r\n]+/).slice(0,5);
+        const raw = (b.getFieldValue("MATRIX") || "").trim().split(/[\r\n]+/).slice(0,8);
         let js = "";
-        matrix.forEach((row, y) => {
-          const cells = row.trim().split(/\s+/).slice(0,5);
-          for (let x = 0; x < 5; x++) {
-            const cell = cells[x] || ".";
-            if (cell === "#") js += `Glowbit.setPixel(${x}, ${y}, Glowbit._state.defaultColor);\n`;
-            else js += `Glowbit.setPixel(${x}, ${y}, null);\n`;
+        for (let y=0;y<8;y++){
+          const row = (raw[y]||"").trim().split(/\s+/).slice(0,8);
+          for (let x=0;x<8;x++){
+            const cell = row[x] || ".";
+            js += (cell === "#")
+              ? `Glowbit.setPixel(${x}, ${y}, Glowbit._state.defaultColor);\n`
+              : `Glowbit.setPixel(${x}, ${y}, null);\n`;
           }
-        });
+        }
         return js;
       });
-      reg("set_brightness", (b) => {
-        const v = Number(b.getFieldValue("VAL") || 255);
-        return `Glowbit._state.brightness = ${v};\n`;
-      });
-      reg("change_color", (b) => {
-        const c = b.getFieldValue("COL") || "#00ff00";
-        return `Glowbit._state.defaultColor = ${JSON.stringify(c)};\n`;
-      });
-      reg("pause_block", (b) => {
-        const ms = Number(b.getFieldValue("MS") || 300);
-        return `Glowbit.pause(${ms});\n`;
-      });
+      reg("set_brightness", (b) => { const v=Number(b.getFieldValue("VAL")||255); return `Glowbit._state.brightness=${v};\n`; });
+      reg("change_color", (b) => { const c=b.getFieldValue("COL")||"#00ff00"; return `Glowbit._state.defaultColor=${JSON.stringify(c)};\n`; });
+      reg("pause_block", (b) => { const ms=Number(b.getFieldValue("MS")||300); return `Glowbit.pause(${ms});\n`; });
       reg("clear_screen", () => `Glowbit.clear();\n`);
 
-      // Events / Sound
-      reg("on_button_pressed", (b) => {
-        const btn = b.getFieldValue("BTN") || "A";
-        const body = G.statementToCode(b, "DO") || "";
-        return `Glowbit.on(${JSON.stringify(btn)}, function(){\n${body}});\n`;
-      });
-      reg("on_shake", (b) => {
-        const body = G.statementToCode(b, "DO") || "";
-        return `Glowbit.on("shake", function(){\n${body}});\n`;
-      });
-      reg("on_gesture", (b) => {
-        const g = b.getFieldValue("GEST") || "tilt_up";
-        const body = G.statementToCode(b, "DO") || "";
-        return `Glowbit.on(${JSON.stringify(g)}, function(){\n${body}});\n`;
-      });
+      // Icons / Arrows
+      reg("show_icon", (b) => { const i=b.getFieldValue("ICON")||"heart"; return `Glowbit.showIcon(${JSON.stringify(i)});\n`; });
+      reg("show_arrow", (b) => { const a=b.getFieldValue("ARROW")||"arrow_up"; return `Glowbit.showIcon(${JSON.stringify(a)});\n`; });
+
+      // Events / Gestures
+      reg("on_button_pressed", (b) => { const btn=b.getFieldValue("BTN")||"A"; const body=G.statementToCode(b,"DO")||""; return `Glowbit.on(${JSON.stringify(btn)}, function(){\n${body}});\n`; });
+      reg("on_shake", (b) => { const body=G.statementToCode(b,"DO")||""; return `Glowbit.on("shake", function(){\n${body}});\n`; });
+      reg("on_gesture", (b) => { const g=b.getFieldValue("GEST")||"tilt_up"; const body=G.statementToCode(b,"DO")||""; return `Glowbit.on(${JSON.stringify(g)}, function(){\n${body}});\n`; });
+      reg("is_gesture", (b) => { const g=b.getFieldValue("GEST")||"screen_up"; return [`(Glowbit._state.lastGesture===${JSON.stringify(g)})`, G.ORDER_ATOMIC]; });
+
+      // Sensors
       reg("sound_level", () => [`Math.floor(Math.random()*200)`, G.ORDER_FUNCTION_CALL]);
+
+      // Music
+      function beatsToMs(beats) {
+        const msPerBeat = 60000 / Math.max(20, Math.min(300, state.tempoBPM || 120));
+        return Math.round(msPerBeat * beats);
+      }
       reg("play_tone", (b) => {
         const f = Number(b.getFieldValue("FREQ") || 440);
         const d = Number(b.getFieldValue("DUR") || 200);
         return `Glowbit.playSound(${f}, ${d});\n`;
       });
+      reg("play_tone_note", (b) => {
+        const note = b.getFieldValue("NOTE") || "C4";
+        const beats = Number(b.getFieldValue("BEATS") || 1);
+        return `(function(){var _ms=${beatsToMs.toString()}(${beats}); Glowbit.playSound(${JSON.stringify(note)}, _ms);}());\n`;
+      });
+      reg("set_tempo", (b) => {
+        const bpm = Number(b.getFieldValue("BPM") || 120);
+        return `Glowbit._state.tempoBPM=${bpm};\n`;
+      });
+      reg("play_until_done", (b) => {
+        // NOTES value: "C4:1, D4:1, E4:2"
+        const list = G.valueToCode(b, "NOTES", G.ORDER_NONE) || '"C4:1"';
+        const helper = function schedule(listStr){
+          try{
+            const items = String(listStr).split(/\s*,\s*/).filter(Boolean);
+            items.forEach(pair=>{
+              const m=String(pair).trim().match(/^([A-G][#b]?\d)\s*:\s*([\d.]+)$/i);
+              if(m){
+                const note=m[1].toUpperCase();
+                const beats=parseFloat(m[2])||1;
+                const ms=(60000/Math.max(20,Math.min(300, (window.Glowbit?Glowbit._state.tempoBPM:120))))*beats;
+                (window.Glowbit||{}).playSound(note, Math.round(ms));
+                (window.Glowbit||{}).pause(Math.round(ms)+10);
+              }
+            });
+          }catch(e){ console.warn("play_until_done parse error", e); }
+        };
+        return `(${helper.toString()})(${list});\n`;
+      });
 
-      // Built-in math helpers used by toolbox
-      G["math_number"] = (block) => [Number(block.getFieldValue("NUM")), G.ORDER_ATOMIC];
+      // Math extras
+      reg("pick_random", (b) => {
+        const from = G.valueToCode(b, "FROM", G.ORDER_NONE) || 0;
+        const to = G.valueToCode(b, "TO", G.ORDER_NONE) || 10;
+        return [`Math.floor(Math.random()*((+(${to}))-(+(${from}))+1)) + (+(${from}))`, G.ORDER_NONE];
+      });
+
+      // Count helpers
+      reg("count_reporter", () => [`(Glowbit._state.count|0)`, G.ORDER_ATOMIC]);
+      reg("count_reset", () => `Glowbit._state.count=0;\n`);
+      reg("count_increment", (b) => { const d=Number(b.getFieldValue("DELTA")||1); return `Glowbit._state.count=(Glowbit._state.count|0)+(${d});\n`; });
+
+      // Built-in helpers (guard against missing)
+      if (!G["math_number"]) G["math_number"] = (block) => [Number(block.getFieldValue("NUM")), G.ORDER_ATOMIC];
       if (!G["math_arithmetic"]) {
         G["math_arithmetic"] = function (block) {
-          const OPERATORS = {
-            "ADD": [" + ", G.ORDER_ADDITION],
-            "MINUS": [" - ", G.ORDER_SUBTRACTION],
-            "MULTIPLY": [" * ", G.ORDER_MULTIPLICATION],
-            "DIVIDE": [" / ", G.ORDER_DIVISION],
-            "POWER": [null, G.ORDER_NONE]
-          };
+          const OPERATORS = { "ADD":[" + ",G.ORDER_ADDITION], "MINUS":[" - ",G.ORDER_SUBTRACTION], "MULTIPLY":[" * ",G.ORDER_MULTIPLICATION], "DIVIDE":[" / ",G.ORDER_DIVISION], "POWER":[null,G.ORDER_NONE] };
           const op = OPERATORS[block.getFieldValue("OP")] || OPERATORS.ADD;
-          const a = G.valueToCode(block, "A", op[1]) || "0";
-          const b = G.valueToCode(block, "B", op[1]) || "0";
-          if (block.getFieldValue("OP") === "POWER") {
-            return [`Math.pow(${a}, ${b})`, G.ORDER_FUNCTION_CALL];
-          }
+          const a = G.valueToCode(block,"A",op[1]) || "0";
+          const b = G.valueToCode(block,"B",op[1]) || "0";
+          if (block.getFieldValue("OP")==="POWER") return [`Math.pow(${a}, ${b})`, G.ORDER_FUNCTION_CALL];
           return [`${a}${op[0]}${b}`, op[1]];
         };
       }
       if (!G["logic_compare"]) {
         G["logic_compare"] = function (block) {
-          const OPERATORS = {
-            "EQ": "==", "NEQ": "!=", "LT": "<",
-            "LTE": "<=", "GT": ">", "GTE": ">="
-          };
-          const op = OPERATORS[block.getFieldValue("OP")] || "==";
-          const order = (op === "==" || op === "!=") ? G.ORDER_EQUALITY : G.ORDER_RELATIONAL;
-          const a = G.valueToCode(block, "A", order) || "0";
-          const b = G.valueToCode(block, "B", order) || "0";
+          const OPS = {"EQ":"==","NEQ":"!=","LT":"<","LTE":"<=","GT":">","GTE":">="};
+          const op = OPS[block.getFieldValue("OP")] || "==";
+          const order = (op==="=="||op==="!=")?G.ORDER_EQUALITY:G.ORDER_RELATIONAL;
+          const a = G.valueToCode(block,"A",order)||"0";
+          const b = G.valueToCode(block,"B",order)||"0";
           return [`${a} ${op} ${b}`, order];
         };
       }
       if (!G["controls_if"]) {
         G["controls_if"] = function (block) {
-          let n = 0;
-          let code = "", branchCode, conditionCode;
+          let n=0, code="", branchCode, conditionCode;
           do {
-            conditionCode = G.valueToCode(block, 'IF' + n, G.ORDER_NONE) || 'false';
-            branchCode = G.statementToCode(block, 'DO' + n) || '';
-            code += (n ? ' else ' : '') + `if (${conditionCode}) {\n${branchCode}}`;
+            conditionCode = G.valueToCode(block,'IF'+n,G.ORDER_NONE) || 'false';
+            branchCode = G.statementToCode(block,'DO'+n) || '';
+            code += (n?' else ':'') + `if (${conditionCode}) {\n${branchCode}}`;
             n++;
-          } while (block.getInput('IF' + n));
+          } while (block.getInput('IF'+n));
           if (block.getInput('ELSE')) {
-            branchCode = G.statementToCode(block, 'ELSE') || '';
+            branchCode = G.statementToCode(block,'ELSE') || '';
             code += ' else {\n' + branchCode + '}';
           }
           code += '\n';
