@@ -5,43 +5,40 @@
   <title>GlowBit Step 5 – Light Up a Row</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Blockly core + Global Glowbit setup -->
+  <!-- Blockly core + Glowbit global -->
   <script src="lib/blockly_compressed.js"></script>
   <script src="lib/blocks_compressed.js"></script>
   <script src="lib/javascript_compressed.js"></script>
   <script src="lib/msg/en.js"></script>
   <script src="assets/global.js"></script>
 
+  <!-- Styling -->
   <style>
-    .gb-wrapper { max-width:1100px; margin:0 auto; font-family:"Segoe UI",Roboto,Arial,sans-serif; }
-    .gb-header { text-align:center; background:#e6f9ff; color:#00A1D6; font-size:22px; font-weight:800;
-                 padding:6px 10px; border-radius:8px; margin-bottom:8px; box-shadow:0 1px 4px rgba(0,0,0,0.08);}
-    .gb-header .highlight { color:#7B2CBF; }
-    .gb-intro { text-align:center; font-size:16px; line-height:1.5; margin:0 0 10px; color:#374151;
-                background:#e0f2fe; border-radius:6px; padding:10px 12px; box-shadow:0 1px 3px rgba(0,0,0,0.06);}
-    #glowbit-step5 .glowbit-playground { max-height:540px; overflow-y:auto!important; border-radius:6px; }
-    .didyouknow { margin-top:18px; background:#fef9c3; border:2px solid #facc15; padding:10px 12px;
-                  border-radius:12px; color:#713f12; font-size:13px; font-weight:600; position:relative;
-                  box-shadow:0 2px 5px rgba(0,0,0,0.06);}
-    .didyouknow::before { content:""; position:absolute; top:-10px; left:20px; border-width:0 10px 10px 10px;
-                           border-style:solid; border-color:transparent transparent #fef9c3 transparent;}
-
-    /* Solution modal */
-    #solutionModal { display:none; position:fixed; top:60px; right:20px; width:640px; max-width:42%;
-                     background:#fff; border-radius:10px; box-shadow:0 6px 20px rgba(0,0,0,0.28);
-                     z-index:12000; overflow:hidden; user-select:none;}
-    #solutionHeader { cursor:move; padding:10px 12px; background:#00A1D6; color:#fff; font-weight:700;
-                      text-align:left; border-radius:10px 10px 0 0; display:flex; justify-content:space-between;
-                      align-items:center;}
-    #solutionTitle { font-size:15px; }
-    #solutionClose { cursor:pointer; font-size:20px; line-height:1; padding:2px 8px; border-radius:6px;
-                     color:#fff; background:transparent; border:none;}
-    #solutionWorkspace { height:360px; width:100%; border-top:1px solid #eee; background:#fafafa; }
-    #solutionFooter { text-align:center; padding:12px; background:#fff;}
-    #solutionFooter button { background:#00A1D6; color:#fff; border:none; border-radius:8px;
-                              padding:8px 18px; cursor:pointer; font-weight:700;}
-    @media (max-width:900px){ #solutionModal{ left:10px; right:10px; width:auto; max-width:calc(100% - 20px);
-                                             top:40px;} #solutionWorkspace{ height:260px;} }
+    .gb-wrapper{max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
+    .gb-header{text-align:center;background:#e6f9ff;color:#00A1D6;font-size:22px;font-weight:800;
+      padding:6px 10px;border-radius:8px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+    .gb-header .highlight{color:#7B2CBF;}
+    .gb-intro{text-align:center;font-size:16px;line-height:1.5;margin:0 0 10px;color:#374151;
+      background:#e0f2fe;border-radius:6px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+    #glowbit-step5 .glowbit-playground{max-height:540px;overflow-y:auto!important;border-radius:6px;}
+    .didyouknow{margin-top:18px;background:#fef9c3;border:2px solid #facc15;padding:10px 12px;border-radius:12px;
+      color:#713f12;font-size:13px;font-weight:600;position:relative;box-shadow:0 2px 5px rgba(0,0,0,0.06);}
+    .didyouknow::before{content:"";position:absolute;top:-10px;left:20px;border-width:0 10px 10px 10px;
+      border-style:solid;border-color:transparent transparent #fef9c3 transparent;}
+    /* Modal */
+    #solutionModal{display:none;position:fixed;top:60px;right:20px;width:640px;max-width:42%;background:#fff;
+      border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.28);z-index:12000;overflow:hidden;user-select:none;}
+    #solutionHeader{cursor:move;padding:10px 12px;background:#00A1D6;color:#fff;font-weight:700;text-align:left;
+      border-radius:10px 10px 0 0;display:flex;justify-content:space-between;align-items:center;}
+    #solutionTitle{font-size:15px;}
+    #solutionClose{cursor:pointer;font-size:20px;line-height:1;padding:2px 8px;border-radius:6px;color:#fff;
+      background:transparent;border:none;}
+    #solutionWorkspace{height:360px;width:100%;border-top:1px solid #eee;background:#fafafa;}
+    #solutionFooter{text-align:center;padding:12px;background:#fff;}
+    #solutionFooter button{background:#00A1D6;color:#fff;border:none;border-radius:8px;padding:8px 18px;
+      cursor:pointer;font-weight:700;}
+    @media(max-width:900px){#solutionModal{left:10px;right:10px;width:auto;max-width:calc(100%-20px);top:40px;}
+      #solutionWorkspace{height:260px;}}
   </style>
 </head>
 
@@ -52,14 +49,14 @@
     </div>
 
     <p class="gb-intro">
-      Now it’s time to play with individual pixels! You’ll clear the screen, then light up several pixels
-      in a row — that’s how pictures and patterns are made on GlowBit.
+      Now it’s time to play with individual pixels! By lighting up several in a row,
+      you’ll create a glowing line across GlowBit’s face — that’s how pictures and patterns are made.
     </p>
 
     <div id="glowbit-step5"></div>
   </div>
 
-  <!-- ✅ Check-your-setup modal -->
+  <!-- Modal -->
   <div id="solutionModal" aria-hidden="true" role="dialog">
     <div id="solutionHeader">
       <div id="solutionTitle">✅ Correct Setup — Step 5</div>
@@ -69,25 +66,44 @@
     <div id="solutionFooter"><button id="solutionCloseBtn">Close</button></div>
   </div>
 
+  <!-- Script -->
   <script>
   (function waitForGlow(){
     if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow,120);
 
-    /* --- Solution XML: clear screen + coloured row --- */
-    const solutionXml = `<xml xmlns="https://developers.google.com/blockly/xml">
+    /* ✅ XML compatibility patch */
+    if(!Blockly.Xml) Blockly.Xml={};
+    if(!Blockly.Xml.textToDom){
+      Blockly.Xml.textToDom=function(text){
+        const parser=new DOMParser();
+        return parser.parseFromString(text,"text/xml").documentElement;
+      };
+    }
+    if(!Blockly.Xml.domToWorkspace){
+      Blockly.Xml.domToWorkspace=function(dom,workspace){
+        if(!workspace||!dom)return;
+        try{Blockly.Xml.appendDomToWorkspace(dom,workspace);}catch(err){
+          console.warn("⚠️ appendDomToWorkspace failed:",err);
+        }
+        workspace.render?.();
+      };
+    }
+
+    /* ✅ Solution XML — Clear Screen then set pixels 0→7 */
+    const solutionXml=`<xml xmlns="https://developers.google.com/blockly/xml">
       <block type="on_start" x="20" y="20">
         <statement name="DO">
           <block type="clear_screen">
             <next>
-              <block type="set_pixel_color">
-                <field name="X">0</field><field name="Y">2</field><field name="COLOR">3</field>
-                <next><block type="set_pixel_color"><field name="X">1</field><field name="Y">2</field><field name="COLOR">3</field>
-                  <next><block type="set_pixel_color"><field name="X">2</field><field name="Y">2</field><field name="COLOR">3</field>
-                    <next><block type="set_pixel_color"><field name="X">3</field><field name="Y">2</field><field name="COLOR">3</field>
-                      <next><block type="set_pixel_color"><field name="X">4</field><field name="Y">2</field><field name="COLOR">3</field>
-                        <next><block type="set_pixel_color"><field name="X">5</field><field name="Y">2</field><field name="COLOR">3</field>
-                          <next><block type="set_pixel_color"><field name="X">6</field><field name="Y">2</field><field name="COLOR">3</field>
-                            <next><block type="set_pixel_color"><field name="X">7</field><field name="Y">2</field><field name="COLOR">3</field></block></next>
+              <block type="set_pixel">
+                <field name="X">0</field><field name="Y">2</field><field name="COLOUR">#00FF00</field>
+                <next><block type="set_pixel"><field name="X">1</field><field name="Y">2</field><field name="COLOUR">#00FF00</field>
+                  <next><block type="set_pixel"><field name="X">2</field><field name="Y">2</field><field name="COLOUR">#00FF00</field>
+                    <next><block type="set_pixel"><field name="X">3</field><field name="Y">2</field><field name="COLOUR">#00FF00</field>
+                      <next><block type="set_pixel"><field name="X">4</field><field name="Y">2</field><field name="COLOUR">#00FF00</field>
+                        <next><block type="set_pixel"><field name="X">5</field><field name="Y">2</field><field name="COLOUR">#00FF00</field>
+                          <next><block type="set_pixel"><field name="X">6</field><field name="Y">2</field><field name="COLOUR">#00FF00</field>
+                            <next><block type="set_pixel"><field name="X">7</field><field name="Y">2</field><field name="COLOUR">#00FF00</field></block></next>
                           </block></next>
                         </block></next>
                       </block></next>
@@ -101,73 +117,67 @@
       </block>
     </xml>`;
 
-    const lesson = Glowbit.createLessonUI('glowbit-step5',{
-      title:'',instructions:'',pixelSize:28,defaultXml:null
+    /* Create main editable workspace (empty start for students) */
+    const lesson=Glowbit.createLessonUI('glowbit-step5',{
+      title:'',
+      instructions:'',
+      pixelSize:28,
+      defaultXml:null
     });
-    window._lesson_step5 = lesson;
+    window._lesson_step5=lesson;
 
-    /* --- Sidebar --- */
+    /* Sidebar override */
     function overrideSidebar(){
-      const container=document.querySelector('#glowbit-step5');
-      if(!container)return;
-      const sidebar=Array.from(container.querySelectorAll('*')).find(el=>{
+      const c=document.querySelector('#glowbit-step5');
+      if(!c)return;
+      const s=[...c.querySelectorAll('*')].find(el=>{
         if(!el||!el.innerText)return false;
         const t=el.innerText.trim();
-        return t.includes('GlowBit Lesson')||t.includes('Follow the steps')||/^Step\s*\d+:/.test(t);
+        return t.includes('GlowBit Lesson')||t.includes('Follow the steps on the right')||/^Step\s*\d+:/.test(t);
       });
-      if(!sidebar)return;
-
-      sidebar.style.background='#e6f9ff';
-      sidebar.style.borderRadius='10px';
-      sidebar.style.padding='12px';
-      sidebar.style.color='#00A1D6';
-      sidebar.style.fontSize='14px';
-      sidebar.style.fontWeight='500';
-      sidebar.style.boxShadow='0 0 8px rgba(0,0,0,0.08)';
-
+      if(!s)return;
+      s.style.background='#e6f9ff';s.style.borderRadius='10px';s.style.padding='12px';
+      s.style.color='#00A1D6';s.style.fontSize='14px';s.style.fontWeight='500';s.style.boxShadow='0 0 8px rgba(0,0,0,0.08)';
       const card='margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;font-weight:600;';
-      sidebar.innerHTML =
+      s.innerHTML=
         '<h3 style="color:#00A1D6;font-weight:800;font-size:16px;margin-bottom:10px;text-align:center;">🌟 Follow These Steps 🌟</h3>'+
-        '<div style="'+card+'">🧹 From the <strong>Basic</strong> tab, add a <strong>Clear Screen</strong> block inside the on start block to begin fresh.</div>'+
-        '<div style="'+card+'">🧩 From the <strong>LED</strong> tab, drag a <strong>Set Pixel (x, y, color “”)</strong> block into the workspace.</div>'+
-        '<div style="'+card+'">➡️ Set <strong>y = 2</strong> and <strong>x = 0</strong>, and pick a color (e.g. 3 = green).</div>'+
-        '<div style="'+card+'">➕ Duplicate the block and change <strong>x</strong> from 1 to 7, keeping the same color.</div>'+
-        '<div style="'+card+'">📦 Make sure all the blocks are inside an <strong>on start</strong> block.</div>'+
-        '<div style="'+card+'">▶️ Run your program — GlowBit clears then lights a bright colored row of pixels!</div>'+
+        '<div style="'+card+'">🧹 From the <strong>Basic</strong> tab, drag a <strong>Clear Screen</strong> block into the workspace.</div>'+
+        '<div style="'+card+'">🧩 From the <strong>LED</strong> tab, drag a <strong>Set Pixel (x,y color “”)</strong> block.</div>'+
+        '<div style="'+card+'">➡️ Set <strong>y = 2</strong> and <strong>x = 0</strong>. Click the color box (showing <code>#00FF00</code>) to choose a color.</div>'+
+        '<div style="'+card+'">➕ Duplicate the block and change <strong>x</strong> from 0 to 7 (keeping y = 2) to form a horizontal line.</div>'+
+        '<div style="'+card+'">📦 Place all these blocks inside an <strong>on start</strong> block.</div>'+
+        '<div style="'+card+'">▶️ Click Run Program — GlowBit lights up a row in your chosen color!</div>'+
         '<button id="check-setup-btn" style="display:block;margin:12px auto 6px;padding:8px 14px;border:none;border-radius:6px;background:#00A1D6;color:#fff;font-weight:700;cursor:pointer;">✅ Check Your Setup</button>'+
-        '<div class="didyouknow">🎨 <strong>Try this!</strong> Change the color number to see different colors on GlowBit (e.g. 1=Red, 3=Green, 5=Blue).</div>';
+        '<div class="didyouknow">💡 <strong>Try This!</strong> Change the color code to different values like <code>#FF0000</code> (red), <code>#0000FF</code> (blue), or <code>#FFFF00</code> (yellow) to see your GlowBit change color!</div>';
     }
-    overrideSidebar();
-    const sid=setInterval(overrideSidebar,400);
-    setTimeout(()=>clearInterval(sid),10000);
+    overrideSidebar();const sid=setInterval(overrideSidebar,400);setTimeout(()=>clearInterval(sid),10000);
 
-    /* --- Modal logic --- */
+    /* Modal logic */
     const modal=document.getElementById('solutionModal');
     function makeDraggable(el){
-      const header=document.getElementById('solutionHeader'); if(!header)return;
-      let dragging=false,startX=0,startY=0,origLeft=0,origTop=0;
-      header.addEventListener('mousedown',e=>{
-        e.preventDefault(); dragging=true;
-        if(el.style.right&&el.style.right!=='auto'){ el.style.left=el.getBoundingClientRect().left+'px'; el.style.right='auto'; }
-        origLeft=parseInt(el.style.left||el.getBoundingClientRect().left,10);
-        origTop=parseInt(el.style.top||el.getBoundingClientRect().top,10);
-        startX=e.clientX; startY=e.clientY;
-        document.addEventListener('mousemove',onDrag);
-        document.addEventListener('mouseup',stopDrag);
+      const h=document.getElementById('solutionHeader');if(!h)return;
+      let drag=false,sx=0,sy=0,ol=0,ot=0;
+      h.addEventListener('mousedown',e=>{
+        e.preventDefault();drag=true;
+        if(el.style.right&&el.style.right!=='auto'){el.style.left=el.getBoundingClientRect().left+'px';el.style.right='auto';}
+        ol=parseInt(el.style.left||el.getBoundingClientRect().left,10);
+        ot=parseInt(el.style.top||el.getBoundingClientRect().top,10);
+        sx=e.clientX;sy=e.clientY;
+        document.addEventListener('mousemove',move);
+        document.addEventListener('mouseup',stop);
       });
-      function onDrag(e){ if(!dragging)return; el.style.left=(origLeft+(e.clientX-startX))+'px'; el.style.top=(origTop+(e.clientY-startY))+'px'; }
-      function stopDrag(){ dragging=false; document.removeEventListener('mousemove',onDrag); document.removeEventListener('mouseup',stopDrag); }
+      function move(e){if(!drag)return;el.style.left=(ol+(e.clientX-sx))+'px';el.style.top=(ot+(e.clientY-sy))+'px';}
+      function stop(){drag=false;document.removeEventListener('mousemove',move);document.removeEventListener('mouseup',stop);}
     }
 
     document.addEventListener('click',e=>{
       if(!e.target)return;
       if(e.target.id==='check-setup-btn'){
-        modal.style.display='block';
-        modal.setAttribute('aria-hidden','false');
+        modal.style.display='block';modal.setAttribute('aria-hidden','false');
         if(!window._solutionWorkspace){
           try{
-            const wsDiv=document.getElementById('solutionWorkspace');
-            window._solutionWorkspace=Blockly.inject(wsDiv,{readOnly:true,scrollbars:true,toolbox:null});
+            const ws=document.getElementById('solutionWorkspace');
+            window._solutionWorkspace=Blockly.inject(ws,{readOnly:true,scrollbars:true,toolbox:null});
             const dom=Blockly.Xml.textToDom(solutionXml);
             Blockly.Xml.domToWorkspace(dom,window._solutionWorkspace);
           }catch(err){console.warn('Solution load failed:',err);}
@@ -175,14 +185,17 @@
         }
       }
       if(e.target.id==='solutionClose'||e.target.id==='solutionCloseBtn'){
-        modal.style.display='none'; modal.setAttribute('aria-hidden','true');
+        modal.style.display='none';modal.setAttribute('aria-hidden','true');
       }
     });
+
     document.addEventListener('keydown',ev=>{
-      if(ev.key==='Escape'){ modal.style.display='none'; modal.setAttribute('aria-hidden','true'); }
+      if(ev.key==='Escape'){
+        modal.style.display='none';modal.setAttribute('aria-hidden','true');
+      }
     });
 
-    if(typeof Glowbit.showIcon==='function') Glowbit.showIcon('smile');
+    if(typeof Glowbit.showIcon==='function')Glowbit.showIcon('smile');
     console.log("✅ Step 5 initialized.");
   })();
   </script>
