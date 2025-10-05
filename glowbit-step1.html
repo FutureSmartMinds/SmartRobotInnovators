@@ -1,6 +1,17 @@
 <script>
-window.addEventListener('load', function () {
-  console.log("✅ Step1 script loaded. Waiting for Glowbit...");
+console.log("🔥 Step1 script tag detected by browser.");
+
+window.addEventListener('DOMContentLoaded', function () {
+  console.log("✅ DOMContentLoaded fired.");
+
+  // Verify that our target container exists in the DOM
+  const container = document.getElementById('glowbit-step1');
+  if (!container) {
+    console.error("❌ #glowbit-step1 not found in DOM. Blockly cannot render.");
+    return;
+  } else {
+    console.log("✅ Found #glowbit-step1 container in DOM.");
+  }
 
   (function waitForGlow() {
     if (window.Glowbit && window.Blockly) {
@@ -25,21 +36,24 @@ window.addEventListener('load', function () {
         console.log("✅ Blockly UI created successfully.");
         window._lesson_step1 = lesson;
 
-        // Check if SVG actually exists
-        const svg = document.querySelector("svg.blocklySvg");
-        if (svg) {
-          console.log("✅ Blockly SVG found in DOM.");
-        } else {
-          console.warn("⚠️ Blockly SVG NOT found in DOM. Rendering may have failed.");
-        }
+        // Verify SVG render
+        setTimeout(() => {
+          const svg = document.querySelector("svg.blocklySvg");
+          if (svg) {
+            console.log("✅ Blockly SVG found in DOM (rendered).");
+          } else {
+            console.warn("⚠️ Blockly SVG NOT found. Rendering may have failed.");
+          }
+        }, 500);
 
       } catch (e) {
         console.error("❌ Error during Blockly UI creation:", e);
       }
     } else {
       console.log("⌛ Waiting for Glowbit or Blockly...");
-      setTimeout(waitForGlow, 150);
+      setTimeout(waitForGlow, 250);
     }
   })();
 });
 </script>
+
