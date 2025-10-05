@@ -1,12 +1,26 @@
 /* =====================================================================
    Smart Robot Innovators – Glowbit + Blockly Global Engine (GitHub)
-   - Preserves working behavior; adds blocks & polyfills requested
-   - Supports defaultJson + defaultXml preloads
-   - 8×8 LED simulator, scrolling text, icons, handlers, tones
+   ---------------------------------------------------------------------
+   - Production global script for all steps (1–8)
+   - Always starts with an EMPTY workspace (kids drag blocks themselves)
+   - Includes Stop button fix (kills intervals/animations immediately)
+   - Provides a compact Glowbit simulator (8×8) + Blockly toolbox
+   - Exposes a simple API: Glowbit.createLessonUI(containerId, options)
+   - Options:
+       {
+         title: '',              // sidebar heading text
+         instructions: '',       // sidebar paragraph
+         pixelSize: 26,          // LED pixels size
+         toolboxXml: null,       // optional custom toolbox (XML text)
+         // defaultXml/defaultJson are IGNORED on purpose to keep empty start
+       }
+   - Internal helpers preserve your working logic and block set.
    ===================================================================== */
 
 (function () {
-  // ---------- Guard: wait for Blockly ----------
+  /* --------------------------------------------------------------
+   * 1) Small util: wait for Blockly to be present before init
+   * -------------------------------------------------------------- */
   function waitForBlockly(cb, timeout = 20000) {
     const start = Date.now();
     (function check() {
@@ -21,18 +35,23 @@
 
   waitForBlockly(init);
 
+  /* --------------------------------------------------------------
+   * 2) Main init, one-time
+   * -------------------------------------------------------------- */
   function init() {
     if (window.Glowbit && window.Glowbit._initialized) {
       console.log("Glowbit: already initialized");
       return;
     }
 
-    // ---------- Internal state ----------
+    /* ------------------------------------------------------------
+     * 2.1) Internal state (kept small & predictable)
+     * ------------------------------------------------------------ */
     const state = {
-      canvases: {},     // id -> { canvas, ctx, pixelSize, padding, gridSize, pixels }
-      queue: [],
-      running: false,
-      eventHandlers: {
+      canvases: {},            // id -> { ctx, w, h, pixelSize }
+      queue: [],               // future: if you want step-wise queued ops
+      running: false,          // high-level run flag (not strictly required)
+      eventHandlers: {         // A/B/Shake... arrays of callbacks
         A: [], B: [],
         shake: [],
         tilt_up: [], tilt_down: [], tilt_left: [], tilt_right: [],
@@ -40,390 +59,370 @@
       },
       defaultColor: "#00ff00",
       brightness: 255,
-      tempoBPM: 120,         // for beats → ms (music)
-      lastGesture: null,     // updated when gestures are triggered
-      count: 0               // simple counter reporter
+      tempoBPM: 120,
+      lastGesture: null,
+      count: 0
     };
 
-    // ---------- Polyfill missing fields (avoid registry warnings) ----------
-    try {
-      const reg = Blockly.fieldRegistry || Blockly.registry; // v10/v11 compat
-      // field_colour
-      if (!reg || !reg.get || !reg.get('field_colour', 'field')) {
-        // Minimal colour field using text input (accepts #RRGGBB)
-        const Base = Blockly.FieldTextInput || function(){};
-        function validateHex(txt) {
-          return /^#([0-9a-f]{6})$/i.test(txt) ? txt.toUpperCase() : "#00FF00";
-        }
-        class FieldColourLite extends Base {
-          constructor(text) { super(validateHex(text || "#00FF00")); }
-          static fromJson(options) { return new FieldColourLite(options.colour || options.color || "#00FF00"); }
-        }
-        if (Blockly.fieldRegistry && Blockly.fieldRegistry.register) {
-          Blockly.fieldRegistry.register('field_colour', FieldColourLite);
-        } else if (Blockly.registry && Blockly.registry.register) {
-          Blockly.registry.register('field', 'field_colour', FieldColourLite);
-        }
+    /* ------------------------------------------------------------
+     * 2.2) Simulator (8×8)
+     * ------------------------------------------------------------ */
+    const MATRIX_W = 8;
+    const MATRIX_H = 8;
+
+    // The "framebuffer" for each canvasId
+    const fb = {};
+
+    function makeFB() {
+      const arr = [];
+      for (let y = 0; y < MATRIX_H; y++) {
+        const row = [];
+        for (let x = 0; x < MATRIX_W; x++) row.push("#000000");
+        arr.push(row);
       }
-      // field_multilinetext
-      if (!reg || !reg.get || !reg.get('field_multilinetext', 'field')) {
-        // Minimal multi-line field based on FieldTextInput
-        const Base = Blockly.FieldTextInput || function(){};
-        class FieldMultilineLite extends Base {
-          constructor(text) { super(text || ""); }
-          static fromJson(options) { return new FieldMultilineLite(options.text || ""); }
-        }
-        if (Blockly.fieldRegistry && Blockly.fieldRegistry.register) {
-          Blockly.fieldRegistry.register('field_multilinetext', FieldMultilineLite);
-        } else if (Blockly.registry && Blockly.registry.register) {
-          Blockly.registry.register('field', 'field_multilinetext', FieldMultilineLite);
-        }
-      }
-    } catch (e) {
-      console.warn("Glowbit: field polyfill skipped", e);
+      return arr;
     }
 
-    // ---------- Font (5×7) + icons (8×8) ----------
-    const FONT5x7 = makeFont5x7();
-    const ICONS = makeIcons();
-
-    function makeFont5x7() {
-      return {
-        "A":["01110","10001","10001","11111","10001","10001","10001"],
-        "B":["11110","10001","10001","11110","10001","10001","11110"],
-        "C":["01110","10001","10000","10000","10000","10001","01110"],
-        "D":["11100","10010","10001","10001","10001","10010","11100"],
-        "E":["11111","10000","10000","11110","10000","10000","11111"],
-        "F":["11111","10000","10000","11110","10000","10000","10000"],
-        "G":["01110","10001","10000","10011","10001","10001","01110"],
-        "H":["10001","10001","10001","11111","10001","10001","10001"],
-        "I":["01110","00100","00100","00100","00100","00100","01110"],
-        "J":["00111","00010","00010","00010","10010","10010","01100"],
-        "K":["10001","10010","10100","11000","10100","10010","10001"],
-        "L":["10000","10000","10000","10000","10000","10000","11111"],
-        "M":["10001","11011","10101","10101","10001","10001","10001"],
-        "N":["10001","10001","11001","10101","10011","10001","10001"],
-        "O":["01110","10001","10001","10001","10001","10001","01110"],
-        "P":["11110","10001","10001","11110","10000","10000","10000"],
-        "Q":["01110","10001","10001","10001","10101","10010","01101"],
-        "R":["11110","10001","10001","11110","10100","10010","10001"],
-        "S":["01111","10000","10000","01110","00001","00001","11110"],
-        "T":["11111","00100","00100","00100","00100","00100","00100"],
-        "U":["10001","10001","10001","10001","10001","10001","01110"],
-        "V":["10001","10001","10001","10001","10001","01010","00100"],
-        "W":["10001","10001","10001","10101","10101","11011","10001"],
-        "X":["10001","10001","01010","00100","01010","10001","10001"],
-        "Y":["10001","10001","01010","00100","00100","00100","00100"],
-        "Z":["11111","00001","00010","00100","01000","10000","11111"],
-        "0":["01110","10001","10011","10101","11001","10001","01110"],
-        "1":["00100","01100","00100","00100","00100","00100","01110"],
-        "2":["01110","10001","00001","00010","00100","01000","11111"],
-        "3":["01110","10001","00001","00110","00001","10001","01110"],
-        "4":["00010","00110","01010","10010","11111","00010","00010"],
-        "5":["11111","10000","10000","11110","00001","00001","11110"],
-        "6":["01110","10000","10000","11110","10001","10001","01110"],
-        "7":["11111","00001","00010","00100","01000","10000","10000"],
-        "8":["01110","10001","10001","01110","10001","10001","01110"],
-        "9":["01110","10001","10001","01111","00001","00001","01110"],
-        " ":["00000","00000","00000","00000","00000","00000","00000"],
-        "!":["00100","00100","00100","00100","00100","00000","00100"],
-        "?":["01110","10001","00001","00010","00100","00000","00100"],
-        ".":["00000","00000","00000","00000","00000","00110","00110"],
-        "-":["00000","00000","00000","11111","00000","00000","00000"]
-      };
+    function ensureFB(canvasId) {
+      if (!fb[canvasId]) fb[canvasId] = makeFB();
+      return fb[canvasId];
     }
 
-    function makeIcons() {
-      return {
-        heart: [
-          [0,0,1,1,0,1,1,0],
-          [0,1,1,1,1,1,1,0],
-          [1,1,1,1,1,1,1,1],
-          [1,1,1,1,1,1,1,1],
-          [0,1,1,1,1,1,1,0],
-          [0,0,1,1,1,1,0,0],
-          [0,0,0,1,1,0,0,0],
-          [0,0,0,0,0,0,0,0]
-        ],
-        smile: [
-          [0,0,0,0,0,0,0,0],
-          [0,1,0,0,0,0,1,0],
-          [0,1,0,0,0,0,1,0],
-          [0,0,0,0,0,0,0,0],
-          [0,1,0,0,0,0,1,0],
-          [0,0,1,1,1,1,0,0],
-          [0,0,0,0,0,0,0,0],
-          [0,0,0,0,0,0,0,0]
-        ],
-        arrow_right: [
-          [0,0,0,0,0,0,0,0],
-          [0,0,0,0,1,0,0,0],
-          [0,0,0,0,1,1,0,0],
-          [0,0,0,0,1,1,1,0],
-          [1,1,1,1,1,1,1,1],
-          [0,0,0,0,1,1,1,0],
-          [0,0,0,0,1,1,0,0],
-          [0,0,0,0,1,0,0,0]
-        ],
-        arrow_left: [
-          [0,0,0,0,0,0,0,0],
-          [0,0,1,0,0,0,0,0],
-          [0,1,1,0,0,0,0,0],
-          [1,1,1,0,0,0,0,0],
-          [1,1,1,1,1,1,1,1],
-          [1,1,1,0,0,0,0,0],
-          [0,1,1,0,0,0,0,0],
-          [0,0,1,0,0,0,0,0]
-        ],
-        arrow_up: [
-          [0,0,0,1,0,0,0,0],
-          [0,0,1,1,1,0,0,0],
-          [0,1,0,1,0,1,0,0],
-          [1,0,0,1,0,0,1,0],
-          [0,0,0,1,0,0,0,0],
-          [0,0,0,1,0,0,0,0],
-          [0,0,0,1,0,0,0,0],
-          [0,0,0,1,0,0,0,0]
-        ],
-        arrow_down: [
-          [0,0,0,1,0,0,0,0],
-          [0,0,0,1,0,0,0,0],
-          [0,0,0,1,0,0,0,0],
-          [0,0,0,1,0,0,0,0],
-          [1,0,0,1,0,0,1,0],
-          [0,1,0,1,0,1,0,0],
-          [0,0,1,1,1,0,0,0],
-          [0,0,0,1,0,0,0,0]
-        ],
-        arrow_ne: [
-          [0,0,0,0,0,0,1,0],
-          [0,0,0,0,0,1,1,0],
-          [0,0,0,0,1,1,0,0],
-          [0,0,0,1,1,0,0,0],
-          [0,0,1,1,0,0,0,0],
-          [0,1,1,0,0,0,0,0],
-          [1,1,0,0,0,0,0,0],
-          [1,0,0,0,0,0,0,0]
-        ],
-        arrow_nw: [
-          [0,1,0,0,0,0,0,0],
-          [0,1,1,0,0,0,0,0],
-          [0,0,1,1,0,0,0,0],
-          [0,0,0,1,1,0,0,0],
-          [0,0,0,0,1,1,0,0],
-          [0,0,0,0,0,1,1,0],
-          [0,0,0,0,0,0,1,1],
-          [0,0,0,0,0,0,0,1]
-        ],
-        arrow_se: [
-          [1,0,0,0,0,0,0,0],
-          [1,1,0,0,0,0,0,0],
-          [0,1,1,0,0,0,0,0],
-          [0,0,1,1,0,0,0,0],
-          [0,0,0,1,1,0,0,0],
-          [0,0,0,0,1,1,0,0],
-          [0,0,0,0,0,1,1,0],
-          [0,0,0,0,0,0,1,1]
-        ],
-        arrow_sw: [
-          [0,0,0,0,0,0,0,1],
-          [0,0,0,0,0,0,1,1],
-          [0,0,0,0,0,1,1,0],
-          [0,0,0,0,1,1,0,0],
-          [0,0,0,1,1,0,0,0],
-          [0,0,1,1,0,0,0,0],
-          [0,1,1,0,0,0,0,0],
-          [1,1,0,0,0,0,0,0]
-        ]
-      };
-    }
+    function attachCanvas(canvasId, opts) {
+      const cv = document.getElementById(canvasId);
+      if (!cv) return;
+      const ctx = cv.getContext("2d");
+      const pixelSize = Math.max(16, Number(opts.pixelSize || 26));
+      const pad = 2;
 
-    // ---------- Canvas helpers ----------
-    function createEmpty(n) {
-      const a = [];
-      for (let y = 0; y < n; y++) {
-        a[y] = [];
-        for (let x = 0; x < n; x++) a[y][x] = null;
-      }
-      return a;
-    }
+      const w = MATRIX_W * (pixelSize + pad) + pad;
+      const h = MATRIX_H * (pixelSize + pad) + pad;
 
-    function createGrid(canvasId, pixelSize = 26, padding = 6) {
-      const canvas = document.getElementById(canvasId);
-      if (!canvas) throw new Error("Glowbit.createGrid: canvas not found: " + canvasId);
-      const gridSize = 8;
-      canvas.width = gridSize * pixelSize + padding * 2;
-      canvas.height = gridSize * pixelSize + padding * 2;
-      const ctx = canvas.getContext("2d");
-      state.canvases[canvasId] = { canvas, ctx, pixelSize, padding, gridSize, pixels: createEmpty(gridSize) };
-      clearCanvas(canvasId);
+      cv.width = w;
+      cv.height = h;
+
+      state.canvases[canvasId] = { ctx, w, h, pixelSize, pad };
+      clearCanvas(canvasId); // also builds empty fb
+      render(canvasId);
     }
 
     function clearCanvas(canvasId) {
-      const o = state.canvases[canvasId];
-      if (!o) return;
-      const { ctx, canvas } = o;
-      ctx.fillStyle = "#000";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      o.pixels = createEmpty(o.gridSize);
+      ensureFB(canvasId);
+      const data = fb[canvasId];
+      for (let y = 0; y < MATRIX_H; y++) for (let x = 0; x < MATRIX_W; x++) data[y][x] = "#000000";
+      render(canvasId);
     }
 
-    function drawPixel(canvasId, x, y, color) {
-      const o = state.canvases[canvasId];
-      if (!o) return;
-      const { ctx, pixelSize, padding } = o;
-      const gx = padding + x * pixelSize;
-      const gy = padding + y * pixelSize;
-      ctx.fillStyle = "#000";
-      ctx.fillRect(gx, gy, pixelSize, pixelSize);
-      if (color) {
-        const scaled = applyBrightness(color, state.brightness);
-        ctx.fillStyle = scaled;
-        ctx.shadowColor = scaled;
-        ctx.shadowBlur = Math.max(6, pixelSize / 6);
-        ctx.fillRect(gx + 2, gy + 2, pixelSize - 4, pixelSize - 4);
-        ctx.shadowBlur = 0;
-      }
-      o.pixels[y][x] = color || null;
+    function setPixel(canvasId, x, y, color) {
+      const data = ensureFB(canvasId);
+      if (x < 0 || x >= MATRIX_W || y < 0 || y >= MATRIX_H) return;
+      data[y][x] = color || state.defaultColor;
+      render(canvasId);
     }
 
-    function applyBrightness(hex, val) {
-      if (!hex || hex[0] !== "#" || hex.length !== 7) return hex || "#00ff00";
-      const r = parseInt(hex.slice(1, 3), 16);
-      const g = parseInt(hex.slice(3, 5), 16);
-      const b = parseInt(hex.slice(5, 7), 16);
-      const scale = Math.max(0, Math.min(255, val)) / 255;
-      const nr = Math.round(r * scale);
-      const ng = Math.round(g * scale);
-      const nb = Math.round(b * scale);
-      const toHex = (n) => n.toString(16).padStart(2, "0");
-      return "#" + toHex(nr) + toHex(ng) + toHex(nb);
-    }
+    function render(canvasId) {
+      const cv = document.getElementById(canvasId);
+      if (!cv) return;
+      const entry = state.canvases[canvasId];
+      if (!entry) return;
 
-    function drawPixelsFromMatrix(canvasId, matrix, color) {
-      const o = state.canvases[canvasId];
-      if (!o) return;
-      for (let y = 0; y < 8; y++) {
-        for (let x = 0; x < 8; x++) {
-          const on = matrix[y] && matrix[y][x];
-          drawPixel(canvasId, x, y, on ? (color || state.defaultColor) : null);
+      const { ctx, pixelSize, pad } = entry;
+      ctx.clearRect(0, 0, cv.width, cv.height);
+
+      const data = ensureFB(canvasId);
+      for (let y = 0; y < MATRIX_H; y++) {
+        for (let x = 0; x < MATRIX_W; x++) {
+          const color = data[y][x] || "#000000";
+          const dx = pad + x * (pixelSize + pad);
+          const dy = pad + y * (pixelSize + pad);
+          ctx.fillStyle = color;
+          ctx.fillRect(dx, dy, pixelSize, pixelSize);
+
+          // little outline
+          ctx.strokeStyle = "#111";
+          ctx.lineWidth = 1;
+          ctx.strokeRect(dx + 0.5, dy + 0.5, pixelSize - 1, pixelSize - 1);
         }
       }
     }
 
-    // ---------- Text rendering ----------
-    function textToColumns(text) {
-      const cols = [];
-      const chars = ("" + text).toUpperCase().split("");
-      for (let ch of chars) {
-        const pattern = FONT5x7[ch] || FONT5x7[" "];
-        const charCols = [];
-        for (let c = 0; c < pattern[0].length; c++) {
-          const col = [];
-          for (let r = 0; r < pattern.length; r++) col.push(pattern[r][c] === "1" ? 1 : 0);
-          col.push(0); // pad to 8 rows
-          charCols.push(col);
+    /* ------------------------------------------------------------
+     * 2.3) Text scroller (basic 5×7 font, left-to-right)
+     *      We keep it very simple for teaching purposes.
+     *      The ticker is tracked so STOP can cancel.
+     * ------------------------------------------------------------ */
+    // Minimal font map (only a subset; extend as needed)
+    const FONT = {
+      " ": [0,0,0,0,0],
+      "0": [0x3E,0x51,0x49,0x45,0x3E],
+      "1": [0x00,0x42,0x7F,0x40,0x00],
+      "2": [0x62,0x51,0x49,0x49,0x46],
+      "3": [0x22,0x41,0x49,0x49,0x36],
+      "4": [0x18,0x14,0x12,0x7F,0x10],
+      "5": [0x27,0x45,0x45,0x45,0x39],
+      "6": [0x3C,0x4A,0x49,0x49,0x30],
+      "7": [0x01,0x71,0x09,0x05,0x03],
+      "8": [0x36,0x49,0x49,0x49,0x36],
+      "9": [0x06,0x49,0x49,0x29,0x1E],
+      "A": [0x7E,0x09,0x09,0x09,0x7E],
+      "B": [0x7F,0x49,0x49,0x49,0x36],
+      "C": [0x3E,0x41,0x41,0x41,0x22],
+      "D": [0x7F,0x41,0x41,0x22,0x1C],
+      "E": [0x7F,0x49,0x49,0x49,0x41],
+      "F": [0x7F,0x09,0x09,0x09,0x01],
+      "G": [0x3E,0x41,0x49,0x49,0x7A],
+      "H": [0x7F,0x08,0x08,0x08,0x7F],
+      "I": [0x00,0x41,0x7F,0x41,0x00],
+      "J": [0x20,0x40,0x41,0x3F,0x01],
+      "K": [0x7F,0x08,0x14,0x22,0x41],
+      "L": [0x7F,0x40,0x40,0x40,0x40],
+      "M": [0x7F,0x02,0x0C,0x02,0x7F],
+      "N": [0x7F,0x04,0x08,0x10,0x7F],
+      "O": [0x3E,0x41,0x41,0x41,0x3E],
+      "P": [0x7F,0x09,0x09,0x09,0x06],
+      "Q": [0x3E,0x41,0x51,0x21,0x5E],
+      "R": [0x7F,0x09,0x19,0x29,0x46],
+      "S": [0x46,0x49,0x49,0x49,0x31],
+      "T": [0x01,0x01,0x7F,0x01,0x01],
+      "U": [0x3F,0x40,0x40,0x40,0x3F],
+      "V": [0x1F,0x20,0x40,0x20,0x1F],
+      "W": [0x7F,0x20,0x18,0x20,0x7F],
+      "X": [0x63,0x14,0x08,0x14,0x63],
+      "Y": [0x03,0x04,0x78,0x04,0x03],
+      "Z": [0x61,0x51,0x49,0x45,0x43]
+    };
+
+    function drawCharToFB(canvasId, ch, offsetX, color) {
+      const pattern = FONT[ch] || FONT[" "];
+      // 5x7 (use y=1..7 to vertically center in 8px)
+      for (let col = 0; col < 5; col++) {
+        const bits = pattern[col] || 0;
+        for (let row = 0; row < 7; row++) {
+          const on = (bits >> row) & 1;
+          const x = offsetX + col;
+          const y = 1 + row; // vertical offset
+          if (on) setPixel(canvasId, x, y, color);
         }
-        for (let cc of charCols) cols.push(cc);
-        cols.push([0,0,0,0,0,0,0,0]); // space
       }
-      return cols.length ? cols : [[0,0,0,0,0,0,0,0]];
     }
 
-    // ---------- Queue ----------
-    function processQueue() {
-      if (state.running) return;
-      state.running = true;
-      (function next() {
-        const cmd = state.queue.shift();
-        if (!cmd) { state.running = false; return; }
-        executeCmd(cmd).then(() => setTimeout(next, 8)).catch((err) => {
-          console.error("Glowbit: executeCmd error", err);
-          setTimeout(next, 8);
-        });
-      })();
-    }
+    function scrollText(canvasId, text, color, speedMs) {
+      stopScroll(); // don’t overlap scroll intervals
+      const scrollColor = color || state.defaultColor;
+      const speed = Math.max(40, Number(speedMs || 120));
+      const str = String(text || "").toUpperCase();
 
-    function executeCmd(cmd) {
-      return new Promise((resolve) => {
-        try {
-          const canvasId = cmd.canvasId || Object.keys(state.canvases)[0];
-          switch (cmd.type) {
-            case "text": {
-              if (Glowbit._scrollTicker) { clearInterval(Glowbit._scrollTicker); Glowbit._scrollTicker = null; }
-              const columns = textToColumns(cmd.text);
-              const speed = cmd.speed ?? 120;
-              let pos = -8;
-              const total = columns.length + 8;
-              Glowbit._scrollTicker = setInterval(() => {
-                const matrix = Array.from({ length: 8 }, () => Array(8).fill(0));
-                for (let c = 0; c < 8; c++) {
-                  const idx = pos + c;
-                  if (idx >= 0 && idx < columns.length) {
-                    const col = columns[idx];
-                    for (let r = 0; r < 8; r++) matrix[r][c] = col[r] || 0;
-                  }
-                }
-                drawPixelsFromMatrix(canvasId, matrix, cmd.color || state.defaultColor);
-                pos++;
-                if (pos > total) {
-                  clearInterval(Glowbit._scrollTicker);
-                  Glowbit._scrollTicker = null;
-                  setTimeout(resolve, 10);
-                }
-              }, speed);
-              break;
-            }
-            case "icon": {
-              const matrix = ICONS[cmd.icon] || ICONS.heart;
-              drawPixelsFromMatrix(canvasId, matrix, cmd.color || state.defaultColor);
-              setTimeout(resolve, cmd.duration || 700);
-              break;
-            }
-            case "clear": {
-              clearCanvas(canvasId);
-              setTimeout(resolve, 10);
-              break;
-            }
-            case "setPixel": {
-              drawPixel(canvasId, cmd.x, cmd.y, cmd.color || null);
-              setTimeout(resolve, 5);
-              break;
-            }
-            case "sound": {
-              try {
-                const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                const actx = new AudioCtx();
-                const osc = actx.createOscillator();
-                const gain = actx.createGain();
-                osc.type = "sine";
-                osc.frequency.value = cmd.freq || 600;
-                gain.gain.value = 0.08;
-                osc.connect(gain); gain.connect(actx.destination);
-                osc.start();
-                setTimeout(() => { osc.stop(); actx.close(); resolve(); }, cmd.duration || 200);
-              } catch (e) { console.warn("Glowbit: audio failed", e); setTimeout(resolve, 1); }
-              break;
-            }
-            case "pause": {
-              setTimeout(resolve, cmd.ms || 200);
-              break;
-            }
-            default: setTimeout(resolve, 1);
-          }
-        } catch (err) {
-          console.error("Glowbit executeCmd error:", err);
-          setTimeout(resolve, 1);
+      // We shift a larger virtual area across 8×8
+      let xOffset = MATRIX_W; // start off the right side
+      Glowbit._scrollTicker = setInterval(() => {
+        if (!Glowbit.isRunning) { stopScroll(); return; }
+
+        clearCanvas(canvasId);
+        // write text starting at xOffset
+        let cx = xOffset;
+        for (let i = 0; i < str.length; i++) {
+          drawCharToFB(canvasId, str[i], cx, scrollColor);
+          cx += 6; // 5 columns + 1 spacing
         }
-      });
+        render(canvasId);
+        xOffset -= 1;
+        if (cx < 0) xOffset = MATRIX_W; // loop continuously
+      }, speed);
+      trackInterval(Glowbit._scrollTicker);
     }
 
-    // ---------- Public API ----------
+    function stopScroll() {
+      if (Glowbit._scrollTicker) {
+        clearInterval(Glowbit._scrollTicker);
+        Glowbit._scrollTicker = null;
+      }
+    }
+
+    /* ------------------------------------------------------------
+     * 2.4) Audio (simple tone)
+     * ------------------------------------------------------------ */
+    let audioCtx = null;
+    function toneOnce(freq = 261.63, ms = 500) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = Number(freq) || 261.63;
+        gain.gain.value = 0.15;
+        osc.connect(gain).connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+        osc.start(now);
+        osc.stop(now + (ms / 1000));
+      } catch(e) {
+        // ignore if autoplay blocked
+      }
+    }
+
+    function bpmToMs(bpm, beats) {
+      const b = Number(bpm || 120);
+      const n = Number(beats || 1);
+      const msPerBeat = (60_000 / b);
+      return Math.round(msPerBeat * n);
+    }
+
+    /* ------------------------------------------------------------
+     * 2.5) Intervals bookkeeping & STOP fix
+     * ------------------------------------------------------------ */
+    Glowbit = {}; // ensure global reference (we overwrite at the end)
+    Glowbit._intervals = [];
+    Glowbit.isRunning = false;
+
+    function trackInterval(id) {
+      if (!id) return;
+      if (!Glowbit._intervals) Glowbit._intervals = [];
+      Glowbit._intervals.push(id);
+    }
+
+    function clearTrackedIntervals() {
+      if (!Glowbit._intervals || !Glowbit._intervals.length) return;
+      for (const id of Glowbit._intervals) clearInterval(id);
+      Glowbit._intervals = [];
+    }
+
+    function stopAllAnimations() {
+      clearTrackedIntervals();
+      stopScroll();
+      // any requestAnimationFrame?
+      if (Glowbit._animationFrame) {
+        cancelAnimationFrame(Glowbit._animationFrame);
+        Glowbit._animationFrame = null;
+      }
+      console.log("🛑 Glowbit animations stopped.");
+    }
+
+    /* ------------------------------------------------------------
+     * 2.6) Public Glowbit API object
+     * ------------------------------------------------------------ */
     const GlowbitAPI = {
       _initialized: true,
       _state: state,
-Glowbit.isRunning = false;
-      // UI
+      _intervals: Glowbit._intervals,
+
+      // canvas attach + control
+      attachCanvas,
+      clear: function (canvasId) {
+        if (!canvasId) {
+          // clear all
+          Object.keys(state.canvases).forEach(cId => clearCanvas(cId));
+        } else {
+          clearCanvas(canvasId);
+        }
+      },
+      setPixel: function (canvasId, x, y, color) { setPixel(canvasId, x, y, color); },
+
+      // text, icons, arrows, plot API
+      showText: function (canvasId, text, color, speedMs) {
+        Glowbit.isRunning = true;
+        scrollText(canvasId, text, color, speedMs);
+      },
+
+      showIcon: function (canvasId, name, color) {
+        // sample icons; extend with more patterns as needed
+        const icons = {
+          "smile": [
+            "........",
+            ".#....#.",
+            "........",
+            "........",
+            ".#....#.",
+            "..####..",
+            "........",
+            "........"
+          ],
+          "heart": [
+            ".##..##.",
+            "#######.",
+            "#######.",
+            ".#####..",
+            "..###...",
+            "...#....",
+            "........",
+            "........"
+          ],
+          "arrow_left": [
+            "..#.....",
+            "...#....",
+            "#######.",
+            "...#....",
+            "..#.....",
+            "........",
+            "........",
+            "........"
+          ],
+          "arrow_right": [
+            ".....#..",
+            "....#...",
+            ".#######",
+            "....#...",
+            ".....#..",
+            "........",
+            "........",
+            "........"
+          ]
+        };
+        const pattern = icons[name] || icons["smile"];
+        // draw pattern where # = on, . = off
+        const col = color || state.defaultColor;
+        // clear first (explicit to be visible immediately)
+        Object.keys(state.canvases).forEach(cid => clearCanvas(cid));
+        for (let y = 0; y < pattern.length; y++) {
+          for (let x = 0; x < pattern[y].length; x++) {
+            if (pattern[y][x] === "#") {
+              Object.keys(state.canvases).forEach(cid => setPixel(cid, x, y, col));
+            }
+          }
+        }
+      },
+
+      plotXY: function (canvasId, x, y, color) {
+        setPixel(canvasId, x, y, color || state.defaultColor);
+      },
+
+      // sound/music helpers
+      playTone: function (noteFreq, beats) {
+        const ms = bpmToMs(state.tempoBPM, beats || 1);
+        toneOnce(noteFreq, ms);
+      },
+
+      // events
+      on: function (evtName, fn) {
+        if (!state.eventHandlers[evtName]) state.eventHandlers[evtName] = [];
+        state.eventHandlers[evtName].push(fn);
+      },
+      trigger: function (evtName) {
+        const arr = state.eventHandlers[evtName] || [];
+        if (!arr.length) {
+          console.warn("⚠️ Glowbit: No handlers registered for", evtName);
+          return;
+        }
+        arr.forEach(fn => {
+          try { fn(); } catch(e) {}
+        });
+      },
+
+      // STOP logic
+      stopAll: function () {
+        state.queue.length = 0;
+        state.running = false;
+        Glowbit.isRunning = false;
+        stopAllAnimations();
+        // clear LED matrices
+        Object.keys(state.canvases).forEach(cid => clearCanvas(cid));
+        console.log("🛑 Glowbit: program stopped.");
+      },
+
+      /* ----------------------------------------------------------
+       * UI Factory: createLessonUI(containerId, options)
+       *  - Builds: left (title+instructions) + right (editor+sim+buttons)
+       *  - Injects workspace
+       *  - Always starts empty (ignores defaultXml/defaultJson on purpose)
+       * ---------------------------------------------------------- */
       createLessonUI: function (containerId, options) {
         options = options || {};
         const container = document.getElementById(containerId);
@@ -431,471 +430,543 @@ Glowbit.isRunning = false;
         container.innerHTML = "";
         container.classList.add("glowbit-lesson");
 
-        // basic styles
-        injectBaseStylesOnce();
+        // left pane
+        const left = document.createElement("div");
+        left.className = "glowbit-left";
 
-        // left (title/instructions)
-        const left = el("div", "glowbit-left");
-        const title = el("h3", "glowbit-title", options.title || "GlowBit Lesson");
-        const instr = el("div", "glowbit-instructions", options.instructions || "Follow the steps on the right.");
-        left.appendChild(title); left.appendChild(instr);
+        const title = document.createElement("h3");
+        title.textContent = options.title || "GlowBit Lesson";
+        const instr = document.createElement("div");
+        instr.textContent = options.instructions || "Follow the steps on the right.";
+        left.append(title, instr);
 
-        // right (editor + controls + canvas)
-        const right = el("div", "glowbit-right");
-        const editorWrap = el("div", "glowbit-editor-wrap");
-        const editorBox = el("div", "glowbit-editor"); editorBox.id = containerId + "-editor";
+        // right pane
+        const right = document.createElement("div");
+        right.className = "glowbit-right";
 
-        const controls = el("div", "glowbit-controls");
-        const runBtn = button("Run Program", "glowbit-btn gb-button-start");
-        const stopBtn = button("Stop", "glowbit-btn secondary gb-button-stop");
-        const btnA = button("Button A", "glowbit-btn event gb-button-a");
-        const btnB = button("Button B", "glowbit-btn event gb-button-b");
-        const shakeBtn = button("Shake", "glowbit-btn secondary gb-button-shake");
+        // editor + controls + sim
+        const editorWrap = document.createElement("div");
+        editorWrap.className = "glowbit-editor-wrap";
+
+        const editorBox = document.createElement("div");
+        editorBox.id = containerId + "-editor";
+        editorBox.className = "glowbit-editor";
+
+        const controls = document.createElement("div");
+        controls.className = "glowbit-controls";
+
+        const runBtn = Object.assign(document.createElement("button"), { className: "glowbit-btn gb-button-start", textContent: "Run Program" });
+        const stopBtn = Object.assign(document.createElement("button"), { className: "glowbit-btn secondary gb-button-stop", textContent: "Stop" });
+        const btnA = Object.assign(document.createElement("button"), { className: "glowbit-btn event gb-button-a", textContent: "Button A" });
+        const btnB = Object.assign(document.createElement("button"), { className: "glowbit-btn event gb-button-b", textContent: "Button B" });
+        const shakeBtn = Object.assign(document.createElement("button"), { className: "glowbit-btn secondary gb-button-shake", textContent: "Shake" });
         controls.append(runBtn, stopBtn, btnA, btnB, shakeBtn);
 
-        const canvasWrap = el("div", "glowbit-canvas-wrap");
-        const canvas = document.createElement("canvas"); canvas.id = containerId + "-canvas"; canvas.className = "glowbit-canvas";
-        const simText = el("div", "glowbit-sim-text", "");
+        const canvasWrap = document.createElement("div");
+        canvasWrap.className = "glowbit-canvas-wrap";
+        const canvas = document.createElement("canvas");
+        canvas.id = containerId + "-canvas";
+        canvas.className = "glowbit-canvas";
+        const simText = Object.assign(document.createElement("div"), { className: "glowbit-sim-text" });
         canvasWrap.append(canvas, simText);
 
         editorWrap.append(editorBox, controls, canvasWrap);
-        right.appendChild(editorWrap);
+        right.append(editorWrap);
         container.append(left, right);
 
-        // canvas + workspace
-        this.attachCanvas(canvas.id, { pixelSize: options.pixelSize || 26, padding: options.padding || 6 });
-        const workspace = this.createWorkspace(editorBox.id, options.toolboxXml);
+        // attach sim
+        attachCanvas(canvas.id, { pixelSize: options.pixelSize || 26 });
 
-        // preload blocks
+        // inject Blockly workspace (with toolbox)
+        const workspace = createWorkspace(editorBox.id, options.toolboxXml);
+
+        // *** ALWAYS START EMPTY ***
         try {
-          if (options.defaultXml) {
-            const dom = Blockly.utils.xml.textToDom(options.defaultXml);
-            Blockly.Xml.domToWorkspace(dom, workspace);
-            console.log("✅ Glowbit: defaultXml loaded.");
-          } else if (options.defaultJson && Blockly.serialization && Blockly.serialization.workspaces && Blockly.serialization.workspaces.load) {
-            Blockly.serialization.workspaces.load(options.defaultJson, workspace);
-            console.log("✅ Glowbit: defaultJson loaded.");
-          }
-        } catch (e) {
-          console.error("❌ Glowbit preload failed", e);
-        }
+          workspace.clear(); // ignore any defaults — per requirement
+        } catch(e) {}
 
-        // run/stop + events
-        const runProgram = () => {
+        // Wire buttons
+        runBtn.addEventListener("click", () => {
           try {
-            resetRuntime();
+            Glowbit.stopAll();           // clear previous runs
+            Glowbit.isRunning = true;    // mark running
             const code = Blockly.JavaScript.workspaceToCode(workspace);
-            new Function(code)();
+            new Function("Glowbit", code)(GlowbitAPI);
             console.log("✅ Glowbit: program loaded, event handlers active");
-             Glowbit.isRunning = true;
-          } catch (e) { console.error("Glowbit.run error", e); }
-        };
-        runBtn.addEventListener("click", runProgram);
-        stopBtn.addEventListener("click", () => {
-          try {
-            state.queue.length = 0;
-            state.running = false;
-            if (Glowbit._scrollTicker) { clearInterval(Glowbit._scrollTicker); Glowbit._scrollTicker = null; }
-            Glowbit.clear();
-            console.log("🛑 Glowbit: program stopped.");
-             Glowbit.isRunning = false;
-if (typeof Glowbit.stopAllAnimations === "function") Glowbit.stopAllAnimations();
-          } catch (e) { console.error("Glowbit.stop error", e); }
+          } catch (e) {
+            console.error("Glowbit.run error", e);
+          }
         });
-        btnA.addEventListener("click", () => Glowbit.trigger("A"));
-        btnB.addEventListener("click", () => Glowbit.trigger("B"));
-        shakeBtn.addEventListener("click", () => Glowbit.trigger("shake"));
 
-        return { workspace, canvasId: canvas.id, runBtn, stopBtn, btnA, btnB, shakeBtn, simText };
-      },
+        stopBtn.addEventListener("click", Glowbit.stopAll);
+        btnA.addEventListener("click", () => GlowbitAPI.trigger("A"));
+        btnB.addEventListener("click", () => GlowbitAPI.trigger("B"));
+        shakeBtn.addEventListener("click", () => GlowbitAPI.trigger("shake"));
 
-      createWorkspace: function (blocklyDivId, toolboxXml) {
-        const defaultToolbox = `
-          <xml xmlns="https://developers.google.com/blockly/xml">
-            <category name="Basic" colour="#5CA699">
-              <block type="on_start"></block>
-              <block type="forever"></block>
-              <block type="repeat_loop"></block>
-              <block type="show_text"></block>
-              <block type="show_number"></block>
-              <block type="pause_block"></block>
-              <block type="clear_screen"></block>
-              <block type="change_color"></block>
-            </category>
-            <category name="LED" colour="#8B5CF6">
-              <block type="plot"></block>
-              <block type="set_pixel"></block>
-              <block type="unplot"></block>
-              <block type="show_leds"></block>
-              <block type="set_brightness"></block>
-            </category>
-            <category name="Input" colour="#FFAB00">
-              <block type="on_button_pressed"></block>
-              <block type="on_shake"></block>
-              <block type="on_gesture"></block>
-              <block type="is_gesture"></block>
-              <block type="sound_level"></block>
-            </category>
-            <category name="Music" colour="#F97316">
-              <block type="play_tone"></block>
-              <block type="play_tone_note"></block>
-              <block type="play_until_done">
-                <value name="NOTES">
-                  <shadow type="text"><field name="TEXT">C4:1, D4:1, E4:2</field></shadow>
-                </value>
-              </block>
-              <block type="set_tempo"></block>
-            </category>
-            <category name="Icons" colour="#22C55E">
-              <block type="show_icon"></block>
-              <block type="show_arrow"></block>
-            </category>
-            <sep></sep>
-            <category name="Logic" colour="#5C81A6">
-              <block type="controls_if"></block>
-              <block type="controls_if"></block>
-              <block type="logic_compare"></block>
-              <block type="logic_boolean"></block>
-            </category>
-            <category name="Loops" colour="#5CA65C">
-              <block type="controls_repeat_ext"></block>
-              <block type="controls_whileUntil"></block>
-            </category>
-            <category name="Math" colour="#F59E0B">
-              <block type="math_number"></block>
-              <block type="math_arithmetic"></block>
-              <block type="pick_random"></block>
-              <block type="count_reporter"></block>
-              <block type="count_reset"></block>
-              <block type="count_increment"></block>
-            </category>
-            <category name="Variables" custom="VARIABLE" colour="#A65C81"></category>
-          </xml>
-        `;
-        const workspace = Blockly.inject(blocklyDivId, {
-          toolbox: toolboxXml || defaultToolbox,
-          trashcan: true,
-          grid: { spacing: 20, length: 3, colour: "#ccc", snap: true },
-          zoom: { controls: true, wheel: true, startScale: 1.0 }
-        });
-        return workspace;
-      },
-
-      attachCanvas: function (canvasId, opts) {
-        opts = opts || {};
-        createGrid(canvasId, opts.pixelSize || 26, opts.padding || 6);
-      },
-
-      enqueue: function (cmd) { state.queue.push(cmd); if (!state.running) processQueue(); },
-
-      // Outputs
-      showText: function (text, speed, color, canvasId) {
-        this.enqueue({ type: "text", text: String(text || ""), speed: speed || 120, color: color || state.defaultColor, canvasId });
-      },
-      showIcon: function (name, color, canvasId) {
-        this.enqueue({ type: "icon", icon: name, color: color || state.defaultColor, canvasId });
-      },
-      clear: function (canvasId) { this.enqueue({ type: "clear", canvasId }); },
-      setPixel: function (x, y, color, canvasId) {
-        this.enqueue({ type: "setPixel", x: Number(x), y: Number(y), color: color || state.defaultColor, canvasId });
-      },
-      playSound: function (nameOrFreq, duration, canvasId) {
-        const tones = { beep: 600, boop: 900, ding: 1200, C4:261.63, D4:293.66, E4:329.63, F4:349.23, G4:392.00, A4:440.00, B4:493.88, C5:523.25 };
-        const freq = (typeof nameOrFreq === "number") ? nameOrFreq : (tones[nameOrFreq] || 700);
-        this.enqueue({ type: "sound", freq, duration: duration || 200, canvasId });
-      },
-      pause: function (ms) { this.enqueue({ type: "pause", ms: Number(ms || 300) }); },
-
-      // Events
-      on: function (evt, handler) {
-        if (!state.eventHandlers[evt]) state.eventHandlers[evt] = [];
-        state.eventHandlers[evt].push(handler);
-      },
-      trigger: function (evt) {
-        state.lastGesture = evt; // for is_gesture reporter
-        const handlers = (state.eventHandlers[evt] || []);
-        if (!handlers.length) console.log("⚠️ Glowbit: No handlers registered for", evt);
-        handlers.forEach(fn => {
-          try { state.queue.push({ type: "pause", ms: 0 }); fn(); if (!state.running) processQueue(); }
-          catch (e) { console.error("Glowbit event handler error", e); }
-        });
+        return { workspace, canvasId: canvas.id, runBtn, stopBtn };
       }
     };
 
-    function resetRuntime() {
-      state.queue.length = 0;
-      state.running = false;
-      if (Glowbit._scrollTicker) { clearInterval(Glowbit._scrollTicker); Glowbit._scrollTicker = null; }
-      state.eventHandlers = {
-        A: [], B: [],
-        shake: [],
-        tilt_up: [], tilt_down: [], tilt_left: [], tilt_right: [],
-        screen_up: [], screen_down: []
-      };
-      state.lastGesture = null;
-    }
+    /* ------------------------------------------------------------
+     * 2.7) Blockly Toolbox (XML)
+     *      - Logic, Loops, Math, Variables, Basic, LED, Music, Input
+     * ------------------------------------------------------------ */
+    function defaultToolboxXml() {
+      return `
+<xml id="toolbox" style="display:none">
+  <category name="Logic" colour="#5C81A6">
+    <block type="controls_if"></block>
+    <block type="logic_compare"></block>
+    <block type="logic_operation"></block>
+    <block type="logic_boolean"></block>
+    <block type="logic_negate"></block>
+  </category>
+  <category name="Loops" colour="#5CA65C">
+    <block type="forever"></block>
+    <block type="repeat_loop">
+      <field name="COUNT">5</field>
+    </block>
+  </category>
+  <category name="Math" colour="#5C68A6">
+    <block type="math_number"><field name="NUM">0</field></block>
+    <block type="math_arithmetic"></block>
+    <block type="math_number_property"></block>
+    <block type="math_random_int"></block>
+  </category>
+  <category name="Variables" custom="VARIABLE" colour="#A65C81"></category>
 
-    // ---------- Utilities ----------
-    function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
-    function button(text, cls) { const b = document.createElement("button"); b.className = cls; b.textContent = text; return b; }
+  <sep></sep>
+  <category name="Basic" colour="#7B2CBF">
+    <block type="on_start"></block>
+    <block type="pause"><field name="MS">300</field></block>
+    <block type="clear_screen"></block>
+    <block type="show_text"><field name="TEXT">Hello!</field></block>
+    <block type="show_number">
+      <value name="NUM"><block type="math_number"><field name="NUM">42</field></block></value>
+    </block>
+  </category>
 
-    let _stylesInjected = false;
-    function injectBaseStylesOnce() {
-      if (_stylesInjected) return; _stylesInjected = true;
-      const css = `
-      .glowbit-lesson{display:flex;gap:18px;align-items:flex-start;font-family:Inter,Arial,sans-serif}
-      .glowbit-left{flex:0 0 30%;background:#fff;border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
-      .glowbit-right{flex:1 1 70%;background:linear-gradient(180deg,#f7fbff,#fff);padding:12px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.04)}
-      .glowbit-title{font-size:20px;margin:0 0 8px 0;color:#0b2340}
-      .glowbit-instructions{font-size:14px;color:#334155;line-height:1.45}
-      .glowbit-editor-wrap{display:flex;flex-direction:column;gap:12px}
-      .glowbit-editor{height:520px;border-radius:8px;overflow:hidden;border:1px solid #e6eef7;background:#fff}
-      .glowbit-controls{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:6px;flex-wrap:wrap}
-      .glowbit-btn{background:#00A1D6;color:#fff;border:none;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600;box-shadow:0 6px 14px rgba(0,161,214,.16)}
-      .glowbit-btn.secondary{background:#6B7280}
-      .glowbit-btn.event{background:#FFA857;color:#061826}
-      .glowbit-canvas-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:6px;overflow:visible}
-      .glowbit-canvas{background:#000;border-radius:10px;box-shadow:0 0 26px 6px rgba(0,255,0,.65)}
-      .glowbit-sim-text{color:#0f0;font-family:monospace;margin-top:4px;min-height:18px}
-      .blocklySvg{height:100%!important}
-      @media (max-width:900px){.glowbit-lesson{flex-direction:column}.glowbit-left,.glowbit-right{width:100%}}
+  <category name="LED" colour="#D97706">
+    <block type="set_pixel">
+      <field name="X">0</field>
+      <field name="Y">0</field>
+      <field name="COLOUR">#00FF00</field>
+    </block>
+    <block type="plot_xy">
+      <field name="X">0</field>
+      <field name="Y">0</field>
+      <field name="COLOUR">#00FF00</field>
+    </block>
+    <block type="show_icon"><field name="ICON">smile</field><field name="COLOUR">#00FF00</field></block>
+    <block type="show_arrow"><field name="DIR">arrow_right</field><field name="COLOUR">#00FF00</field></block>
+  </category>
+
+  <category name="Music" colour="#06B6D4">
+    <block type="set_tempo"><field name="BPM">120</field></block>
+    <block type="play_tone">
+      <field name="NOTE">Middle C</field>
+      <field name="BEATS">1</field>
+    </block>
+  </category>
+
+  <category name="Input" colour="#10B981">
+    <block type="on_button"><field name="BTN">A</field></block>
+    <block type="on_shake"></block>
+    <block type="gesture_is"><field name="GEST">screen_up</field></block>
+    <block type="sound_level"></block>
+  </category>
+</xml>
       `;
-      const s = document.createElement("style"); s.textContent = css; document.head.appendChild(s);
     }
 
-    // ---------- Custom Blocks (original + added) ----------
-    try {
-      Blockly.defineBlocksWithJsonArray([
-        // Program structure
-        { "type":"on_start","message0":"on start %1","args0":[{"type":"input_statement","name":"DO"}],"colour":200,"nextStatement":null },
-        { "type":"forever","message0":"forever %1","args0":[{"type":"input_statement","name":"DO"}],"colour":120,"nextStatement":null },
-        { "type":"repeat_loop","message0":"repeat %1 times %2","args0":[{"type":"field_number","name":"COUNT","value":5,"min":1},{"type":"input_statement","name":"DO"}],"colour":120,"previousStatement":null,"nextStatement":null },
+    /* ------------------------------------------------------------
+     * 2.8) Workspace inject helper
+     * ------------------------------------------------------------ */
+    function createWorkspace(editorDivId, customToolboxXmlText) {
+      const editorDiv = document.getElementById(editorDivId);
+      const toolboxXmlText = (customToolboxXmlText && String(customToolboxXmlText).trim())
+        ? customToolboxXmlText
+        : defaultToolboxXml();
 
-        // Display / LED
-        { "type":"show_text","message0":"show text %1","args0":[{"type":"field_input","name":"TEXT","text":"Hello"}],"previousStatement":null,"nextStatement":null,"colour":160 },
-        { "type":"show_number","message0":"show number %1","args0":[{"type":"input_value","name":"NUM"}],"previousStatement":null,"nextStatement":null,"colour":160 },
+      const toolboxDom = Blockly.utils.xml.textToDom(toolboxXmlText);
+      const workspace = Blockly.inject(editorDiv, {
+        toolbox: toolboxDom,
+        trashcan: true,
+        scrollbars: true,
+        zoom: { controls: true, wheel: true, startScale: 0.95, maxScale: 2.0, minScale: 0.5, pinch: true }
+      });
 
-        { "type":"plot","message0":"plot x %1 y %2","args0":[{"type":"field_number","name":"X","value":0,"min":0,"max":7},{"type":"field_number","name":"Y","value":0,"min":0,"max":7}],"previousStatement":null,"nextStatement":null,"colour":290 },
-        { "type":"set_pixel","message0":"set pixel x %1 y %2 color %3","args0":[{"type":"field_number","name":"X","value":0,"min":0,"max":7},{"type":"field_number","name":"Y","value":0,"min":0,"max":7},{"type":"field_colour","name":"COL","colour":"#00FF00"}],"previousStatement":null,"nextStatement":null,"colour":290 },
-        { "type":"unplot","message0":"unplot x %1 y %2","args0":[{"type":"field_number","name":"X","value":0,"min":0,"max":7},{"type":"field_number","name":"Y","value":0,"min":0,"max":7}],"previousStatement":null,"nextStatement":null,"colour":290 },
+      // Ensure Variables flyout works as expected
+      workspace.registerToolboxCategoryCallback('VARIABLE', function(ws) {
+        return Blockly.Variables.flyoutCategory(ws);
+      });
 
-        // 8×8 multi-line entry (# or .), 8 lines of 8 cells each
-        { "type":"show_leds","message0":"show leds 8×8 %1","args0":[{"type":"field_multilinetext","name":"MATRIX","text":"# . . . . . . #\n. # . . . . # .\n. . # . . # . .\n. . . # # . . .\n. . . # # . . .\n. . # . . # . .\n. # . . . . # .\n# . . . . . . #"}],"previousStatement":null,"nextStatement":null,"colour":20 },
-
-        { "type":"set_brightness","message0":"set brightness %1","args0":[{"type":"field_number","name":"VAL","value":255,"min":0,"max":255}],"previousStatement":null,"nextStatement":null,"colour":230 },
-        { "type":"change_color","message0":"set color %1","args0":[{"type":"field_colour","name":"COL","colour":"#00FF00"}],"previousStatement":null,"nextStatement":null,"colour":230 },
-        { "type":"pause_block","message0":"pause (ms) %1","args0":[{"type":"field_number","name":"MS","value":300,"min":0}],"previousStatement":null,"nextStatement":null,"colour":120 },
-        { "type":"clear_screen","message0":"clear screen","previousStatement":null,"nextStatement":null,"colour":0 },
-
-        // Icons / Arrows
-        { "type":"show_icon","message0":"show icon %1","args0":[{"type":"field_dropdown","name":"ICON","options":[["heart","heart"],["smile","smile"]]}],"previousStatement":null,"nextStatement":null,"colour":22 },
-        { "type":"show_arrow","message0":"show arrow %1","args0":[{"type":"field_dropdown","name":"ARROW","options":[["N","arrow_up"],["S","arrow_down"],["E","arrow_right"],["W","arrow_left"],["NE","arrow_ne"],["NW","arrow_nw"],["SE","arrow_se"],["SW","arrow_sw"]]}],"previousStatement":null,"nextStatement":null,"colour":22 },
-
-        // Input / Events / Gestures
-        { "type":"on_button_pressed","message0":"on button %1 do %2","args0":[{"type":"field_dropdown","name":"BTN","options":[["A","A"],["B","B"]]},{"type":"input_statement","name":"DO"}],"colour":20,"previousStatement":null,"nextStatement":null },
-        { "type":"on_shake","message0":"on shake do %1","args0":[{"type":"input_statement","name":"DO"}],"colour":20,"previousStatement":null,"nextStatement":null },
-        { "type":"on_gesture","message0":"on gesture %1 do %2","args0":[{"type":"field_dropdown","name":"GEST","options":[["tilt up","tilt_up"],["tilt down","tilt_down"],["tilt left","tilt_left"],["tilt right","tilt_right"],["screen up","screen_up"],["screen down","screen_down"]]},{"type":"input_statement","name":"DO"}],"colour":20,"previousStatement":null,"nextStatement":null },
-        { "type":"is_gesture","message0":"is %1","args0":[{"type":"field_dropdown","name":"GEST","options":[["screen up","screen_up"],["screen down","screen_down"],["tilt up","tilt_up"],["tilt down","tilt_down"]]}],"output":"Boolean","colour":200 },
-
-        // Sensors
-        { "type":"sound_level","message0":"sound level","output":"Number","colour":60 },
-
-        // Music
-        { "type":"play_tone","message0":"play tone %1 Hz for %2 ms","args0":[{"type":"field_number","name":"FREQ","value":440,"min":50,"max":2000},{"type":"field_number","name":"DUR","value":200,"min":50,"max":2000}],"previousStatement":null,"nextStatement":null,"colour":60 },
-
-        // note + beats
-        { "type":"play_tone_note","message0":"play tone %1 for %2 beat(s)","args0":[{"type":"field_dropdown","name":"NOTE","options":[["Middle C (C4)","C4"],["D4","D4"],["E4","E4"],["F4","F4"],["G4","G4"],["A4","A4"],["B4","B4"],["High C (C5)","C5"]]},{"type":"field_number","name":"BEATS","value":1,"min":0.25,"max":8,"precision":0.25}],"previousStatement":null,"nextStatement":null,"colour":60 },
-
-        { "type":"set_tempo","message0":"set tempo (BPM) %1","args0":[{"type":"field_number","name":"BPM","value":120,"min":20,"max":300}],"previousStatement":null,"nextStatement":null,"colour":60 },
-
-        { "type":"play_until_done","message0":"play until done notes %1","args0":[{"type":"input_value","name":"NOTES"}],"previousStatement":null,"nextStatement":null,"colour":60 },
-
-        // Math
-        { "type":"pick_random","message0":"pick random %1 to %2","args0":[{"type":"input_value","name":"FROM","check":"Number"},{"type":"input_value","name":"TO","check":"Number"}],"output":"Number","colour":230 },
-
-        // Count helpers
-        { "type":"count_reporter","message0":"count","output":"Number","colour":230 },
-        { "type":"count_reset","message0":"reset count","previousStatement":null,"nextStatement":null,"colour":230 },
-        { "type":"count_increment","message0":"change count by %1","args0":[{"type":"field_number","name":"DELTA","value":1,"min":-100,"max":100}],"previousStatement":null,"nextStatement":null,"colour":230 }
-      ]);
-    } catch (e) {
-      console.warn("Glowbit: blocks may already be defined", e);
+      return workspace;
     }
 
-    // ---------- Generators ----------
-    try {
-      const G = Blockly.JavaScript;
-      function reg(name, fn) { if (G.forBlock) G.forBlock[name] = fn; G[name] = fn; }
+    /* ------------------------------------------------------------
+     * 2.9) Custom Blocks (definitions + JS generators)
+     *      All "GlowBit" specific blocks live here.
+     * ------------------------------------------------------------ */
+    const B = Blockly.Blocks;
+    const G = Blockly.JavaScript;
 
-      // Structure
-      reg("on_start", (b) => { const body = G.statementToCode(b, "DO") || ""; return `${body}\n`; });
-     reg("forever", (b) => {
-  const body = G.statementToCode(b, "DO") || "";
-  return `
-const _loopId = setInterval(function() {
-  if (!Glowbit.isRunning) {
-    clearInterval(_loopId);
-    return;
-  }
-  ${body}
-}, 400);
-if (!Glowbit._loopIntervals) Glowbit._loopIntervals = [];
-Glowbit._loopIntervals.push(_loopId);
+    // ---- Helpers for generators
+    function reg(name, fn) { G[name] = fn; }
+
+    // ========== Basic
+    B.on_start = {
+      init: function () {
+        this.appendDummyInput().appendField("on start");
+        this.appendStatementInput("DO");
+        this.setColour("#7B2CBF");
+        this.setTooltip("Run the blocks below once when program starts.");
+      }
+    };
+    reg("on_start", (b) => {
+      const body = G.statementToCode(b, "DO") || "";
+      return `${body}\n`;
+    });
+
+    B.pause = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField("pause (ms)")
+          .appendField(new Blockly.FieldNumber(300, 0, 60000, 10), "MS");
+        this.setColour("#7B2CBF");
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+      }
+    };
+    reg("pause", (b) => {
+      const ms = Number(b.getFieldValue("MS") || 300);
+      // Simple asynchronous delay
+      return `await (async ()=> new Promise(r => setTimeout(r, ${ms})))();\n`;
+    });
+
+    B.clear_screen = {
+      init: function () {
+        this.appendDummyInput().appendField("clear screen");
+        this.setColour("#7B2CBF");
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+      }
+    };
+    reg("clear_screen", () => {
+      // clear all canvases
+      return `Glowbit.clear();\n`;
+    });
+
+    // ========== Loops
+    B.forever = {
+      init: function () {
+        this.appendDummyInput().appendField("forever");
+        this.appendStatementInput("DO");
+        this.setColour("#5CA65C");
+      }
+    };
+    reg("forever", (b) => {
+      const body = G.statementToCode(b, "DO") || "";
+      // Stop-aware forever loop (tracked interval)
+      return `
+(function(){
+  const _loopId = setInterval(async function(){
+    if (!Glowbit.isRunning) { clearInterval(_loopId); return; }
+    ${body}
+  }, 400);
+  if (!Glowbit._intervals) Glowbit._intervals = [];
+  Glowbit._intervals.push(_loopId);
+})();
 `;
-});
-      reg("repeat_loop", (b) => { const n = Number(b.getFieldValue("COUNT") || 1); const body = G.statementToCode(b, "DO") || ""; return `for(let i=0;i<${n};i++){\n${body}}\n`; });
+    });
 
-      // Display / LED
-      reg("show_text", (b) => { const t = b.getFieldValue("TEXT") || ""; return `Glowbit.showText(${JSON.stringify(t)}, 120);\n`; });
-      reg("show_number", (b) => { const v = G.valueToCode(b, "NUM", G.ORDER_NONE) || 0; return `Glowbit.showText(String(${v}), 120);\n`; });
-      reg("plot", (b) => { const x = Number(b.getFieldValue("X")||0), y = Number(b.getFieldValue("Y")||0); return `Glowbit.setPixel(${x}, ${y}, Glowbit._state.defaultColor);\n`; });
-      reg("set_pixel", (b) => { const x = Number(b.getFieldValue("X")||0), y = Number(b.getFieldValue("Y")||0), c = b.getFieldValue("COL")||"#00ff00"; return `Glowbit.setPixel(${x}, ${y}, ${JSON.stringify(c)});\n`; });
-      reg("unplot", (b) => { const x=b.getFieldValue("X")||0, y=b.getFieldValue("Y")||0; return `Glowbit.setPixel(${x}, ${y}, null);\n`; });
-
-      reg("show_leds", (b) => {
-        const raw = (b.getFieldValue("MATRIX") || "").trim().split(/[\r\n]+/).slice(0,8);
-        let js = "";
-        for (let y=0;y<8;y++){
-          const row = (raw[y]||"").trim().split(/\s+/).slice(0,8);
-          for (let x=0;x<8;x++){
-            const cell = row[x] || ".";
-            js += (cell === "#")
-              ? `Glowbit.setPixel(${x}, ${y}, Glowbit._state.defaultColor);\n`
-              : `Glowbit.setPixel(${x}, ${y}, null);\n`;
-          }
-        }
-        return js;
-      });
-      reg("set_brightness", (b) => { const v=Number(b.getFieldValue("VAL")||255); return `Glowbit._state.brightness=${v};\n`; });
-      reg("change_color", (b) => { const c=b.getFieldValue("COL")||"#00ff00"; return `Glowbit._state.defaultColor=${JSON.stringify(c)};\n`; });
-      reg("pause_block", (b) => { const ms=Number(b.getFieldValue("MS")||300); return `Glowbit.pause(${ms});\n`; });
-      reg("clear_screen", () => `Glowbit.clear();\n`);
-
-      // Icons / Arrows
-      reg("show_icon", (b) => { const i=b.getFieldValue("ICON")||"heart"; return `Glowbit.showIcon(${JSON.stringify(i)});\n`; });
-      reg("show_arrow", (b) => { const a=b.getFieldValue("ARROW")||"arrow_up"; return `Glowbit.showIcon(${JSON.stringify(a)});\n`; });
-
-      // Events / Gestures
-      reg("on_button_pressed", (b) => { const btn=b.getFieldValue("BTN")||"A"; const body=G.statementToCode(b,"DO")||""; return `Glowbit.on(${JSON.stringify(btn)}, function(){\n${body}});\n`; });
-      reg("on_shake", (b) => { const body=G.statementToCode(b,"DO")||""; return `Glowbit.on("shake", function(){\n${body}});\n`; });
-      reg("on_gesture", (b) => { const g=b.getFieldValue("GEST")||"tilt_up"; const body=G.statementToCode(b,"DO")||""; return `Glowbit.on(${JSON.stringify(g)}, function(){\n${body}});\n`; });
-      reg("is_gesture", (b) => { const g=b.getFieldValue("GEST")||"screen_up"; return [`(Glowbit._state.lastGesture===${JSON.stringify(g)})`, G.ORDER_ATOMIC]; });
-
-      // Sensors
-      reg("sound_level", () => [`Math.floor(Math.random()*200)`, G.ORDER_FUNCTION_CALL]);
-
-      // Music
-      function beatsToMs(beats) {
-        const msPerBeat = 60000 / Math.max(20, Math.min(300, state.tempoBPM || 120));
-        return Math.round(msPerBeat * beats);
+    B.repeat_loop = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField("repeat")
+          .appendField(new Blockly.FieldNumber(5, 1, 100, 1), "COUNT")
+          .appendField("times");
+        this.appendStatementInput("DO");
+        this.setColour("#5CA65C");
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
       }
-      reg("play_tone", (b) => {
-        const f = Number(b.getFieldValue("FREQ") || 440);
-        const d = Number(b.getFieldValue("DUR") || 200);
-        return `Glowbit.playSound(${f}, ${d});\n`;
-      });
-      reg("play_tone_note", (b) => {
-        const note = b.getFieldValue("NOTE") || "C4";
-        const beats = Number(b.getFieldValue("BEATS") || 1);
-        return `(function(){var _ms=${beatsToMs.toString()}(${beats}); Glowbit.playSound(${JSON.stringify(note)}, _ms);}());\n`;
-      });
-      reg("set_tempo", (b) => {
-        const bpm = Number(b.getFieldValue("BPM") || 120);
-        return `Glowbit._state.tempoBPM=${bpm};\n`;
-      });
-      reg("play_until_done", (b) => {
-        // NOTES value: "C4:1, D4:1, E4:2"
-        const list = G.valueToCode(b, "NOTES", G.ORDER_NONE) || '"C4:1"';
-        const helper = function schedule(listStr){
-          try{
-            const items = String(listStr).split(/\s*,\s*/).filter(Boolean);
-            items.forEach(pair=>{
-              const m=String(pair).trim().match(/^([A-G][#b]?\d)\s*:\s*([\d.]+)$/i);
-              if(m){
-                const note=m[1].toUpperCase();
-                const beats=parseFloat(m[2])||1;
-                const ms=(60000/Math.max(20,Math.min(300, (window.Glowbit?Glowbit._state.tempoBPM:120))))*beats;
-                (window.Glowbit||{}).playSound(note, Math.round(ms));
-                (window.Glowbit||{}).pause(Math.round(ms)+10);
-              }
-            });
-          }catch(e){ console.warn("play_until_done parse error", e); }
-        };
-        return `(${helper.toString()})(${list});\n`;
-      });
+    };
+    reg("repeat_loop", (b) => {
+      const n = Number(b.getFieldValue("COUNT") || 1);
+      const body = G.statementToCode(b, "DO") || "";
+      return `
+for(let i=0;i<${n};i++){
+  if (!Glowbit.isRunning) break;
+  ${body}
+}
+`;
+    });
 
-      // Math extras
-      reg("pick_random", (b) => {
-        const from = G.valueToCode(b, "FROM", G.ORDER_NONE) || 0;
-        const to = G.valueToCode(b, "TO", G.ORDER_NONE) || 10;
-        return [`Math.floor(Math.random()*((+(${to}))-(+(${from}))+1)) + (+(${from}))`, G.ORDER_NONE];
-      });
+    // ========== Basic display
+    B.show_text = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField("show text")
+          .appendField(new Blockly.FieldTextInput("Hello!"), "TEXT");
+        this.setColour("#7B2CBF");
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+      }
+    };
+    reg("show_text", (b) => {
+      const t = JSON.stringify(b.getFieldValue("TEXT") || "");
+      return `Glowbit.showText(/* any canvas */ Object.keys(Glowbit._state.canvases)[0], ${t});\n`;
+    });
 
-      // Count helpers
-      reg("count_reporter", () => [`(Glowbit._state.count|0)`, G.ORDER_ATOMIC]);
-      reg("count_reset", () => `Glowbit._state.count=0;\n`);
-      reg("count_increment", (b) => { const d=Number(b.getFieldValue("DELTA")||1); return `Glowbit._state.count=(Glowbit._state.count|0)+(${d});\n`; });
+    B.show_number = {
+      init: function () {
+        this.appendValueInput("NUM").appendField("show number");
+        this.setColour("#7B2CBF");
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+      }
+    };
+    reg("show_number", (b) => {
+      const n = G.valueToCode(b, "NUM", G.ORDER_NONE) || "0";
+      return `Glowbit.showText(Object.keys(Glowbit._state.canvases)[0], String(${n}));\n`;
+    });
 
-      // Built-in helpers (guard against missing)
-      if (!G["math_number"]) G["math_number"] = (block) => [Number(block.getFieldValue("NUM")), G.ORDER_ATOMIC];
-      if (!G["math_arithmetic"]) {
-        G["math_arithmetic"] = function (block) {
-          const OPERATORS = { "ADD":[" + ",G.ORDER_ADDITION], "MINUS":[" - ",G.ORDER_SUBTRACTION], "MULTIPLY":[" * ",G.ORDER_MULTIPLICATION], "DIVIDE":[" / ",G.ORDER_DIVISION], "POWER":[null,G.ORDER_NONE] };
-          const op = OPERATORS[block.getFieldValue("OP")] || OPERATORS.ADD;
-          const a = G.valueToCode(block,"A",op[1]) || "0";
-          const b = G.valueToCode(block,"B",op[1]) || "0";
-          if (block.getFieldValue("OP")==="POWER") return [`Math.pow(${a}, ${b})`, G.ORDER_FUNCTION_CALL];
-          return [`${a}${op[0]}${b}`, op[1]];
-        };
+    // ========== LED
+    B.set_pixel = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField("set pixel x")
+          .appendField(new Blockly.FieldNumber(0, 0, 7, 1), "X")
+          .appendField("y")
+          .appendField(new Blockly.FieldNumber(0, 0, 7, 1), "Y")
+          .appendField("color")
+          .appendField(new Blockly.FieldColour("#00FF00"), "COLOUR");
+        this.setColour("#D97706");
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
       }
-      if (!G["logic_compare"]) {
-        G["logic_compare"] = function (block) {
-          const OPS = {"EQ":"==","NEQ":"!=","LT":"<","LTE":"<=","GT":">","GTE":">="};
-          const op = OPS[block.getFieldValue("OP")] || "==";
-          const order = (op==="=="||op==="!=")?G.ORDER_EQUALITY:G.ORDER_RELATIONAL;
-          const a = G.valueToCode(block,"A",order)||"0";
-          const b = G.valueToCode(block,"B",order)||"0";
-          return [`${a} ${op} ${b}`, order];
-        };
+    };
+    reg("set_pixel", (b) => {
+      const x = Number(b.getFieldValue("X") || 0);
+      const y = Number(b.getFieldValue("Y") || 0);
+      const col = JSON.stringify(b.getFieldValue("COLOUR") || "#00FF00");
+      return `Glowbit.setPixel(Object.keys(Glowbit._state.canvases)[0], ${x}, ${y}, ${col});\n`;
+    });
+
+    B.plot_xy = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField("plot x")
+          .appendField(new Blockly.FieldNumber(0, 0, 7, 1), "X")
+          .appendField("y")
+          .appendField(new Blockly.FieldNumber(0, 0, 7, 1), "Y")
+          .appendField("color")
+          .appendField(new Blockly.FieldColour("#00FF00"), "COLOUR");
+        this.setColour("#D97706");
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
       }
-      if (!G["controls_if"]) {
-        G["controls_if"] = function (block) {
-          let n=0, code="", branchCode, conditionCode;
-          do {
-            conditionCode = G.valueToCode(block,'IF'+n,G.ORDER_NONE) || 'false';
-            branchCode = G.statementToCode(block,'DO'+n) || '';
-            code += (n?' else ':'') + `if (${conditionCode}) {\n${branchCode}}`;
-            n++;
-          } while (block.getInput('IF'+n));
-          if (block.getInput('ELSE')) {
-            branchCode = G.statementToCode(block,'ELSE') || '';
-            code += ' else {\n' + branchCode + '}';
-          }
-          code += '\n';
-          return code;
-        };
+    };
+    reg("plot_xy", (b) => {
+      const x = Number(b.getFieldValue("X") || 0);
+      const y = Number(b.getFieldValue("Y") || 0);
+      const col = JSON.stringify(b.getFieldValue("COLOUR") || "#00FF00");
+      return `Glowbit.plotXY(Object.keys(Glowbit._state.canvases)[0], ${x}, ${y}, ${col});\n`;
+    });
+
+    B.show_icon = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField("show icon")
+          .appendField(new Blockly.FieldDropdown([
+            ["smile","smile"],["heart","heart"],
+            ["arrow_left","arrow_left"],["arrow_right","arrow_right"]
+          ]), "ICON")
+          .appendField("color")
+          .appendField(new Blockly.FieldColour("#00FF00"), "COLOUR");
+        this.setColour("#D97706");
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
       }
-    } catch (e) {
-      console.error("Glowbit: generator registration failed", e);
+    };
+    reg("show_icon", (b) => {
+      const icon = JSON.stringify(b.getFieldValue("ICON") || "smile");
+      const col = JSON.stringify(b.getFieldValue("COLOUR") || "#00FF00");
+      return `Glowbit.showIcon(Object.keys(Glowbit._state.canvases)[0], ${icon}, ${col});\n`;
+    });
+
+    B.show_arrow = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField("show arrow")
+          .appendField(new Blockly.FieldDropdown([
+            ["arrow_left","arrow_left"],["arrow_right","arrow_right"]
+          ]), "DIR")
+          .appendField("color")
+          .appendField(new Blockly.FieldColour("#00FF00"), "COLOUR");
+        this.setColour("#D97706");
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+      }
+    };
+    reg("show_arrow", (b) => {
+      const dir = JSON.stringify(b.getFieldValue("DIR") || "arrow_right");
+      const col = JSON.stringify(b.getFieldValue("COLOUR") || "#00FF00");
+      return `Glowbit.showIcon(Object.keys(Glowbit._state.canvases)[0], ${dir}, ${col});\n`;
+    });
+
+    // ========== Music
+    B.set_tempo = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField("set tempo (BPM)")
+          .appendField(new Blockly.FieldNumber(120, 20, 360, 1), "BPM");
+        this.setColour("#06B6D4");
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+      }
+    };
+    reg("set_tempo", (b) => {
+      const bpm = Number(b.getFieldValue("BPM") || 120);
+      return `Glowbit._state.tempoBPM = ${bpm};\n`;
+    });
+
+    // Middle C… simplified mapping
+    const NOTE_FREQ = {
+      "Middle C": 261.63,
+      "D": 293.66,
+      "E": 329.63,
+      "F": 349.23,
+      "G": 392.00,
+      "A": 440.00,
+      "B": 493.88,
+      "High C": 523.25
+    };
+
+    B.play_tone = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField("play tone")
+          .appendField(new Blockly.FieldDropdown(Object.keys(NOTE_FREQ).map(k => [k,k])), "NOTE")
+          .appendField("for")
+          .appendField(new Blockly.FieldDropdown([["1","1"],["1/2","0.5"],["2","2"]]), "BEATS")
+          .appendField("beat(s)");
+        this.setColour("#06B6D4");
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+      }
+    };
+    reg("play_tone", (b) => {
+      const note = b.getFieldValue("NOTE") || "Middle C";
+      const beats = Number(b.getFieldValue("BEATS") || 1);
+      const freq = NOTE_FREQ[note] || NOTE_FREQ["Middle C"];
+      const ms = `(${beats})* (60000 / (Glowbit._state.tempoBPM || 120))`;
+      return `Glowbit.playTone(${freq}, ${ms});\n`;
+    });
+
+    // ========== Input / Events / Gestures
+    B.on_button = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField("on button")
+          .appendField(new Blockly.FieldDropdown([["A","A"],["B","B"]]), "BTN");
+        this.appendStatementInput("DO");
+        this.setColour("#10B981");
+      }
+    };
+    reg("on_button", (b) => {
+      const btn = b.getFieldValue("BTN") || "A";
+      const body = G.statementToCode(b, "DO") || "";
+      const key = JSON.stringify(btn);
+      return `Glowbit.on(${key}, async function(){ if(!Glowbit.isRunning) return; ${body} });\n`;
+    });
+
+    B.on_shake = {
+      init: function () {
+        this.appendDummyInput().appendField("on shake");
+        this.appendStatementInput("DO");
+        this.setColour("#10B981");
+      }
+    };
+    reg("on_shake", (b) => {
+      const body = G.statementToCode(b, "DO") || "";
+      return `Glowbit.on("shake", async function(){ if(!Glowbit.isRunning) return; ${body} });\n`;
+    });
+
+    B.gesture_is = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField("gesture is")
+          .appendField(new Blockly.FieldDropdown([
+            ["screen_up","screen_up"],["screen_down","screen_down"],
+            ["tilt_up","tilt_up"],["tilt_down","tilt_down"],
+            ["tilt_left","tilt_left"],["tilt_right","tilt_right"]
+          ]), "GEST");
+        this.setOutput(true, "Boolean");
+        this.setColour("#10B981");
+      }
+    };
+    reg("gesture_is", (b) => {
+      const g = JSON.stringify(b.getFieldValue("GEST") || "screen_up");
+      return [`(Glowbit._state.lastGesture === ${g})`, G.ORDER_ATOMIC];
+    });
+
+    B.sound_level = {
+      init: function () {
+        this.appendDummyInput().appendField("sound level");
+        this.setOutput(true, "Number");
+        this.setColour("#10B981");
+      }
+    };
+    reg("sound_level", () => {
+      // simple fake (random 0..100)
+      return ["(Math.floor(Math.random()*101))", G.ORDER_ATOMIC];
+    });
+
+    // ========== Variables (built-in UI handles creation)
+    // Toolbox uses custom="VARIABLE", no extra blocks needed here.
+
+    /* ------------------------------------------------------------
+     * 2.10) Minimal styles (keep things usable without external CSS)
+     * ------------------------------------------------------------ */
+    injectMinimalStyles();
+
+    function injectMinimalStyles() {
+      if (document.getElementById("glowbit-min-css")) return;
+      const css = `
+.glowbit-lesson{display:grid;grid-template-columns:1fr 2fr;gap:14px;margin-top:8px;}
+.glowbit-left{background:#f5f7fb;border-radius:8px;padding:12px;color:#374151}
+.glowbit-right{}
+.glowbit-editor-wrap{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:10px;}
+.glowbit-editor{height:420px;border:1px solid #e5e7eb;border-radius:6px;margin-bottom:10px;overflow:hidden;}
+.glowbit-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.glowbit-btn{background:#4B0082;color:#fff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:700}
+.glowbit-btn.secondary{background:#6b7280}
+.glowbit-btn.event{background:#10B981}
+.glowbit-canvas-wrap{display:flex;gap:10px;align-items:center}
+.glowbit-canvas{background:#111;border-radius:6px}
+.glowbit-sim-text{color:#4B0082;font-weight:700}
+@media (max-width: 960px){.glowbit-lesson{grid-template-columns:1fr}}
+      `.trim();
+      const style = document.createElement("style");
+      style.id = "glowbit-min-css";
+      style.textContent = css;
+      document.head.appendChild(style);
     }
 
-    // ---------- Expose API ----------
+    /* ------------------------------------------------------------
+     * 2.11) Expose public API
+     * ------------------------------------------------------------ */
+    GlowbitAPI.createWorkspace = createWorkspace; // (exposed for future steps)
+    GlowbitAPI.defaultToolboxXml = defaultToolboxXml;
+
+    // attach STOP helpers
+    GlowbitAPI.stopAllAnimations = stopAllAnimations;
+
+    // finalize global
     window.Glowbit = GlowbitAPI;
+
     console.log("✅ Glowbit Global.js loaded and ready.");
   }
- /**
- * Stops all LED animation loops and async tasks.
- */
-Glowbit.stopAllAnimations = function() {
-  // Clear any active intervals or animation frames
-  if (Glowbit._loopIntervals) {
-    Glowbit._loopIntervals.forEach(clearInterval);
-    Glowbit._loopIntervals = [];
-  }
-  if (Glowbit._animationFrame) {
-    cancelAnimationFrame(Glowbit._animationFrame);
-    Glowbit._animationFrame = null;
-  }
-  console.log("🛑 Glowbit animations stopped.");
-};
 })();
