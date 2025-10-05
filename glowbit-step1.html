@@ -1,98 +1,165 @@
-<script>
-/* ===============================================================
-   Glowbit Step 1 – Show Text
-   Adapted for GitHub Pages (ensures DOM + Glowbit ready)
-   =============================================================== */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GlowBit Step 1 – Show Text</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-window.addEventListener('load', function() {
-  console.log("🔥 Step1 script tag detected by browser.");
-  console.log("✅ DOMContentLoaded fired.");
+  <!-- Blockly + Global Glowbit setup -->
+  <script src="lib/blockly_compressed.js"></script>
+  <script src="lib/blocks_compressed.js"></script>
+  <script src="lib/javascript_compressed.js"></script>
+  <script src="lib/msg/en.js"></script>
+  <script src="assets/global.js"></script>
 
-  function waitForGlow() {
-    // Check for Glowbit and Blockly objects first
-    if (window.Glowbit && window.Blockly) {
-      console.log("✅ Glowbit & Blockly available.");
-
-      const container = document.getElementById('glowbit-step1');
-      if (!container) {
-        console.error("❌ #glowbit-step1 not found in DOM. Blockly cannot render.");
-        return;
-      } else {
-        console.log("✅ Found #glowbit-step1 container in DOM.");
-      }
-
-      // Working JSON block preload from LearnWorlds
-      const startBlocks = {
-        "blocks": {
-          "languageVersion": 0,
-          "blocks": [
-            {
-              "type": "show_text",
-              "x": 20,
-              "y": 20,
-              "fields": { "TEXT": "Smart Robot" }
-            }
-          ]
-        }
-      };
-
-      // Create Blockly UI
-      const lesson = Glowbit.createLessonUI('glowbit-step1', {
-        title: '',
-        instructions: '',
-        pixelSize: 28,
-        defaultJson: startBlocks
-      });
-      window._lesson_step1 = lesson;
-      console.log("✅ Glowbit.createLessonUI executed.");
-
-      // Sidebar override
-      function overrideSidebar() {
-        const container = document.querySelector('#glowbit-step1');
-        if (!container) return;
-
-        const sidebar = Array.from(container.querySelectorAll('*')).find(el =>
-          el.innerText && (
-            el.innerText.includes("GlowBit Lesson") ||
-            el.innerText.includes("Follow the steps on the right")
-          )
-        );
-
-        if (sidebar) {
-          sidebar.style.background = '#e6f9ff';
-          sidebar.style.borderRadius = '10px';
-          sidebar.style.padding = '12px';
-          sidebar.style.color = '#00A1D6';
-          sidebar.style.fontSize = '14px';
-          sidebar.style.fontWeight = '500';
-          sidebar.style.boxShadow = '0 0 8px rgba(0,0,0,0.08)';
-
-          const stepCardStyle = 'margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#ffffff;font-weight:600;';
-
-          sidebar.innerHTML =
-            '<h3 style="color:#00A1D6;font-weight:800;font-size:16px;margin-bottom:10px;text-align:center;">🌟 Follow These Steps 🌟</h3>' +
-            '<div style="' + stepCardStyle + '">🧩 <strong>Go to the "Basic" tab</strong>. Drag the <strong>Show Text</strong> block into the workspace.</div>' +
-            '<div style="' + stepCardStyle + '">✍️ <strong>Click the text field</strong> (it says "Hello!" by default). Type <strong>Smart Robot</strong>.</div>' +
-            '<div style="' + stepCardStyle + '">📦 <strong>Find the "on start"</strong> block in Basic. Drag your Show Text block inside it.</div>' +
-            '<div style="' + stepCardStyle + '">▶️ <strong>Click Run Program</strong>. Watch GlowBit scroll <strong>Smart Robot</strong> across its face!</div>' +
-            '<div class="didyouknow">💡 <strong>Did you know?</strong> Robots in real life often use screens or lights to share messages, and now you’ll get to try it too.</div>';
-        }
-      }
-
-      overrideSidebar();
-      const sid = setInterval(overrideSidebar, 500);
-      setTimeout(() => clearInterval(sid), 10000);
-
-      if (typeof Glowbit.showIcon === 'function') Glowbit.showIcon('smile');
-      console.log("✅ Step 1 fully initialized.");
-
-    } else {
-      console.log("⌛ Waiting for Glowbit or Blockly...");
-      setTimeout(waitForGlow, 200);
+  <!-- Step 1 styling -->
+  <style>
+    .gb-wrapper { max-width:1100px; margin:0 auto; font-family:"Segoe UI", Roboto, Arial, sans-serif; }
+    .gb-header {
+      text-align:center;
+      background:#e6f9ff;
+      color:#00A1D6;
+      font-size:22px;
+      font-weight:800;
+      padding:6px 10px;
+      border-radius:8px;
+      margin-bottom:8px;
+      box-shadow:0 1px 4px rgba(0,0,0,0.08);
     }
+    .gb-header .highlight { color:#991b1b; }
+    .gb-intro {
+      text-align:center;
+      font-size:14px;
+      line-height:1.4;
+      margin:0 0 10px;
+      color:#374151;
+      background:#e0f2fe;
+      border-radius:6px;
+      padding:8px 10px;
+      box-shadow:0 1px 3px rgba(0,0,0,0.06);
+    }
+    #glowbit-step1 .glowbit-playground {
+      max-height:500px;
+      overflow-y:auto !important;
+      border-radius:6px;
+    }
+    .didyouknow {
+      margin-top:18px;
+      background:#fef9c3;
+      border:2px solid #facc15;
+      padding:10px 12px;
+      border-radius:12px;
+      color:#713f12;
+      font-size:13px;
+      font-weight:600;
+      position:relative;
+      box-shadow:0 2px 5px rgba(0,0,0,0.06);
+    }
+    .didyouknow::before {
+      content:"";
+      position:absolute;
+      top:-10px;
+      left:20px;
+      border-width:0 10px 10px 10px;
+      border-style:solid;
+      border-color:transparent transparent #fef9c3 transparent;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="gb-wrapper">
+    <div class="gb-header">
+      🌟 <span style="color:#7B2CBF;">Step 1</span>: Show Text — Teach <span style="color:#7B2CBF;">GlowBit</span> to Talk!
+    </div>
+
+    <p class="gb-intro">
+      Welcome to your very first <span class="highlight">GlowBit</span> adventure! In this step, you’ll teach
+      <span class="highlight">GlowBit</span> to “speak” using lights on its 8×8 LED grid. You’ll code
+      <span class="highlight">GlowBit</span> to scroll the words <strong class="highlight">Smart Robot</strong> across its glowing face.
+    </p>
+
+    <div id="glowbit-step1"></div>
+  </div>
+
+  <!-- Step 1 Script -->
+  <script>
+  /* ===============================================================
+     Glowbit Step 1 — Show Text (GitHub Pages Adapted)
+     Keeps LW functionality; waits for DOM + Glowbit readiness
+     =============================================================== */
+  function initStep1() {
+    if (!window.Glowbit || !window.Blockly) {
+      console.log("⌛ Waiting for Glowbit or Blockly...");
+      return setTimeout(initStep1, 150);
+    }
+
+    const container = document.getElementById('glowbit-step1');
+    if (!container) {
+      console.log("⌛ Waiting for #glowbit-step1 container...");
+      return setTimeout(initStep1, 100);
+    }
+
+    console.log("✅ Glowbit, Blockly, and container ready. Initializing Step 1.");
+
+    const startBlocks = {
+      "blocks": {
+        "languageVersion": 0,
+        "blocks": [
+          { "type": "show_text", "x": 20, "y": 20, "fields": { "TEXT": "Smart Robot" } }
+        ]
+      }
+    };
+
+    const lesson = Glowbit.createLessonUI('glowbit-step1', {
+      title: '',
+      instructions: '',
+      pixelSize: 28,
+      defaultJson: startBlocks
+    });
+    window._lesson_step1 = lesson;
+
+    function overrideSidebar() {
+      const sidebar = Array.from(container.querySelectorAll('*')).find(el =>
+        el.innerText && (
+          el.innerText.includes("GlowBit Lesson") ||
+          el.innerText.includes("Follow the steps on the right")
+        )
+      );
+      if (!sidebar) return;
+
+      sidebar.style.background = '#e6f9ff';
+      sidebar.style.borderRadius = '10px';
+      sidebar.style.padding = '12px';
+      sidebar.style.color = '#00A1D6';
+      sidebar.style.fontSize = '14px';
+      sidebar.style.fontWeight = '500';
+      sidebar.style.boxShadow = '0 0 8px rgba(0,0,0,0.08)';
+
+      const stepCardStyle =
+        'margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#ffffff;font-weight:600;';
+
+      sidebar.innerHTML =
+        '<h3 style="color:#00A1D6;font-weight:800;font-size:16px;margin-bottom:10px;text-align:center;">🌟 Follow These Steps 🌟</h3>' +
+        '<div style="' + stepCardStyle + '">🧩 <strong>Go to the "Basic" tab</strong>. Drag the <strong>Show Text</strong> block into the workspace.</div>' +
+        '<div style="' + stepCardStyle + '">✍️ <strong>Click the text field</strong> (it says "Hello!" by default). Type <strong>Smart Robot</strong>.</div>' +
+        '<div style="' + stepCardStyle + '">📦 <strong>Find the "on start"</strong> block in Basic. Drag your Show Text block inside it.</div>' +
+        '<div style="' + stepCardStyle + '">▶️ <strong>Click Run Program</strong>. Watch GlowBit scroll <strong>Smart Robot</strong> across its face!</div>' +
+        '<div class="didyouknow">💡 <strong>Did you know?</strong> Robots in real life often use screens or lights to share messages, and now you’ll get to try it too.</div>';
+    }
+
+    overrideSidebar();
+    const sid = setInterval(overrideSidebar, 500);
+    setTimeout(() => clearInterval(sid), 10000);
+
+    if (typeof Glowbit.showIcon === 'function') Glowbit.showIcon('smile');
+    console.log("✅ Step 1 fully initialized.");
   }
 
-  // Wait 300ms extra to guarantee DOM elements exist
-  setTimeout(waitForGlow, 300);
-});
-</script>
+  window.addEventListener('DOMContentLoaded', () => {
+    console.log("🔥 Step 1 script loaded; DOMContentLoaded fired.");
+    setTimeout(initStep1, 300);
+  });
+  </script>
+</body>
+</html>
