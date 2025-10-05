@@ -422,7 +422,7 @@
     const GlowbitAPI = {
       _initialized: true,
       _state: state,
-
+Glowbit.isRunning = false;
       // UI
       createLessonUI: function (containerId, options) {
         options = options || {};
@@ -487,6 +487,7 @@
             const code = Blockly.JavaScript.workspaceToCode(workspace);
             new Function(code)();
             console.log("✅ Glowbit: program loaded, event handlers active");
+             Glowbit.isRunning = true;
           } catch (e) { console.error("Glowbit.run error", e); }
         };
         runBtn.addEventListener("click", runProgram);
@@ -497,6 +498,8 @@
             if (Glowbit._scrollTicker) { clearInterval(Glowbit._scrollTicker); Glowbit._scrollTicker = null; }
             Glowbit.clear();
             console.log("🛑 Glowbit: program stopped.");
+             Glowbit.isRunning = false;
+if (typeof Glowbit.stopAllAnimations === "function") Glowbit.stopAllAnimations();
           } catch (e) { console.error("Glowbit.stop error", e); }
         });
         btnA.addEventListener("click", () => Glowbit.trigger("A"));
@@ -726,7 +729,20 @@
 
       // Structure
       reg("on_start", (b) => { const body = G.statementToCode(b, "DO") || ""; return `${body}\n`; });
-      reg("forever", (b) => { const body = G.statementToCode(b, "DO") || ""; return `setInterval(function(){\n${body}}, 400);\n`; });
+     reg("forever", (b) => {
+  const body = G.statementToCode(b, "DO") || "";
+  return `
+const _loopId = setInterval(function() {
+  if (!Glowbit.isRunning) {
+    clearInterval(_loopId);
+    return;
+  }
+  ${body}
+}, 400);
+if (!Glowbit._loopIntervals) Glowbit._loopIntervals = [];
+Glowbit._loopIntervals.push(_loopId);
+`;
+});
       reg("repeat_loop", (b) => { const n = Number(b.getFieldValue("COUNT") || 1); const body = G.statementToCode(b, "DO") || ""; return `for(let i=0;i<${n};i++){\n${body}}\n`; });
 
       // Display / LED
@@ -867,4 +883,19 @@
     window.Glowbit = GlowbitAPI;
     console.log("✅ Glowbit Global.js loaded and ready.");
   }
+ /**
+ * Stops all LED animation loops and async tasks.
+ */
+Glowbit.stopAllAnimations = function() {
+  // Clear any active intervals or animation frames
+  if (Glowbit._loopIntervals) {
+    Glowbit._loopIntervals.forEach(clearInterval);
+    Glowbit._loopIntervals = [];
+  }
+  if (Glowbit._animationFrame) {
+    cancelAnimationFrame(Glowbit._animationFrame);
+    Glowbit._animationFrame = null;
+  }
+  console.log("🛑 Glowbit animations stopped.");
+};
 })();
