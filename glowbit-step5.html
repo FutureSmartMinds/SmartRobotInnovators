@@ -73,25 +73,63 @@
   <!-- Script -->
   <script>
   (function waitForGlow(){
-    if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow, 120);
+  if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow, 120);
 
-    /* Solution XML */
-    const solutionXml = `<xml xmlns="https://developers.google.com/blockly/xml">
-      <block type="on_start" x="20" y="20">
-        <statement name="DO">
-          ${Array.from({length:8},(_,i)=>`
-            <block type="set_pixel"><field name="X">${i}</field><field name="Y">2</field>
-              ${i<7?'<next>':''}${i<7?'</next>':''}
-            </block>`).join('')}
-        </statement>
-      </block>
-    </xml>`;
+  /* ✅ XML compatibility patch (ensures Blockly.Xml helpers exist) */
+  if (!Blockly.Xml) Blockly.Xml = {};
+  if (!Blockly.Xml.textToDom) {
+    Blockly.Xml.textToDom = function (text) {
+      const parser = new DOMParser();
+      return parser.parseFromString(text, "text/xml").documentElement;
+    };
+  }
+  if (!Blockly.Xml.domToWorkspace) {
+    Blockly.Xml.domToWorkspace = function (dom, workspace) {
+      if (!workspace) return;
+      const blocks = dom.getElementsByTagName("block");
+      if (blocks.length === 0) return;
+      for (let i = 0; i < blocks.length; i++) {
+        const xmlText = new XMLSerializer().serializeToString(blocks[i]);
+        try {
+          workspace.newBlock(blocks[i].getAttribute("type"));
+        } catch (err) {
+          console.warn("⚠️ Could not render block:", blocks[i].getAttribute("type"), err);
+        }
+      }
+      workspace.render();
+    };
+  }
 
-    /* Main lesson UI */
-    const lesson = Glowbit.createLessonUI('glowbit-step5',{
-      title:'', instructions:'', pixelSize:28, defaultXml:null
-    });
-    window._lesson_step5 = lesson;
+  /* Solution XML */
+  const solutionXml = `<xml xmlns="https://developers.google.com/blockly/xml">
+    <block type="on_start" x="20" y="20">
+      <statement name="DO">
+        <block type="set_pixel"><field name="X">0</field><field name="Y">2</field>
+          <next><block type="set_pixel"><field name="X">1</field><field name="Y">2</field>
+            <next><block type="set_pixel"><field name="X">2</field><field name="Y">2</field>
+              <next><block type="set_pixel"><field name="X">3</field><field name="Y">2</field>
+                <next><block type="set_pixel"><field name="X">4</field><field name="Y">2</field>
+                  <next><block type="set_pixel"><field name="X">5</field><field name="Y">2</field>
+                    <next><block type="set_pixel"><field name="X">6</field><field name="Y">2</field>
+                      <next><block type="set_pixel"><field name="X">7</field><field name="Y">2</field></block></next>
+                    </block></next>
+                  </block></next>
+                </block></next>
+              </block></next>
+            </block></next>
+          </block></next>
+        </block>
+      </statement>
+    </block>
+  </xml>`;
+
+  const lesson = Glowbit.createLessonUI('glowbit-step5', {
+    title: '',
+    instructions: '',
+    pixelSize: 28,
+    defaultXml: null
+  });
+  window._lesson_step5 = lesson;
 
     /* Sidebar override */
     function overrideSidebar(){
