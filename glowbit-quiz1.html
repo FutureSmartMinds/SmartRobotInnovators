@@ -206,12 +206,15 @@
     const stepCard = 'margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;font-weight:600;';
 
     sidebar.innerHTML =
-      '<h3 style="color:#00A1D6;font-weight:800;font-size:16px;margin-bottom:10px;text-align:center;">🌟 GlowBit Quiz Challenge 🌟</h3>' +
-      '<div style="'+stepCard+'">🎨 Create two rows of lights — the top row red, the bottom row blue. They should take turns lighting up with a short pause in between.</div>' +
-      '<div style="'+stepCard+'">🧩 Use blocks from <strong>LED</strong> and <strong>Loops</strong> tabs. Be creative — you can use a <strong>forever</strong> loop!</div>' +
-      '<div style="'+stepCard+'">▶️ Press <strong>Run Program</strong> to test your animation.</div>' +
-      '<button id="check-setup-btn-quiz" style="display:block;margin:12px auto 6px;padding:8px 14px;border:none;border-radius:6px;background:#00A1D6;color:#fff;font-weight:700;cursor:pointer;">✅ Check Your Setup</button>' +
-      '<div class="didyouknow">💡 <strong>Did you know?</strong> Robots use timing and color patterns to communicate signals — just like you are doing now!</div>';
+  '<h3 style="color:#00A1D6;font-weight:800;font-size:16px;margin-bottom:10px;text-align:center;">🌟 GlowBit Quiz 🌟</h3>' +
+  '<div style="'+stepCard+'">🎯 <strong>Your Challenge:</strong> Create two glowing rows — one <strong style="color:#FF0000;">red</strong> and one <strong style="color:#0000FF;">blue</strong> — that light up one after the other!</div>' +
+  '<div style="'+stepCard+'">🧩 Use <strong>Set Pixel</strong> blocks for <strong>y = 0</strong> (top row) and <strong>y = 4</strong> (bottom row). Set <strong>red (#FF0000)</strong> for y = 0 and <strong>blue (#0000FF)</strong> for y = 4.</div>' +
+  '<div style="'+stepCard+'">✨ Add a <strong>Clear Screen</strong> block at the start of your code to reset the lights between changes.</div>' +
+  '<div style="'+stepCard+'">⏸️ Use a <strong>Pause</strong> block (for example 500 ms) between each color to make the rows glow one after the other.</div>' +
+  '<div style="'+stepCard+'">💡 You may use a <strong>Forever</strong> loop if you want the pattern to repeat continuously.</div>' +
+  '<div style="'+stepCard+'">▶️ Click <strong>Run Program</strong> to see your lights dance, then press <strong>Check Your Setup</strong> to compare with the correct answer.</div>' +
+  '<button id="check-setup-btn-quiz" style="display:block;margin:12px auto 6px;padding:8px 14px;border:none;border-radius:6px;background:#00A1D6;color:#fff;font-weight:700;cursor:pointer;">✅ Check Your Setup</button>' +
+  '<div class="didyouknow">💡 <strong>Did you know?</strong> In robotics, loops and color signals are used for timing and feedback — like traffic lights for your bot!</div>';
   }
 
   overrideSidebar();
