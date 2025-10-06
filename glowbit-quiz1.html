@@ -188,7 +188,7 @@
   });
   window._lesson_quiz1 = lesson;
 
-  /* Sidebar */
+  /* Sidebar Instructions */
   function overrideSidebar() {
     const container = document.querySelector('#glowbit-quiz1');
     if (!container) return;
@@ -220,6 +220,9 @@
 
   /* Modal Logic */
   const modal = document.getElementById('solutionModalQuiz');
+  const closeX = document.getElementById('solutionCloseQuiz');
+  const closeBtn = document.getElementById('solutionCloseBtnQuiz');
+
   document.addEventListener('click', function(e){
     if(e.target.id === 'check-setup-btn-quiz'){
       modal.style.display='block';
@@ -235,5 +238,6 @@
       modal.setAttribute('aria-hidden','true');
     }
   });
+
 })();
 </script>
