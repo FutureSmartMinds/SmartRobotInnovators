@@ -88,59 +88,58 @@
     /* Empty workspace */
     const emptyJson = { "blocks": { "languageVersion": 0, "blocks": [] } };
 
-    /* Correct solution JSON */
+    /* Correct solution JSON — syntax checked */
     const solutionJson = {
       "blocks": {
         "languageVersion": 0,
-        "blocks": [
-          {
-            "type": "forever",
-            "x": 20,
-            "y": 20,
-            "inputs": {
-              "DO": {
-                "block": {
-                  "type": "clear_screen",
-                  "next": {
-                    "block": {
-                      "type": "set_pixel", "fields": { "X": 0, "Y": 0, "COLOR": "#FF0000" },
+        "blocks": [{
+          "type": "forever",
+          "x": 20,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "clear_screen",
+                "next": {
+                  "block": {
+                    "type": "set_pixel", "fields": { "X": 0, "Y": 0, "COLOR": "#FF0000" },
+                    "next": {
+                      "block": { "type": "set_pixel", "fields": { "X": 1, "Y": 0, "COLOR": "#FF0000" },
+                      "next": { "block": { "type": "set_pixel", "fields": { "X": 2, "Y": 0, "COLOR": "#FF0000" },
+                      "next": { "block": { "type": "set_pixel", "fields": { "X": 3, "Y": 0, "COLOR": "#FF0000" },
+                      "next": { "block": { "type": "set_pixel", "fields": { "X": 4, "Y": 0, "COLOR": "#FF0000" },
+                      "next": { "block": { "type": "set_pixel", "fields": { "X": 5, "Y": 0, "COLOR": "#FF0000" },
+                      "next": { "block": { "type": "set_pixel", "fields": { "X": 6, "Y": 0, "COLOR": "#FF0000" },
+                      "next": { "block": { "type": "set_pixel", "fields": { "X": 7, "Y": 0, "COLOR": "#FF0000" },
                       "next": {
-                        "block": { "type": "set_pixel", "fields": { "X": 1, "Y": 0, "COLOR": "#FF0000" },
-                        "next": { "block": { "type": "set_pixel", "fields": { "X": 2, "Y": 0, "COLOR": "#FF0000" },
-                        "next": { "block": { "type": "set_pixel", "fields": { "X": 3, "Y": 0, "COLOR": "#FF0000" },
-                        "next": { "block": { "type": "set_pixel", "fields": { "X": 4, "Y": 0, "COLOR": "#FF0000" },
-                        "next": { "block": { "type": "set_pixel", "fields": { "X": 5, "Y": 0, "COLOR": "#FF0000" },
-                        "next": { "block": { "type": "set_pixel", "fields": { "X": 6, "Y": 0, "COLOR": "#FF0000" },
-                        "next": { "block": { "type": "set_pixel", "fields": { "X": 7, "Y": 0, "COLOR": "#FF0000" },
-                        "next": {
-                          "block": {
-                            "type": "pause_block", "fields": { "MS": 500 },
-                            "next": {
-                              "block": {
-                                "type": "clear_screen",
-                                "next": {
-                                  "block": { "type": "set_pixel", "fields": { "X": 0, "Y": 4, "COLOR": "#0000FF" },
-                                  "next": { "block": { "type": "set_pixel", "fields": { "X": 1, "Y": 4, "COLOR": "#0000FF" },
-                                  "next": { "block": { "type": "set_pixel", "fields": { "X": 2, "Y": 4, "COLOR": "#0000FF" },
-                                  "next": { "block": { "type": "set_pixel", "fields": { "X": 3, "Y": 4, "COLOR": "#0000FF" },
-                                  "next": { "block": { "type": "set_pixel", "fields": { "X": 4, "Y": 4, "COLOR": "#0000FF" },
-                                  "next": { "block": { "type": "set_pixel", "fields": { "X": 5, "Y": 4, "COLOR": "#0000FF" },
-                                  "next": { "block": { "type": "set_pixel", "fields": { "X": 6, "Y": 4, "COLOR": "#0000FF" },
-                                  "next": { "block": { "type": "set_pixel", "fields": { "X": 7, "Y": 4, "COLOR": "#0000FF" },
-                                  "next": { "block": { "type": "pause_block", "fields": { "MS": 500 } } }
-                                  }}}}}}}}}}}}}}
+                        "block": {
+                          "type": "pause_block", "fields": { "MS": 500 },
+                          "next": {
+                            "block": {
+                              "type": "clear_screen",
+                              "next": {
+                                "block": {
+                                  "type": "set_pixel", "fields": { "X": 0, "Y": 4, "COLOR": "#0000FF" },
+                                  "next": {
+                                    "block": { "type": "set_pixel", "fields": { "X": 1, "Y": 4, "COLOR": "#0000FF" },
+                                    "next": { "block": { "type": "set_pixel", "fields": { "X": 2, "Y": 4, "COLOR": "#0000FF" },
+                                    "next": { "block": { "type": "set_pixel", "fields": { "X": 3, "Y": 4, "COLOR": "#0000FF" },
+                                    "next": { "block": { "type": "set_pixel", "fields": { "X": 4, "Y": 4, "COLOR": "#0000FF" },
+                                    "next": { "block": { "type": "set_pixel", "fields": { "X": 5, "Y": 4, "COLOR": "#0000FF" },
+                                    "next": { "block": { "type": "set_pixel", "fields": { "X": 6, "Y": 4, "COLOR": "#0000FF" },
+                                    "next": { "block": { "type": "set_pixel", "fields": { "X": 7, "Y": 4, "COLOR": "#0000FF" },
+                                    "next": { "block": { "type": "pause_block", "fields": { "MS": 500 } } }
+                                    }}}}}}}}}}}}}}
                               }
                             }
                           }
                         }
-                      }}}}}}}}}}}}
-                    }
-                  }
+                      }}}}}}}}}}}}}}
                 }
               }
             }
           }
-        ]
+        }]
       }
     };
 
