@@ -12,15 +12,13 @@
     .gb-header .highlight { color:#7B2CBF; }
     .gb-intro { text-align:center; font-size:15px; line-height:1.5; margin:0 0 10px; color:#374151; background:#e0f2fe; border-radius:6px; padding:10px 12px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
     #glowbit-quiz1 .glowbit-playground { max-height:540px; overflow-y:auto !important; border-radius:6px; }
-
     .didyouknow { margin-top:18px; background:#fef9c3; border:2px solid #facc15; padding:10px 12px; border-radius:12px; color:#713f12; font-size:13px; font-weight:600; position:relative; box-shadow:0 2px 5px rgba(0,0,0,0.06); }
     .didyouknow::before { content:""; position:absolute; top:-10px; left:20px; border-width:0 10px 10px 10px; border-style:solid; border-color:transparent transparent #fef9c3 transparent; }
 
-    /* Solution Modal */
     #solutionModalQuiz { display:none; position:fixed; top:60px; right:20px; width:640px; max-width:42%; background:#fff; border-radius:10px; box-shadow:0 6px 20px rgba(0,0,0,0.28); z-index:12000; overflow:hidden; user-select:none; }
     #solutionHeaderQuiz { cursor:move; padding:10px 12px; background:#00A1D6; color:#fff; font-weight:700; text-align:left; border-radius:10px 10px 0 0; display:flex; justify-content:space-between; align-items:center; }
     #solutionTitleQuiz { font-size:15px; }
-    #solutionCloseQuiz { cursor:pointer; font-size:20px; line-height:1; padding:2px 8px; border-radius:6px; color:#fff; background:transparent; border:none; }
+    #solutionCloseQuiz { cursor:pointer; font-size:20px; line-height:1; padding:2px 8px; color:#fff; background:transparent; border:none; }
     #solutionWorkspaceQuiz { height:360px; width:100%; border-top:1px solid #eee; background:#fafafa; }
     #solutionFooterQuiz { text-align:center; padding:12px; background:#fff; }
     #solutionFooterQuiz button { background:#00A1D6; color:#fff; border:none; border-radius:8px; padding:8px 18px; cursor:pointer; font-weight:700; }
@@ -40,23 +38,20 @@
 
     <p class="gb-intro">
       Time for your first <strong>GlowBit Quiz!</strong><br>
-      Create two glowing rows — one <span style="color:#FF0000;font-weight:600;">red</span> at the top and one <span style="color:#0000FF;font-weight:600;">blue</span> at the bottom — that take turns lighting up with a short pause between them.<br>
-      Use what you learned in the steps, and show your creativity!
+      Create two glowing rows — one <span style="color:#FF0000;font-weight:600;">red</span> at the top (y = 0) and one <span style="color:#0000FF;font-weight:600;">blue</span> at the bottom (y = 4).<br>
+      Make them light up one after the other with a short pause in between.
     </p>
 
     <div id="glowbit-quiz1"></div>
   </div>
 
-  <!-- Solution Modal -->
   <div id="solutionModalQuiz" aria-hidden="true" role="dialog">
     <div id="solutionHeaderQuiz">
       <div id="solutionTitleQuiz">✅ Correct Answer — Color Dance Challenge</div>
       <button id="solutionCloseQuiz" title="Close">✕</button>
     </div>
     <div id="solutionWorkspaceQuiz" aria-label="Correct solution workspace"></div>
-    <div id="solutionFooterQuiz">
-      <button id="solutionCloseBtnQuiz">Close</button>
-    </div>
+    <div id="solutionFooterQuiz"><button id="solutionCloseBtnQuiz">Close</button></div>
   </div>
 
   <script>
@@ -65,6 +60,18 @@
     console.log("✅ GlowBit Quiz initialized.");
 
     const emptyJson = { "blocks": { "languageVersion": 0, "blocks": [] } };
+
+    const rowBlocks = (y, color) => {
+      let chain = null;
+      for (let x = 7; x >= 0; x--) {
+        chain = {
+          "type": "set_pixel",
+          "fields": { "X": x, "Y": y, "COLOR": color },
+          ...(chain ? { "next": { "block": chain } } : {})
+        };
+      }
+      return chain;
+    };
 
     const solutionJson = {
       "blocks": {
@@ -84,30 +91,37 @@
                         "type": "clear_screen",
                         "next": {
                           "block": {
-                            "type": "set_pixel", "fields": { "X": 0, "Y": 0, "COLOR": "#FF0000" },
-                            "next": { "block": { "type": "set_pixel", "fields": { "X": 1, "Y": 0, "COLOR": "#FF0000" },
-                            "next": { "block": { "type": "set_pixel", "fields": { "X": 2, "Y": 0, "COLOR": "#FF0000" },
-                            "next": { "block": { "type": "set_pixel", "fields": { "X": 3, "Y": 0, "COLOR": "#FF0000" },
-                            "next": { "block": { "type": "set_pixel", "fields": { "X": 4, "Y": 0, "COLOR": "#FF0000" },
-                            "next": { "block": { "type": "set_pixel", "fields": { "X": 5, "Y": 0, "COLOR": "#FF0000" },
-                            "next": { "block": { "type": "set_pixel", "fields": { "X": 6, "Y": 0, "COLOR": "#FF0000" },
-                            "next": { "block": { "type": "set_pixel", "fields": { "X": 7, "Y": 0, "COLOR": "#FF0000" },
+                            ...rowBlocks(0, "#FF0000"),
                             "next": {
                               "block": {
-                                "type": "pause", "fields": { "DURATION": 500 },
+                                "type": "pause",
+                                "fields": { "DURATION": 500 },
                                 "next": {
                                   "block": {
                                     "type": "clear_screen",
                                     "next": {
-                                      "block": { "type": "set_pixel", "fields": { "X": 0, "Y": 4, "COLOR": "#0000FF" },
-                                      "next": { "block": { "type": "set_pixel", "fields": { "X": 1, "Y": 4, "COLOR": "#0000FF" },
-                                      "next": { "block": { "type": "set_pixel", "fields": { "X": 2, "Y": 4, "COLOR": "#0000FF" },
-                                      "next": { "block": { "type": "set_pixel", "fields": { "X": 3, "Y": 4, "COLOR": "#0000FF" },
-                                      "next": { "block": { "type": "set_pixel", "fields": { "X": 4, "Y": 4, "COLOR": "#0000FF" },
-                                      "next": { "block": { "type": "set_pixel", "fields": { "X": 5, "Y": 4, "COLOR": "#0000FF" },
-                                      "next": { "block": { "type": "set_pixel", "fields": { "X": 6, "Y": 4, "COLOR": "#0000FF" },
-                                      "next": { "block": { "type": "set_pixel", "fields": { "X": 7, "Y": 4, "COLOR": "#0000FF" },
-                                      "next": { "block": { "type": "pause", "fields": { "DURATION": 500 } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } }
+                                      "block": {
+                                        ...rowBlocks(4, "#0000FF"),
+                                        "next": {
+                                          "block": {
+                                            "type": "pause",
+                                            "fields": { "DURATION": 500 }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         ]
       }
@@ -135,35 +149,35 @@
       sidebar.style.fontWeight = '500';
       sidebar.style.boxShadow = '0 0 8px rgba(0,0,0,0.08)';
 
-      const stepCard = 'margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;font-weight:600;';
-
+      const card = 'margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;font-weight:600;';
       sidebar.innerHTML =
         '<h3 style="color:#00A1D6;font-weight:800;font-size:16px;margin-bottom:10px;text-align:center;">🌟 GlowBit Quiz Challenge 🌟</h3>' +
-        '<div style="'+stepCard+'">🎨 Create two rows of lights — the top row red, the bottom row blue. They should take turns lighting up with a short pause in between.</div>' +
-        '<div style="'+stepCard+'">🧩 Use blocks from <strong>LED</strong> and <strong>Loops</strong> tabs. Be creative — you can use a <strong>forever</strong> loop!</div>' +
-        '<div style="'+stepCard+'">▶️ Press <strong>Run Program</strong> to test your animation.</div>' +
-        '<button id="check-setup-btn-quiz" style="display:block;margin:12px auto 6px;padding:8px 14px;border:none;border-radius:6px;background:#00A1D6;color:#fff;font-weight:700;cursor:pointer;">✅ Check Your Setup</button>' +
-        '<div class="didyouknow">💡 <strong>Did you know?</strong> Robots use timing and color patterns to communicate signals — just like you are doing now!</div>';
+        `<div style="${card}">🧠 Create a row of <strong style="color:#FF0000;">red</strong> lights at y = 0 (x = 0→7).</div>` +
+        `<div style="${card}">💡 Add a pause, then clear the screen.</div>` +
+        `<div style="${card}">💙 Create a row of <strong style="color:#0000FF;">blue</strong> lights at y = 4 (x = 0→7).</div>` +
+        `<div style="${card}">⏱ Loop it using a <strong>forever</strong> block.</div>` +
+        `<button id="check-setup-btn-quiz" style="display:block;margin:12px auto 6px;padding:8px 14px;border:none;border-radius:6px;background:#00A1D6;color:#fff;font-weight:700;cursor:pointer;">✅ Check Your Setup</button>` +
+        '<div class="didyouknow">💡 <strong>Did you know?</strong> Robots use loops like this to create animated signals and patterns!</div>';
     }
 
     overrideSidebar();
-    const interval = setInterval(overrideSidebar, 400);
-    setTimeout(() => clearInterval(interval), 10000);
+    const fix = setInterval(overrideSidebar, 400);
+    setTimeout(() => clearInterval(fix), 10000);
 
     const modal = document.getElementById('solutionModalQuiz');
-    document.addEventListener('click', function(e){
-      if(e.target.id === 'check-setup-btn-quiz'){
-        modal.style.display='block';
-        modal.setAttribute('aria-hidden','false');
-        if(!window._solutionWorkspaceQuiz){
+    document.addEventListener('click', function(e) {
+      if (e.target.id === 'check-setup-btn-quiz') {
+        modal.style.display = 'block';
+        modal.setAttribute('aria-hidden', 'false');
+        if (!window._solutionWorkspaceQuiz) {
           const wsDiv = document.getElementById('solutionWorkspaceQuiz');
-          window._solutionWorkspaceQuiz = Blockly.inject(wsDiv, { readOnly:true, scrollbars:true, toolbox:null });
+          window._solutionWorkspaceQuiz = Blockly.inject(wsDiv, { readOnly: true, scrollbars: true, toolbox: null });
           Blockly.serialization.workspaces.load(solutionJson, window._solutionWorkspaceQuiz);
         }
       }
-      if(e.target.id === 'solutionCloseQuiz' || e.target.id === 'solutionCloseBtnQuiz'){
-        modal.style.display='none';
-        modal.setAttribute('aria-hidden','true');
+      if (e.target.id === 'solutionCloseQuiz' || e.target.id === 'solutionCloseBtnQuiz') {
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
       }
     });
   })();
