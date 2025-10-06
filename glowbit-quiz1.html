@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GlowBit Quiz 1 — Color Dance</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GlowBit Quiz 1 — Color Dance Challenge</title>
 
   <style>
     .gb-wrapper { max-width:1100px; margin:0 auto; font-family:"Segoe UI", Roboto, Arial, sans-serif; }
@@ -30,9 +31,8 @@
     }
   </style>
 </head>
-<body>
 
-  <!-- QUIZ 1: GlowBit Challenge — Color Dance! -->
+<body>
   <div class="gb-wrapper">
     <div class="gb-header">
       🌟 <span class="highlight">GlowBit Quiz 1</span>: Color Dance Challenge
@@ -66,7 +66,52 @@
 
     const emptyJson = { "blocks": { "languageVersion": 0, "blocks": [] } };
 
-    const solutionJson = { /* your JSON structure (unchanged) */ };
+    const solutionJson = {
+      "blocks": {
+        "languageVersion": 0,
+        "blocks": [
+          {
+            "type": "on_start",
+            "x": 20,
+            "y": 20,
+            "inputs": {
+              "DO": {
+                "block": {
+                  "type": "forever",
+                  "inputs": {
+                    "DO": {
+                      "block": {
+                        "type": "clear_screen",
+                        "next": {
+                          "block": {
+                            "type": "set_pixel", "fields": { "X": 0, "Y": 0, "COLOR": "#FF0000" },
+                            "next": { "block": { "type": "set_pixel", "fields": { "X": 1, "Y": 0, "COLOR": "#FF0000" },
+                            "next": { "block": { "type": "set_pixel", "fields": { "X": 2, "Y": 0, "COLOR": "#FF0000" },
+                            "next": { "block": { "type": "set_pixel", "fields": { "X": 3, "Y": 0, "COLOR": "#FF0000" },
+                            "next": { "block": { "type": "set_pixel", "fields": { "X": 4, "Y": 0, "COLOR": "#FF0000" },
+                            "next": { "block": { "type": "set_pixel", "fields": { "X": 5, "Y": 0, "COLOR": "#FF0000" },
+                            "next": { "block": { "type": "set_pixel", "fields": { "X": 6, "Y": 0, "COLOR": "#FF0000" },
+                            "next": { "block": { "type": "set_pixel", "fields": { "X": 7, "Y": 0, "COLOR": "#FF0000" },
+                            "next": {
+                              "block": {
+                                "type": "pause", "fields": { "DURATION": 500 },
+                                "next": {
+                                  "block": {
+                                    "type": "clear_screen",
+                                    "next": {
+                                      "block": { "type": "set_pixel", "fields": { "X": 0, "Y": 4, "COLOR": "#0000FF" },
+                                      "next": { "block": { "type": "set_pixel", "fields": { "X": 1, "Y": 4, "COLOR": "#0000FF" },
+                                      "next": { "block": { "type": "set_pixel", "fields": { "X": 2, "Y": 4, "COLOR": "#0000FF" },
+                                      "next": { "block": { "type": "set_pixel", "fields": { "X": 3, "Y": 4, "COLOR": "#0000FF" },
+                                      "next": { "block": { "type": "set_pixel", "fields": { "X": 4, "Y": 4, "COLOR": "#0000FF" },
+                                      "next": { "block": { "type": "set_pixel", "fields": { "X": 5, "Y": 4, "COLOR": "#0000FF" },
+                                      "next": { "block": { "type": "set_pixel", "fields": { "X": 6, "Y": 4, "COLOR": "#0000FF" },
+                                      "next": { "block": { "type": "set_pixel", "fields": { "X": 7, "Y": 4, "COLOR": "#0000FF" },
+                                      "next": { "block": { "type": "pause", "fields": { "DURATION": 500 } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } }
+          }
+        ]
+      }
+    };
 
     const lesson = Glowbit.createLessonUI('glowbit-quiz1', {
       title: '',
@@ -106,9 +151,6 @@
     setTimeout(() => clearInterval(interval), 10000);
 
     const modal = document.getElementById('solutionModalQuiz');
-    const closeX = document.getElementById('solutionCloseQuiz');
-    const closeBtn = document.getElementById('solutionCloseBtnQuiz');
-
     document.addEventListener('click', function(e){
       if(e.target.id === 'check-setup-btn-quiz'){
         modal.style.display='block';
@@ -126,6 +168,5 @@
     });
   })();
   </script>
-
 </body>
 </html>
