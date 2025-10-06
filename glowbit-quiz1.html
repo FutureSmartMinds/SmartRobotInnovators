@@ -70,64 +70,188 @@
   console.log("✅ GlowBit Quiz initialized.");
 
   const emptyJson = {"blocks":{"languageVersion":0,"blocks":[]}};
-  const redRow = [];
-  const blueRow = [];
-  for(let i=0;i<8;i++){
-    redRow.push({"type":"set_pixel","fields":{"X":i,"Y":0,"COLOR":"#FF0000"}});
-    blueRow.push({"type":"set_pixel","fields":{"X":i,"Y":4,"COLOR":"#0000FF"}});
-  }
-  function chain(arr){
-    for(let i=0;i<arr.length-1;i++){ arr[i].next={"block":arr[i+1]}; }
-    return arr[0];
-  }
-  const redChain=chain(redRow);
-  const blueChain=chain(blueRow);
+  
+  /* Correct solution JSON */
+  const solutionJson = {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "forever",
+          "x": 20,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "clear_screen",
+                "next": {
+                  "block": {
+                    "type": "set_pixel",
+                    "fields": { "X": 0, "Y": 0, "COLOR": "#FF0000" },
+                    "next": {
+                      "block": {
+                        "type": "set_pixel",
+                        "fields": { "X": 1, "Y": 0, "COLOR": "#FF0000" },
+                        "next": {
+                          "block": {
+                            "type": "set_pixel",
+                            "fields": { "X": 2, "Y": 0, "COLOR": "#FF0000" },
+                            "next": {
+                              "block": {
+                                "type": "set_pixel",
+                                "fields": { "X": 3, "Y": 0, "COLOR": "#FF0000" },
+                                "next": {
+                                  "block": {
+                                    "type": "set_pixel",
+                                    "fields": { "X": 4, "Y": 0, "COLOR": "#FF0000" },
+                                    "next": {
+                                      "block": {
+                                        "type": "set_pixel",
+                                        "fields": { "X": 5, "Y": 0, "COLOR": "#FF0000" },
+                                        "next": {
+                                          "block": {
+                                            "type": "set_pixel",
+                                            "fields": { "X": 6, "Y": 0, "COLOR": "#FF0000" },
+                                            "next": {
+                                              "block": {
+                                                "type": "set_pixel",
+                                                "fields": { "X": 7, "Y": 0, "COLOR": "#FF0000" },
+                                                "next": {
+                                                  "block": {
+                                                    "type": "pause",
+                                                    "fields": { "MS": 500 },
+                                                    "next": {
+                                                      "block": {
+                                                        "type": "clear_screen",
+                                                        "next": {
+                                                          "block": {
+                                                            "type": "set_pixel",
+                                                            "fields": { "X": 0, "Y": 4, "COLOR": "#0000FF" },
+                                                            "next": {
+                                                              "block": {
+                                                                "type": "set_pixel",
+                                                                "fields": { "X": 1, "Y": 4, "COLOR": "#0000FF" },
+                                                                "next": {
+                                                                  "block": {
+                                                                    "type": "set_pixel",
+                                                                    "fields": { "X": 2, "Y": 4, "COLOR": "#0000FF" },
+                                                                    "next": {
+                                                                      "block": {
+                                                                        "type": "set_pixel",
+                                                                        "fields": { "X": 3, "Y": 4, "COLOR": "#0000FF" },
+                                                                        "next": {
+                                                                          "block": {
+                                                                            "type": "set_pixel",
+                                                                            "fields": { "X": 4, "Y": 4, "COLOR": "#0000FF" },
+                                                                            "next": {
+                                                                              "block": {
+                                                                                "type": "set_pixel",
+                                                                                "fields": { "X": 5, "Y": 4, "COLOR": "#0000FF" },
+                                                                                "next": {
+                                                                                  "block": {
+                                                                                    "type": "set_pixel",
+                                                                                    "fields": { "X": 6, "Y": 4, "COLOR": "#0000FF" },
+                                                                                    "next": {
+                                                                                      "block": {
+                                                                                        "type": "set_pixel",
+                                                                                        "fields": { "X": 7, "Y": 4, "COLOR": "#0000FF" },
+                                                                                        "next": {
+                                                                                          "block": {
+                                                                                            "type": "pause",
+                                                                                            "fields": { "MS": 500 }
+                                                                                          }
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
 
-  const solutionJson={"blocks":{"languageVersion":0,"blocks":[
-    {"type":"forever","x":20,"y":20,"inputs":{
-      "DO":{"block":{
-        "type":"clear_screen",
-        "next":{"block":{
-          "type":"set_pixel","fields":{"X":0,"Y":0,"COLOR":"#FF0000"},
-          "next":{"block":redChain,
-          "next":{"block":{"type":"pause","fields":{"MS":500},
-          "next":{"block":{"type":"clear_screen",
-          "next":{"block":blueChain,"next":{"block":{"type":"pause","fields":{"MS":500}}}}}}}}}}}}}
-    }}]}};
-
-  const lesson=Glowbit.createLessonUI("glowbit-quiz",{title:"",instructions:"",pixelSize:28,defaultJson:emptyJson});
-  window._lesson_quiz=lesson;
+  const lesson = Glowbit.createLessonUI("glowbit-quiz", {
+    title: "",
+    instructions: "",
+    pixelSize: 28,
+    defaultJson: emptyJson
+  });
 
   function overrideSidebar(){
-    const c=document.querySelector("#glowbit-quiz");
-    if(!c)return;
-    const s=Array.from(c.querySelectorAll("*")).find(e=>e.innerText&&e.innerText.includes("GlowBit Lesson"));
-    if(!s)return;
-    const card='margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;font-weight:600;';
-    s.style.background="#e6f9ff"; s.style.borderRadius="10px"; s.style.padding="12px";
-    s.style.color="#00A1D6"; s.style.fontSize="14px"; s.style.boxShadow="0 0 8px rgba(0,0,0,0.08)";
-    s.innerHTML='<h3 style="color:#00A1D6;font-weight:800;text-align:center;">🌟 Your Final Challenge 🌟</h3>'
-      +'<div style="'+card+'">🧠 Create a row of <strong style="color:#FF0000;">red</strong> lights at y=0 (x=0→7).</div>'
-      +'<div style="'+card+'">💡 Add a <strong>pause</strong> block, then clear the screen.</div>'
-      +'<div style="'+card+'">💙 Create a row of <strong style="color:#0000FF;">blue</strong> lights at y=4 (x=0→7).</div>'
-      +'<div style="'+card+'">⏱ Add another pause and wrap all inside a <strong>forever</strong> block.</div>'
-      +'<button id="check-setup-btn-quiz" style="display:block;margin:12px auto;padding:8px 14px;border:none;border-radius:6px;background:#00A1D6;color:#fff;font-weight:700;cursor:pointer;">✅ Check Your Setup</button>'
-      +'<div class="didyouknow">💡 <strong>Did you know?</strong> Robots use loops like this to make endless glowing patterns!</div>';
+    const container = document.querySelector("#glowbit-quiz");
+    if(!container) return;
+    const sidebar = Array.from(container.querySelectorAll("*")).find(e => e.innerText && e.innerText.includes("GlowBit Lesson"));
+    if(!sidebar) return;
+    const card = 'margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;font-weight:600;';
+    sidebar.style.background="#e6f9ff";
+    sidebar.style.borderRadius="10px";
+    sidebar.style.padding="12px";
+    sidebar.style.color="#00A1D6";
+    sidebar.style.fontSize="14px";
+    sidebar.style.boxShadow="0 0 8px rgba(0,0,0,0.08)";
+    sidebar.innerHTML =
+      '<h3 style="color:#00A1D6;font-weight:800;text-align:center;">🌟 Your Final Challenge 🌟</h3>' +
+      '<div style="'+card+'">🧠 Create a row of <strong style="color:#FF0000;">red</strong> lights at y=0 (x=0→7).</div>' +
+      '<div style="'+card+'">💡 Add a <strong>pause</strong> block, then clear the screen.</div>' +
+      '<div style="'+card+'">💙 Create a row of <strong style="color:#0000FF;">blue</strong> lights at y=4 (x=0→7).</div>' +
+      '<div style="'+card+'">⏱ Add another pause and wrap all inside a <strong>forever</strong> block.</div>' +
+      '<button id="check-setup-btn-quiz" style="display:block;margin:12px auto;padding:8px 14px;border:none;border-radius:6px;background:#00A1D6;color:#fff;font-weight:700;cursor:pointer;">✅ Check Your Setup</button>' +
+      '<div class="didyouknow">💡 <strong>Did you know?</strong> Robots use loops like this to make endless glowing patterns!</div>';
   }
-  overrideSidebar(); const fix=setInterval(overrideSidebar,400); setTimeout(()=>clearInterval(fix),10000);
 
-  const modal=document.getElementById("solutionModalQuiz");
-  document.addEventListener("click",function(e){
-    if(e.target.id==="check-setup-btn-quiz"){
-      modal.style.display="block"; modal.setAttribute("aria-hidden","false");
+  overrideSidebar();
+  const sidebarTimer = setInterval(overrideSidebar, 400);
+  setTimeout(()=>clearInterval(sidebarTimer), 10000);
+
+  const modal = document.getElementById("solutionModalQuiz");
+  document.addEventListener("click", function(e){
+    if(e.target.id === "check-setup-btn-quiz"){
+      modal.style.display = "block";
+      modal.setAttribute("aria-hidden", "false");
       if(!window._solutionWorkspaceQuiz){
-        const ws=document.getElementById("solutionWorkspaceQuiz");
-        window._solutionWorkspaceQuiz=Blockly.inject(ws,{readOnly:true,scrollbars:true,toolbox:null});
-        Blockly.serialization.workspaces.load(solutionJson,window._solutionWorkspaceQuiz);
+        const wsDiv = document.getElementById("solutionWorkspaceQuiz");
+        window._solutionWorkspaceQuiz = Blockly.inject(wsDiv, { readOnly: true, scrollbars: true, toolbox: null });
+        Blockly.serialization.workspaces.load(solutionJson, window._solutionWorkspaceQuiz);
       }
     }
-    if(e.target.id==="solutionCloseQuiz"||e.target.id==="solutionCloseBtnQuiz"){
-      modal.style.display="none"; modal.setAttribute("aria-hidden","true");
+    if(e.target.id === "solutionCloseQuiz" || e.target.id === "solutionCloseBtnQuiz"){
+      modal.style.display = "none";
+      modal.setAttribute("aria-hidden", "true");
     }
   });
 })();
