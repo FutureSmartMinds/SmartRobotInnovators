@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GlowBit Step 8 – Sense the Shake</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Blockly + Glowbit core -->
+  <script src="lib/blockly_compressed.js"></script>
+  <script src="lib/blocks_compressed.js"></script>
+  <script src="lib/javascript_compressed.js"></script>
+  <script src="lib/msg/en.js"></script>
+  <script src="assets/global.js"></script>
+  <script src="lib/blockly_xml_patch.js"></script>
+
+  <style>
+    .gb-wrapper {max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
+    .gb-header {text-align:center;background:#e6f9ff;color:#00A1D6;font-size:22px;font-weight:800;
+                padding:6px 10px;border-radius:8px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+    .gb-header .highlight {color:#7B2CBF;}
+    .gb-intro {text-align:center;font-size:16px;line-height:1.5;margin:0 0 10px;color:#374151;
+               background:#e0f2fe;border-radius:6px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+    #glowbit-step8 .glowbit-playground {max-height:540px;overflow-y:auto!important;border-radius:6px;}
+    .didyouknow {margin-top:18px;background:#fef9c3;border:2px solid #facc15;padding:10px 12px;
+                 border-radius:12px;color:#713f12;font-size:13px;font-weight:600;position:relative;
+                 box-shadow:0 2px 5px rgba(0,0,0,0.06);}
+    .didyouknow::before {content:"";position:absolute;top:-10px;left:20px;border-width:0 10px 10px 10px;
+                         border-style:solid;border-color:transparent transparent #fef9c3 transparent;}
+
+    /* Solution modal */
+    #solutionModal8 {display:none;position:fixed;top:60px;right:20px;width:640px;max-width:42%;
+                     background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.28);
+                     z-index:12000;overflow:hidden;user-select:none;}
+    #solutionHeader8 {cursor:move;padding:10px 12px;background:#00A1D6;color:#fff;font-weight:700;
+                      text-align:left;border-radius:10px 10px 0 0;display:flex;justify-content:space-between;align-items:center;}
+    #solutionTitle8 {font-size:15px;}
+    #solutionClose8 {cursor:pointer;font-size:20px;line-height:1;padding:2px 8px;border-radius:6px;
+                     color:#fff;background:transparent;border:none;}
+    #solutionWorkspace8 {height:360px;width:100%;border-top:1px solid #eee;background:#fafafa;}
+    #solutionFooter8 {text-align:center;padding:12px;background:#fff;}
+    #solutionFooter8 button {background:#00A1D6;color:#fff;border:none;border-radius:8px;
+                              padding:8px 18px;cursor:pointer;font-weight:700;}
+    @media (max-width:900px){
+      #solutionModal8{left:10px;right:10px;width:auto;max-width:calc(100% - 20px);top:40px;}
+      #solutionWorkspace8{height:260px;}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="gb-wrapper">
+    <div class="gb-header">
+      🌟 <span class="highlight">Step 8</span>: Sense the Shake — <span class="highlight">GlowBit</span>’s Magic Move
+    </div>
+
+    <p class="gb-intro">
+      Let’s code your GlowBit to sparkle when you shake it. It’s like giving GlowBit a dance move, powered by AI!
+    </p>
+
+    <div id="glowbit-step8"></div>
+  </div>
+
+  <!-- Solution modal -->
+  <div id="solutionModal8" aria-hidden="true" role="dialog">
+    <div id="solutionHeader8">
+      <div id="solutionTitle8">✅ Correct Setup — Step 8</div>
+      <button id="solutionClose8" title="Close">✕</button>
+    </div>
+    <div id="solutionWorkspace8" aria-label="Correct solution workspace"></div>
+    <div id="solutionFooter8"><button id="solutionCloseBtn8">Close</button></div>
+  </div>
+
+  <script>
+  (function waitForGlow(){
+    if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow,120);
+
+    /* ✅ Correct setup (JSON for Check Your Setup) */
+    const solutionJson = {
+      "blocks": {
+        "languageVersion": 0,
+        "blocks": [
+          {
+            "type": "on_shake",
+            "x": 20,
+            "y": 20,
+            "inputs": {
+              "DO": {
+                "block": {
+                  "type": "clear_screen",
+                  "next": {
+                    "block": {
+                      "type": "set_pixel", "fields": {"X":0,"Y":2},
+                      "next": {"block": {"type":"set_pixel","fields":{"X":1,"Y":2},
+                      "next": {"block": {"type":"set_pixel","fields":{"X":2,"Y":2},
+                      "next": {"block": {"type":"set_pixel","fields":{"X":3,"Y":2},
+                      "next": {"block": {"type":"set_pixel","fields":{"X":4,"Y":2}}}}}}}}}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    };
+
+    /* 🧱 Create lesson UI (empty workspace start per Glowbit Course Pattern v1) */
+    const lesson = Glowbit.createLessonUI('glowbit-step8', {
+      title:'', instructions:'', pixelSize:28, defaultJson:null
+    });
+    window._lesson_step8 = lesson;
+    if(lesson && lesson.workspace) lesson.workspace.clear();
+
+    /* 🪄 Sidebar instructions */
+    function overrideSidebar(){
+      const container=document.querySelector('#glowbit-step8');
+      if(!container)return;
+      const sidebar=[...container.querySelectorAll('div')].find(el=>{
+        if(!el||!el.innerText)return false;
+        const t=el.innerText.trim();
+        return t.includes('GlowBit Lesson')||t.includes('Follow the steps')||/^Step\s*\d+:/.test(t);
+      });
+      if(!sidebar)return;
+
+      sidebar.style.background='#e6f9ff';
+      sidebar.style.borderRadius='10px';
+      sidebar.style.padding='12px';
+      sidebar.style.color='#00A1D6';
+      sidebar.style.fontSize='14px';
+      sidebar.style.fontWeight='500';
+      sidebar.style.boxShadow='0 0 8px rgba(0,0,0,0.08)';
+
+      const card='margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;font-weight:600;';
+      sidebar.innerHTML=
+        '<h3 style="color:#00A1D6;font-weight:800;font-size:16px;margin-bottom:10px;text-align:center;">🌟 Follow These Steps 🌟</h3>'+
+        '<div style="'+card+'">🧩 From the <strong>Input</strong> tab, drag an <strong>on shake</strong> block to the workspace.</div>'+
+        '<div style="'+card+'">🧹 Add a <strong>Clear Screen</strong> block inside it before the pixel blocks.</div>'+
+        '<div style="'+card+'">💡 From the <strong>LED</strong> tab, drag five <strong>Set Pixel (x,y)</strong> blocks for row y = 2 (x = 0→4).</div>'+
+        '<div style="'+card+'">▶️ Click <strong>Run Program</strong>, then shake the simulator — GlowBit sparkles!</div>'+
+        '<button id="check-setup-btn8" style="display:block;margin:12px auto 6px;padding:8px 14px;border:none;border-radius:6px;background:#00A1D6;color:#fff;font-weight:700;cursor:pointer;">✅ Check Your Setup</button>'+
+        '<div class="didyouknow">💡 <strong>Did you know?</strong> Motion sensors in robots detect shakes, tilts, and bumps to trigger cool effects!</div>';
+    }
+
+    overrideSidebar();
+    const sid=setInterval(overrideSidebar,400);
+    setTimeout(()=>clearInterval(sid),10000);
+
+    /* 🧩 Check Your Setup Modal */
+    const modal=document.getElementById('solutionModal8');
+    document.addEventListener('click',function(e){
+      if(e.target.id==='check-setup-btn8'){
+        modal.style.display='block';
+        modal.setAttribute('aria-hidden','false');
+        if(!window._solutionWorkspace8){
+          const wsDiv=document.getElementById('solutionWorkspace8');
+          window._solutionWorkspace8=Blockly.inject(wsDiv,{readOnly:true,scrollbars:true,toolbox:null});
+          Blockly.serialization.workspaces.load(solutionJson, window._solutionWorkspace8);
+        }
+      }
+      if(e.target.id==='solutionClose8'||e.target.id==='solutionCloseBtn8'){
+        modal.style.display='none';
+        modal.setAttribute('aria-hidden','true');
+      }
+    });
+
+    if(typeof Glowbit.showIcon==='function') Glowbit.showIcon('smile');
+    console.log('✅ Step 8 initialized.');
+  })();
+  </script>
+</body>
+</html>
