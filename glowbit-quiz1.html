@@ -64,11 +64,11 @@
     <div id="solutionFooterQuiz"><button id="solutionCloseBtnQuiz">Close</button></div>
   </div>
 
- <script>
+<script>
 (function waitForGlow(){
-  if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow,120);
+  if (!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow, 120);
 
-  /* 🧠 Correct Solution JSON (fixed brackets) */
+  /* ✅ Correct, validated solution JSON */
   const solutionJson = {
     "blocks": {
       "languageVersion": 0,
@@ -83,62 +83,60 @@
                 "type": "clear_screen",
                 "next": {
                   "block": {
-                    "type": "set_pixel", "fields": {"X":0,"Y":0,"COLOUR":"#FF0000"},
+                    "type": "set_pixel", "fields": { "X": 0, "Y": 0, "COLOUR": "#FF0000" },
                     "next": {
                       "block": {
-                        "type": "set_pixel","fields":{"X":1,"Y":0,"COLOUR":"#FF0000"},
+                        "type": "set_pixel", "fields": { "X": 1, "Y": 0, "COLOUR": "#FF0000" },
                         "next": {
                           "block": {
-                            "type": "set_pixel","fields":{"X":2,"Y":0,"COLOUR":"#FF0000"},
+                            "type": "set_pixel", "fields": { "X": 2, "Y": 0, "COLOUR": "#FF0000" },
                             "next": {
                               "block": {
-                                "type": "set_pixel","fields":{"X":3,"Y":0,"COLOUR":"#FF0000"},
+                                "type": "set_pixel", "fields": { "X": 3, "Y": 0, "COLOUR": "#FF0000" },
                                 "next": {
                                   "block": {
-                                    "type": "set_pixel","fields":{"X":4,"Y":0,"COLOUR":"#FF0000"},
+                                    "type": "set_pixel", "fields": { "X": 4, "Y": 0, "COLOUR": "#FF0000" },
                                     "next": {
                                       "block": {
-                                        "type": "set_pixel","fields":{"X":5,"Y":0,"COLOUR":"#FF0000"},
+                                        "type": "set_pixel", "fields": { "X": 5, "Y": 0, "COLOUR": "#FF0000" },
                                         "next": {
                                           "block": {
-                                            "type": "set_pixel","fields":{"X":6,"Y":0,"COLOUR":"#FF0000"},
+                                            "type": "set_pixel", "fields": { "X": 6, "Y": 0, "COLOUR": "#FF0000" },
                                             "next": {
                                               "block": {
-                                                "type": "set_pixel","fields":{"X":7,"Y":0,"COLOUR":"#FF0000"},
+                                                "type": "set_pixel", "fields": { "X": 7, "Y": 0, "COLOUR": "#FF0000" },
                                                 "next": {
                                                   "block": {
-                                                    "type": "pause","fields":{"MS":500},
+                                                    "type": "pause", "fields": { "MS": 500 },
                                                     "next": {
                                                       "block": {
                                                         "type": "clear_screen",
                                                         "next": {
                                                           "block": {
-                                                            "type": "set_pixel","fields":{"X":0,"Y":4,"COLOUR":"#0000FF"},
+                                                            "type": "set_pixel", "fields": { "X": 0, "Y": 4, "COLOUR": "#0000FF" },
                                                             "next": {
                                                               "block": {
-                                                                "type": "set_pixel","fields":{"X":1,"Y":4,"COLOUR":"#0000FF"},
+                                                                "type": "set_pixel", "fields": { "X": 1, "Y": 4, "COLOUR": "#0000FF" },
                                                                 "next": {
                                                                   "block": {
-                                                                    "type": "set_pixel","fields":{"X":2,"Y":4,"COLOUR":"#0000FF"},
+                                                                    "type": "set_pixel", "fields": { "X": 2, "Y": 4, "COLOUR": "#0000FF" },
                                                                     "next": {
                                                                       "block": {
-                                                                        "type": "set_pixel","fields":{"X":3,"Y":4,"COLOUR":"#0000FF"},
+                                                                        "type": "set_pixel", "fields": { "X": 3, "Y": 4, "COLOUR": "#0000FF" },
                                                                         "next": {
                                                                           "block": {
-                                                                            "type": "set_pixel","fields":{"X":4,"Y":4,"COLOUR":"#0000FF"},
+                                                                            "type": "set_pixel", "fields": { "X": 4, "Y": 4, "COLOUR": "#0000FF" },
                                                                             "next": {
                                                                               "block": {
-                                                                                "type": "set_pixel","fields":{"X":5,"Y":4,"COLOUR":"#0000FF"},
+                                                                                "type": "set_pixel", "fields": { "X": 5, "Y": 4, "COLOUR": "#0000FF" },
                                                                                 "next": {
                                                                                   "block": {
-                                                                                    "type": "set_pixel","fields":{"X":6,"Y":4,"COLOUR":"#0000FF"},
+                                                                                    "type": "set_pixel", "fields": { "X": 6, "Y": 4, "COLOUR": "#0000FF" },
                                                                                     "next": {
                                                                                       "block": {
-                                                                                        "type": "set_pixel","fields":{"X":7,"Y":4,"COLOUR":"#0000FF"},
+                                                                                        "type": "set_pixel", "fields": { "X": 7, "Y": 4, "COLOUR": "#0000FF" },
                                                                                         "next": {
-                                                                                          "block": {
-                                                                                            "type": "pause","fields":{"MS":500}
-                                                                                          }
+                                                                                          "block": { "type": "pause", "fields": { "MS": 500 } }
                                                                                         }
                                                                                       }
                                                                                     }
@@ -186,56 +184,61 @@
 
   /* 🧱 Create lesson UI (empty start) */
   const lesson = Glowbit.createLessonUI('glowbit-quiz', {
-    title:'', instructions:'', pixelSize:28, defaultJson:null
+    title: '',
+    instructions: '',
+    pixelSize: 28,
+    defaultJson: null
   });
-  if(lesson && lesson.workspace) lesson.workspace.clear();
+  if (lesson && lesson.workspace) lesson.workspace.clear();
   window._lesson_quiz = lesson;
 
   /* 🪄 Sidebar */
   function overrideSidebar(){
-    const container=document.querySelector('#glowbit-quiz');
-    if(!container)return;
-    const sidebar=[...container.querySelectorAll('div')].find(el=>el.innerText&&el.innerText.includes('GlowBit Lesson'));
-    if(!sidebar)return;
+    const container = document.querySelector('#glowbit-quiz');
+    if(!container) return;
+    const sidebar = [...container.querySelectorAll('div')].find(el => el.innerText && el.innerText.includes('GlowBit Lesson'));
+    if(!sidebar) return;
 
-    sidebar.style.background='#e6f9ff';
-    sidebar.style.borderRadius='10px';
-    sidebar.style.padding='12px';
-    sidebar.style.color='#00A1D6';
-    sidebar.style.fontSize='14px';
-    sidebar.style.fontWeight='500';
-    sidebar.style.boxShadow='0 0 8px rgba(0,0,0,0.08)';
+    sidebar.style.background = '#e6f9ff';
+    sidebar.style.borderRadius = '10px';
+    sidebar.style.padding = '12px';
+    sidebar.style.color = '#00A1D6';
+    sidebar.style.fontSize = '14px';
+    sidebar.style.fontWeight = '500';
+    sidebar.style.boxShadow = '0 0 8px rgba(0,0,0,0.08)';
 
-    sidebar.innerHTML=
-      '<h3 style="color:#7B2CBF;font-weight:800;font-size:16px;margin-bottom:10px;text-align:center;">🎯 GlowBit Quiz – The Dancing Duo!</h3>'+
-      '<p style="font-size:15px;line-height:1.5;color:#374151;">🧠 Make the top row glow <strong>red</strong>, then the bottom row glow <strong>blue</strong>, with a pause in between.<br><br>'+
-      '💡 Use a <strong>Forever</strong> loop if you like, so your GlowBit keeps dancing forever!<br><br>'+
-      '▶️ <strong>Click Run Program</strong> to start the show.</p>'+
-      '<button id="check-setup-btn-quiz" style="display:block;margin:12px auto 6px;padding:8px 14px;border:none;border-radius:6px;background:#00A1D6;color:#fff;font-weight:700;cursor:pointer;">✅ Check Your Setup</button>'+
+    sidebar.innerHTML =
+      '<h3 style="color:#7B2CBF;font-weight:800;font-size:16px;margin-bottom:10px;text-align:center;">🎯 GlowBit Quiz – The Dancing Duo!</h3>' +
+      '<p style="font-size:15px;line-height:1.5;color:#374151;">🧠 Make the top row glow <strong>red</strong>, then the bottom row glow <strong>blue</strong>, with a pause in between.<br><br>' +
+      '💡 Use a <strong>Forever</strong> loop if you like, so your GlowBit keeps dancing forever!<br><br>' +
+      '▶️ <strong>Click Run Program</strong> to start the show.</p>' +
+      '<button id="check-setup-btn-quiz" style="display:block;margin:12px auto 6px;padding:8px 14px;border:none;border-radius:6px;background:#00A1D6;color:#fff;font-weight:700;cursor:pointer;">✅ Check Your Setup</button>' +
       '<div class="didyouknow">💡 <strong>Did you know?</strong> Alternating light patterns are used in real robots for alerts, signals, and expressions!</div>';
   }
   overrideSidebar();
-  const int=setInterval(overrideSidebar,400);
-  setTimeout(()=>clearInterval(int),10000);
+  const int = setInterval(overrideSidebar, 400);
+  setTimeout(()=>clearInterval(int), 10000);
 
   /* 🧩 Modal */
-  const modal=document.getElementById('solutionModalQuiz');
-  document.addEventListener('click',e=>{
-    if(e.target.id==='check-setup-btn-quiz'){
-      modal.style.display='block'; modal.setAttribute('aria-hidden','false');
-      if(!window._solutionWorkspaceQuiz){
-        const wsDiv=document.getElementById('solutionWorkspaceQuiz');
-        window._solutionWorkspaceQuiz=Blockly.inject(wsDiv,{readOnly:true,scrollbars:true,toolbox:null});
+  const modal = document.getElementById('solutionModalQuiz');
+  document.addEventListener('click', e => {
+    if (e.target.id === 'check-setup-btn-quiz') {
+      modal.style.display = 'block';
+      modal.setAttribute('aria-hidden', 'false');
+      if (!window._solutionWorkspaceQuiz) {
+        const wsDiv = document.getElementById('solutionWorkspaceQuiz');
+        window._solutionWorkspaceQuiz = Blockly.inject(wsDiv, { readOnly: true, scrollbars: true, toolbox: null });
         Blockly.serialization.workspaces.load(solutionJson, window._solutionWorkspaceQuiz);
       }
     }
-    if(e.target.id==='solutionCloseQuiz'||e.target.id==='solutionCloseBtnQuiz'){
-      modal.style.display='none'; modal.setAttribute('aria-hidden','true');
+    if (e.target.id === 'solutionCloseQuiz' || e.target.id === 'solutionCloseBtnQuiz') {
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
     }
   });
 
   console.log("✅ GlowBit Quiz initialized.");
 })();
-  </script>
+</script>
 </body>
 </html>
