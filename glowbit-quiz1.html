@@ -68,7 +68,7 @@
 (function waitForGlow(){
   if (!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow, 120);
 
-  /* ✅ Correct, validated solution JSON */
+  /* ✅ Correct, compatible solution JSON (no COLOUR field, uses pause_block) */
   const solutionJson = {
     "blocks": {
       "languageVersion": 0,
@@ -83,60 +83,60 @@
                 "type": "clear_screen",
                 "next": {
                   "block": {
-                    "type": "set_pixel", "fields": { "X": 0, "Y": 0, "COLOUR": "#FF0000" },
+                    "type": "set_pixel", "fields": { "X": 0, "Y": 0 },
                     "next": {
                       "block": {
-                        "type": "set_pixel", "fields": { "X": 1, "Y": 0, "COLOUR": "#FF0000" },
+                        "type": "set_pixel", "fields": { "X": 1, "Y": 0 },
                         "next": {
                           "block": {
-                            "type": "set_pixel", "fields": { "X": 2, "Y": 0, "COLOUR": "#FF0000" },
+                            "type": "set_pixel", "fields": { "X": 2, "Y": 0 },
                             "next": {
                               "block": {
-                                "type": "set_pixel", "fields": { "X": 3, "Y": 0, "COLOUR": "#FF0000" },
+                                "type": "set_pixel", "fields": { "X": 3, "Y": 0 },
                                 "next": {
                                   "block": {
-                                    "type": "set_pixel", "fields": { "X": 4, "Y": 0, "COLOUR": "#FF0000" },
+                                    "type": "set_pixel", "fields": { "X": 4, "Y": 0 },
                                     "next": {
                                       "block": {
-                                        "type": "set_pixel", "fields": { "X": 5, "Y": 0, "COLOUR": "#FF0000" },
+                                        "type": "set_pixel", "fields": { "X": 5, "Y": 0 },
                                         "next": {
                                           "block": {
-                                            "type": "set_pixel", "fields": { "X": 6, "Y": 0, "COLOUR": "#FF0000" },
+                                            "type": "set_pixel", "fields": { "X": 6, "Y": 0 },
                                             "next": {
                                               "block": {
-                                                "type": "set_pixel", "fields": { "X": 7, "Y": 0, "COLOUR": "#FF0000" },
+                                                "type": "set_pixel", "fields": { "X": 7, "Y": 0 },
                                                 "next": {
                                                   "block": {
-                                                    "type": "pause", "fields": { "MS": 500 },
+                                                    "type": "pause_block", "fields": { "MS": 500 },
                                                     "next": {
                                                       "block": {
                                                         "type": "clear_screen",
                                                         "next": {
                                                           "block": {
-                                                            "type": "set_pixel", "fields": { "X": 0, "Y": 4, "COLOUR": "#0000FF" },
+                                                            "type": "set_pixel", "fields": { "X": 0, "Y": 4 },
                                                             "next": {
                                                               "block": {
-                                                                "type": "set_pixel", "fields": { "X": 1, "Y": 4, "COLOUR": "#0000FF" },
+                                                                "type": "set_pixel", "fields": { "X": 1, "Y": 4 },
                                                                 "next": {
                                                                   "block": {
-                                                                    "type": "set_pixel", "fields": { "X": 2, "Y": 4, "COLOUR": "#0000FF" },
+                                                                    "type": "set_pixel", "fields": { "X": 2, "Y": 4 },
                                                                     "next": {
                                                                       "block": {
-                                                                        "type": "set_pixel", "fields": { "X": 3, "Y": 4, "COLOUR": "#0000FF" },
+                                                                        "type": "set_pixel", "fields": { "X": 3, "Y": 4 },
                                                                         "next": {
                                                                           "block": {
-                                                                            "type": "set_pixel", "fields": { "X": 4, "Y": 4, "COLOUR": "#0000FF" },
+                                                                            "type": "set_pixel", "fields": { "X": 4, "Y": 4 },
                                                                             "next": {
                                                                               "block": {
-                                                                                "type": "set_pixel", "fields": { "X": 5, "Y": 4, "COLOUR": "#0000FF" },
+                                                                                "type": "set_pixel", "fields": { "X": 5, "Y": 4 },
                                                                                 "next": {
                                                                                   "block": {
-                                                                                    "type": "set_pixel", "fields": { "X": 6, "Y": 4, "COLOUR": "#0000FF" },
+                                                                                    "type": "set_pixel", "fields": { "X": 6, "Y": 4 },
                                                                                     "next": {
                                                                                       "block": {
-                                                                                        "type": "set_pixel", "fields": { "X": 7, "Y": 4, "COLOUR": "#0000FF" },
+                                                                                        "type": "set_pixel", "fields": { "X": 7, "Y": 4 },
                                                                                         "next": {
-                                                                                          "block": { "type": "pause", "fields": { "MS": 500 } }
+                                                                                          "block": { "type": "pause_block", "fields": { "MS": 500 } }
                                                                                         }
                                                                                       }
                                                                                     }
@@ -237,7 +237,7 @@
     }
   });
 
-  console.log("✅ GlowBit Quiz initialized.");
+  console.log("✅ GlowBit Quiz initialized (fixed pause_block + colours).");
 })();
 </script>
 </body>
