@@ -1,110 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GlowBit Quiz 1 — Color Dance Challenge</title>
-<style>
-  body { font-family:"Segoe UI", Roboto, Arial, sans-serif; margin:0; background:#f8fafc; }
-  .gb-wrapper { max-width:1100px; margin:0 auto; }
-  .gb-header { text-align:center; background:#e6f9ff; color:#00A1D6; font-size:22px; font-weight:800; padding:6px 10px; border-radius:8px; margin:8px 0; }
-  .gb-header .highlight { color:#7B2CBF; }
-  .gb-intro { text-align:center; font-size:15px; line-height:1.5; margin:0 0 10px; color:#374151; background:#e0f2fe; border-radius:6px; padding:10px 12px; }
-  .didyouknow { margin-top:18px; background:#fef9c3; border:2px solid #facc15; padding:10px 12px; border-radius:12px; color:#713f12; font-size:13px; font-weight:600; }
-  #solutionModalQuiz { display:none; position:fixed; top:60px; right:20px; width:640px; max-width:42%; background:#fff; border-radius:10px; box-shadow:0 6px 20px rgba(0,0,0,0.28); z-index:9999; overflow:hidden; }
-  #solutionHeaderQuiz { background:#00A1D6; color:#fff; padding:10px; font-weight:700; display:flex; justify-content:space-between; align-items:center; }
-  #solutionWorkspaceQuiz { height:360px; width:100%; border-top:1px solid #eee; background:#fafafa; }
-  #solutionFooterQuiz { text-align:center; padding:10px; }
-  #solutionFooterQuiz button { background:#00A1D6; color:#fff; border:none; border-radius:8px; padding:8px 18px; cursor:pointer; font-weight:700; }
-</style>
+  <meta charset="UTF-8" />
+  <title>GlowBit Quiz 1 — Color Dance Challenge</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Blockly + Glowbit core (same pattern as your working steps) -->
+  <script src="lib/blockly_compressed.js"></script>
+  <script src="lib/blocks_compressed.js"></script>
+  <script src="lib/javascript_compressed.js"></script>
+  <script src="lib/msg/en.js"></script>
+  <script src="assets/global.js"></script>
+  <script src="lib/blockly_xml_patch.js"></script>
+
+  <style>
+    body { font-family:"Segoe UI", Roboto, Arial, sans-serif; margin:0; background:#f8fafc; }
+    .gb-wrapper { max-width:1100px; margin:0 auto; }
+    .gb-header {
+      text-align:center; background:#e6f9ff; color:#00A1D6; font-size:22px; font-weight:800;
+      padding:6px 10px; border-radius:8px; margin:8px 0;
+    }
+    .gb-header .highlight { color:#7B2CBF; }
+    .gb-intro {
+      text-align:center; font-size:15px; line-height:1.5; margin:0 0 10px; color:#374151;
+      background:#e0f2fe; border-radius:6px; padding:10px 12px;
+    }
+    #glowbit-quiz1 .glowbit-playground { max-height:540px; overflow-y:auto !important; border-radius:6px; }
+    .didyouknow {
+      margin-top:18px; background:#fef9c3; border:2px solid #facc15; padding:10px 12px; border-radius:12px;
+      color:#713f12; font-size:13px; font-weight:600;
+    }
+
+    /* Solution modal */
+    #solutionModalQuiz {
+      display:none; position:fixed; top:60px; right:20px; width:640px; max-width:42%;
+      background:#fff; border-radius:10px; box-shadow:0 6px 20px rgba(0,0,0,0.28);
+      z-index:12000; overflow:hidden; user-select:none;
+    }
+    #solutionHeaderQuiz {
+      padding:10px 12px; background:#00A1D6; color:#fff; font-weight:700;
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    #solutionWorkspaceQuiz { height:360px; width:100%; border-top:1px solid #eee; background:#fafafa; }
+    #solutionFooterQuiz { text-align:center; padding:12px; background:#fff; }
+    #solutionFooterQuiz button {
+      background:#00A1D6; color:#fff; border:none; border-radius:8px;
+      padding:8px 18px; cursor:pointer; font-weight:700;
+    }
+  </style>
 </head>
 
 <body>
-<div class="gb-wrapper">
-  <div class="gb-header">🌟 <span class="highlight">GlowBit Quiz 1</span>: Color Dance Challenge</div>
-  <p class="gb-intro">
-    Create two glowing rows — one <span style="color:#FF0000;font-weight:600;">red</span> at the top (y=0) and one
-    <span style="color:#0000FF;font-weight:600;">blue</span> at the bottom (y=4). They should light up one after the other with a pause!
-  </p>
-  <div id="glowbit-quiz1"></div>
-</div>
+  <div class="gb-wrapper">
+    <div class="gb-header">
+      🌟 <span class="highlight">GlowBit Quiz 1</span>: Color Dance Challenge
+    </div>
 
-<!-- Solution Modal -->
-<div id="solutionModalQuiz" aria-hidden="true">
-  <div id="solutionHeaderQuiz">
-    <span>✅ Correct Answer — Color Dance</span>
-    <button id="solutionCloseQuiz">✕</button>
+    <p class="gb-intro">
+      Create two glowing rows — one <strong style="color:#FF0000;">red</strong> (<code>#FF0000</code>) at <strong>y=0</strong> and one
+      <strong style="color:#0000FF;">blue</strong> (<code>#0000FF</code>) at <strong>y=4</strong>. Make them light up one after the other with a pause!
+    </p>
+
+    <div id="glowbit-quiz1"></div>
   </div>
-  <div id="solutionWorkspaceQuiz"></div>
-  <div id="solutionFooterQuiz"><button id="solutionCloseBtnQuiz">Close</button></div>
-</div>
 
-<script>
-(function waitForGlow() {
-  if (!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow, 150);
-  console.log("✅ GlowBit Quiz initialized.");
+  <!-- Solution modal -->
+  <div id="solutionModalQuiz" aria-hidden="true" role="dialog">
+    <div id="solutionHeaderQuiz">
+      <div>✅ Correct Answer — Color Dance</div>
+      <button id="solutionCloseQuiz" title="Close">✕</button>
+    </div>
+    <div id="solutionWorkspaceQuiz" aria-label="Correct solution workspace"></div>
+    <div id="solutionFooterQuiz"><button id="solutionCloseBtnQuiz">Close</button></div>
+  </div>
 
-  const emptyJson = { blocks: { languageVersion: 0, blocks: [] } };
-
-  // Helper to create a row of pixels
-  function makeRow(y, color) {
-    let first = null, last = null;
-    for (let x = 0; x < 8; x++) {
-      const block = {
-        type: "set_pixel",
-        fields: { X: x, Y: y, COLOR: color }
-      };
-      if (!first) first = block;
-      if (last) last.next = { block };
-      last = block;
-    }
-    return first;
-  }
-
-  // Build the solution dynamically to avoid syntax errors
-  const redRow = makeRow(0, "#FF0000");
-  const blueRow = makeRow(4, "#0000FF");
-
-  const solutionJson = {
-    blocks: {
-      languageVersion: 0,
-      blocks: [
+  <!-- ✅ Keep solution JSON OUT of JavaScript parsing -->
+  <script id="quiz-solution-json" type="application/json">
+  {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
         {
-          type: "on_start",
-          x: 20,
-          y: 20,
-          inputs: {
-            DO: {
-              block: {
-                type: "forever",
-                inputs: {
-                  DO: {
-                    block: {
-                      type: "clear_screen",
-                      next: {
-                        block: Object.assign({}, redRow, {
-                          next: {
-                            block: {
-                              type: "pause",
-                              fields: { DURATION: 500 },
-                              next: {
-                                block: {
-                                  type: "clear_screen",
-                                  next: {
-                                    block: Object.assign({}, blueRow, {
-                                      next: {
-                                        block: {
-                                          type: "pause",
-                                          fields: { DURATION: 500 }
-                                        }
-                                      }
-                                    })
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        })
+          "type": "on_start",
+          "x": 20,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "forever",
+                "inputs": {
+                  "DO": {
+                    "block": {
+                      "type": "clear_screen",
+                      "next": {
+                        "block": { "type": "set_pixel", "fields": { "X": 0, "Y": 0 },
+                        "next": { "block": { "type": "set_pixel", "fields": { "X": 1, "Y": 0 },
+                        "next": { "block": { "type": "set_pixel", "fields": { "X": 2, "Y": 0 },
+                        "next": { "block": { "type": "set_pixel", "fields": { "X": 3, "Y": 0 },
+                        "next": { "block": { "type": "set_pixel", "fields": { "X": 4, "Y": 0 },
+                        "next": { "block": { "type": "set_pixel", "fields": { "X": 5, "Y": 0 },
+                        "next": { "block": { "type": "set_pixel", "fields": { "X": 6, "Y": 0 },
+                        "next": { "block": { "type": "set_pixel", "fields": { "X": 7, "Y": 0 },
+                        "next": { "block": { "type": "pause_block", "fields": { "MS": 500 },
+                        "next": { "block": { "type": "clear_screen",
+                        "next": { "block": { "type": "set_pixel", "fields": { "X": 0, "Y": 4 },
+                        "next": { "block": { "type": "set_pixel", "fields": { "X": 1, "Y": 4 },
+                        "next": { "block": { "type": "set_pixel", "fields": { "X": 2, "Y": 4 },
+                        "next": { "block": { "type": "set_pixel", "fields": { "X": 3, "Y": 4 },
+                        "next": { "block": { "type": "set_pixel", "fields": { "X": 4, "Y": 4 },
+                        "next": { "block": { "type": "set_pixel", "fields": { "X": 5, "Y": 4 },
+                        "next": { "block": { "type": "set_pixel", "fields": { "X": 6, "Y": 4 },
+                        "next": { "block": { "type": "set_pixel", "fields": { "X": 7, "Y": 4 },
+                        "next": { "block": { "type": "pause_block", "fields": { "MS": 500 } } }
+                        }}}}}}}}}}}}}}}}}}}}}}}}
                       }
                     }
                   }
@@ -115,57 +123,79 @@
         }
       ]
     }
-  };
-
-  const lesson = Glowbit.createLessonUI('glowbit-quiz1', {
-    title: '',
-    instructions: '',
-    pixelSize: 28,
-    defaultJson: emptyJson
-  });
-  window._lesson_quiz1 = lesson;
-
-  function overrideSidebar() {
-    const container = document.querySelector('#glowbit-quiz1');
-    if (!container) return;
-    const sidebar = Array.from(container.querySelectorAll('*')).find(el => el.innerText && el.innerText.includes('GlowBit Lesson'));
-    if (!sidebar) return;
-    sidebar.style.background = '#e6f9ff';
-    sidebar.style.borderRadius = '10px';
-    sidebar.style.padding = '12px';
-    sidebar.style.color = '#00A1D6';
-    sidebar.style.fontSize = '14px';
-    sidebar.style.fontWeight = '500';
-    sidebar.innerHTML =
-      '<h3 style="color:#00A1D6;font-weight:800;font-size:16px;margin-bottom:10px;text-align:center;">🌟 Quiz Challenge 🌟</h3>' +
-      '<p>🎨 Create a row of <strong style="color:#FF0000;">red</strong> lights at y=0.</p>' +
-      '<p>💡 Pause, clear the screen, then make a <strong style="color:#0000FF;">blue</strong> row at y=4.</p>' +
-      '<p>⏱ Add pauses and loop it forever!</p>' +
-      '<button id="check-setup-btn-quiz" style="display:block;margin:12px auto 6px;padding:8px 14px;border:none;border-radius:6px;background:#00A1D6;color:#fff;font-weight:700;cursor:pointer;">✅ Check Your Setup</button>' +
-      '<div class="didyouknow">💡 Robots use patterns like this to show status or dance!</div>';
   }
+  </script>
 
-  overrideSidebar();
-  const fix = setInterval(overrideSidebar, 400);
-  setTimeout(() => clearInterval(fix), 8000);
+  <script>
+  (function waitForGlow() {
+    if (!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow, 120);
 
-  const modal = document.getElementById('solutionModalQuiz');
-  document.addEventListener('click', e => {
-    if (e.target.id === 'check-setup-btn-quiz') {
-      modal.style.display = 'block';
-      modal.setAttribute('aria-hidden', 'false');
-      if (!window._solutionWorkspaceQuiz) {
-        const wsDiv = document.getElementById('solutionWorkspaceQuiz');
-        window._solutionWorkspaceQuiz = Blockly.inject(wsDiv, { readOnly: true, scrollbars: true, toolbox: null });
-        Blockly.serialization.workspaces.load(solutionJson, window._solutionWorkspaceQuiz);
+    console.log("✅ GlowBit Quiz initialized.");
+
+    /* Always start kids with an empty workspace */
+    const emptyJson = { "blocks": { "languageVersion": 0, "blocks": [] } };
+
+    const lesson = Glowbit.createLessonUI('glowbit-quiz1', {
+      title: '',
+      instructions: '',
+      pixelSize: 28,
+      defaultJson: emptyJson
+    });
+    window._lesson_quiz1 = lesson;
+
+    /* Sidebar with the quiz instructions */
+    function overrideSidebar(){
+      const container = document.querySelector('#glowbit-quiz1');
+      if (!container) return;
+      const sidebar = Array.from(container.querySelectorAll('*')).find(el => el.innerText && el.innerText.includes('GlowBit Lesson'));
+      if (!sidebar) return;
+
+      sidebar.style.background = '#e6f9ff';
+      sidebar.style.borderRadius = '10px';
+      sidebar.style.padding = '12px';
+      sidebar.style.color = '#00A1D6';
+      sidebar.style.fontSize = '14px';
+      sidebar.style.fontWeight = '500';
+      sidebar.style.boxShadow = '0 0 8px rgba(0,0,0,0.08)';
+
+      const card='margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;font-weight:600;';
+      sidebar.innerHTML =
+        '<h3 style="color:#00A1D6;font-weight:800;font-size:16px;margin-bottom:10px;text-align:center;">🌟 Quiz Challenge 🌟</h3>'+
+        '<div style="'+card+'">🔴 Make a row at <strong>y=0</strong> in <strong style="color:#FF0000;">red</strong> (<code>#FF0000</code>) — set <strong>x</strong> from 0→7.</div>'+
+        '<div style="'+card+'">⏸ Add a <strong>pause</strong>, then <strong>clear screen</strong>.</div>'+
+        '<div style="'+card+'">🔵 Make a row at <strong>y=4</strong> in <strong style="color:#0000FF;">blue</strong> (<code>#0000FF</code>) — set <strong>x</strong> from 0→7.</div>'+
+        '<div style="'+card+'">♾ Put it inside a <strong>forever</strong> loop so they take turns glowing.</div>'+
+        '<div style="'+card+'">▶️ Click <strong>Run Program</strong> to see your lights dance!</div>'+
+        '<button id="check-setup-btn-quiz" style="display:block;margin:12px auto 6px;padding:8px 14px;border:none;border-radius:6px;background:#00A1D6;color:#fff;font-weight:700;cursor:pointer;">✅ Check Your Setup</button>'+
+        '<div class="didyouknow">💡 Robots use patterns like this to show status or to make fun animations!</div>';
+    }
+    overrideSidebar();
+    const sid = setInterval(overrideSidebar, 400);
+    setTimeout(() => clearInterval(sid), 8000);
+
+    /* Modal: load solution from the JSON script tag */
+    const modal = document.getElementById('solutionModalQuiz');
+
+    document.addEventListener('click', (e) => {
+      if (e.target.id === 'check-setup-btn-quiz') {
+        modal.style.display = 'block';
+        modal.setAttribute('aria-hidden', 'false');
+        if (!window._solutionWorkspaceQuiz) {
+          const wsDiv = document.getElementById('solutionWorkspaceQuiz');
+          window._solutionWorkspaceQuiz = Blockly.inject(wsDiv, { readOnly: true, scrollbars: true, toolbox: null });
+
+          const txt = document.getElementById('quiz-solution-json').textContent.trim();
+          const solutionJson = JSON.parse(txt);  // ✅ Browser never parses this as JS, so no ']' errors
+          Blockly.serialization.workspaces.load(solutionJson, window._solutionWorkspaceQuiz);
+        }
       }
-    }
-    if (e.target.id === 'solutionCloseQuiz' || e.target.id === 'solutionCloseBtnQuiz') {
-      modal.style.display = 'none';
-      modal.setAttribute('aria-hidden', 'true');
-    }
-  });
-})();
-</script>
+      if (e.target.id === 'solutionCloseQuiz' || e.target.id === 'solutionCloseBtnQuiz') {
+        if (document.activeElement) document.activeElement.blur(); /* avoid aria-hidden focus warning */
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+      }
+    });
+  })();
+  </script>
 </body>
 </html>
