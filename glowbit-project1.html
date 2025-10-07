@@ -30,9 +30,9 @@
     .gb-btn {padding:8px 14px;border:none;border-radius:6px;font-weight:700;cursor:pointer;flex:1;text-align:center;}
     .gb-btn.next {background:#00A1D6;color:#fff;}
     .gb-btn.back {background:#6B7280;color:#fff;}
-    .gb-btn.check {background:#10B981;color:#fff;}
+    .gb-btn.check {background:#10B981;color:#fff;display:block;margin:12px auto 0;} /* centered */
 
-    /* Modal */
+    /* Solution modal */
     #solutionModalP1 {display:none;position:fixed;top:60px;right:20px;width:640px;max-width:42%;
                      background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.28);
                      z-index:12000;overflow:hidden;user-select:none;}
@@ -56,7 +56,7 @@
     </div>
 
     <p class="gb-intro">
-      Join Liam and bring GlowBit’s emotions to life! You’ll create a happy face, a sad face, and switch moods with buttons A and B.
+      Create a happy face, a sad face, and switch moods with buttons A and B — now centered on the 8×8 grid!
     </p>
 
     <div id="glowbit-project1-step1"></div>
@@ -76,111 +76,185 @@
   (function waitForGlow(){
     if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow,120);
 
-    /* ✅ Solution JSON for "Check Your Setup" */
-  const solutionJson = {
-  "blocks": {
-    "languageVersion": 0,
-    "blocks": [
-      {
-        "id": "onstart1",
-        "type": "on_start",
-        "x": 30, "y": 20,
-        "inputs": {
-          "DO": {
-            "block": {
-              "type": "set_pixel",
-              "fields": {"X":0,"Y":1,"COL":"#00FF00"},
-              "next": {"block": {"type": "set_pixel","fields": {"X":1,"Y":2,"COL":"#00FF00"}}}
-            }
+    /* -------------------------------------------
+       1) Build solutionJson programmatically
+       - Shows: On Button A -> clear + 5 plot (smile)
+               On Button B -> clear + 5 plot (sad)
+       - All coords centered for 8×8 (offset +1,+1)
+    --------------------------------------------*/
+    const smile = [[1,2],[2,3],[3,3],[4,3],[5,2]]; // centered from (0,1)(1,2)(2,2)(3,2)(4,1)
+    const sad   = [[1,4],[2,3],[3,3],[4,3],[5,4]]; // centered from (0,3)(1,2)(2,2)(3,2)(4,3)
+
+    function chainPlots(coords){
+      let first=null, curr=null;
+      coords.forEach(([x,y])=>{
+        const blk = {"type":"plot","fields":{"X":x,"Y":y}};
+        if(!first){ first=blk; curr=blk; }
+        else { curr.next = {"block": blk}; curr = blk; }
+      });
+      return first;
+    }
+    function doClearThenPlots(coords){
+      const chain = chainPlots(coords);
+      return { "block": { "type":"clear_screen", "next": (chain? {"block": chain} : undefined) } };
+    }
+    const solutionJson = {
+      "blocks": {
+        "languageVersion": 0,
+        "blocks": [
+          {
+            "type": "on_button_pressed",
+            "fields": {"BTN":"A"},
+            "x": 24, "y": 20,
+            "inputs": { "DO": doClearThenPlots(smile) }
+          },
+          {
+            "type": "on_button_pressed",
+            "fields": {"BTN":"B"},
+            "x": 260, "y": 20,
+            "inputs": { "DO": doClearThenPlots(sad) }
           }
-        }
-      },
-      {
-        "id": "onbuttonA",
-        "type": "on_button_pressed",
-        "fields": {"BTN":"A"},
-        "x": 30, "y": 150,
-        "inputs": {
-          "DO": {
-            "block": {"type": "clear_screen"}
-          }
-        }
-      },
-      {
-        "id": "onbuttonB",
-        "type": "on_button_pressed",
-        "fields": {"BTN":"B"},
-        "x": 240, "y": 150,
-        "inputs": {
-          "DO": {
-            "block": {"type": "clear_screen"}
-          }
-        }
+        ]
       }
-    ]
-  }
-};
-    /* 🧱 Lesson setup */
+    };
+
+    /* -------------------------------------------
+       2) Create Lesson UI (re-uses your global.js)
+    --------------------------------------------*/
     const lesson = Glowbit.createLessonUI('glowbit-project1-step1', {
       title:'', instructions:'', pixelSize:28, defaultJson:null
     });
     if(lesson && lesson.workspace) lesson.workspace.clear();
 
-    /* 📘 Sidebar pages */
-    const pages = [
-      `<h3 style="text-align:center;color:#00A1D6;">Step 1: Set Up Your Happy Face 😊</h3>
+    /* -------------------------------------------
+       3) Auto-paginate sidebar to fill to the
+          bottom of the Blockly workspace height
+          (uses #...-editor height as the target)
+    --------------------------------------------*/
+    const stepCards = [
+      // Step 1 – Happy (centered)
+      `<h3 style="text-align:center;color:#00A1D6;">Step 1: Happy Face (Centered) 😊</h3>
        <div style="margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;">
-       • Go to the <strong>LED</strong> tab and drag five <strong>Plot (x,y)</strong> blocks.<br>
-       • Set x:0 y:1, x:1 y:2, x:2 y:2, x:3 y:2, x:4 y:1.<br>
-       • Add an <strong>on start</strong> block and place all inside.<br>
-       • Click <strong>Run</strong> to see GlowBit’s smile!</div>`,
+       • From <strong>LED</strong>, drag five <strong>Plot (x,y)</strong> blocks.<br>
+       • Use centered coords on the 8×8 grid: <code>(1,2) (2,3) (3,3) (4,3) (5,2)</code>.<br>
+       • Add <strong>on start</strong> from Basic and (optionally) try it there to preview.<br>
+       • Click <strong>Run</strong> and verify the smile is centered.</div>`,
 
-      `<h3 style="text-align:center;color:#00A1D6;">Step 2: Create the Sad Face 😢</h3>
+      // Step 2 – Sad (centered)
+      `<h3 style="text-align:center;color:#00A1D6;">Step 2: Sad Face (Centered) 😢</h3>
        <div style="margin:10px 0;padding:10px;border-radius:8px;background:#7B2CBF;color:#fff;">
-       • Duplicate the <strong>on start</strong> block.<br>
-       • In the new block, use Plot with x:0 y:3, x:1 y:2, x:2 y:2, x:3 y:2, x:4 y:3.<br>
-       • Run the program again to see the sad face appear!</div>`,
+       • Duplicate your five Plot blocks.<br>
+       • Use centered coords for sad mouth: <code>(1,4) (2,3) (3,3) (4,3) (5,4)</code>.<br>
+       • (Optional) Preview in <strong>on start</strong> to check shape.</div>`,
 
-      `<h3 style="text-align:center;color:#00A1D6;">Step 3: Switch Moods with Liam 🔄</h3>
+      // Step 3 – Switch moods
+      `<h3 style="text-align:center;color:#00A1D6;">Step 3: Switch Moods 🔄</h3>
        <div style="margin:10px 0;padding:10px;border-radius:8px;background:#00A1D6;color:#fff;">
-       • Add <strong>on button A pressed</strong> from Input tab.<br>
-       • Move the happy face blocks inside it.<br>
-       • Add another for <strong>button B</strong> and put the sad face inside.<br>
-       • Run, press A or B to change GlowBit’s mood!</div>
-       <button id="check-setup-btnP1" class="gb-btn check">✅ Check Your Setup</button>
-       <div class="didyouknow">💡 <strong>Did you know?</strong> Robots use LEDs to show feelings, just like GlowBit!</div>`
+       • Add <strong>on button A pressed</strong> (Input), put <strong>clear screen</strong> first,<br>
+       &nbsp;&nbsp;then the 5 Plot blocks for the <strong>happy</strong> face.<br>
+       • Add <strong>on button B pressed</strong>, put <strong>clear screen</strong> first,<br>
+       &nbsp;&nbsp;then the 5 Plot blocks for the <strong>sad</strong> face.<br>
+       • Click <strong>Run</strong>, then press A or B to change moods!</div>`,
+
+      // Tips to help fill first page neatly
+      `<div style="margin:10px 0;padding:10px;border-radius:8px;background:#065F46;color:#fff;">
+       ✅ Tip: If a face looks offset, double-check the x,y pairs.<br>
+       ✅ Tip: Use <strong>Plot</strong> (no color) to match the solution view.</div>`,
+
+      // Last page: Check Setup + Did you know
+      `<button id="check-setup-btnP1" class="gb-btn check">✅ Check Your Setup</button>
+       <div class="didyouknow">💡 <strong>Did you know?</strong> Emotions on robots are often shown with LEDs and sounds — you’re doing the same with GlowBit!</div>`
     ];
 
-    /* 🧭 Navigation logic */
-    function renderSidebar(idx){
-      const sidebar=document.querySelector('#glowbit-project1-step1 .glowbit-left');
-      if(!sidebar)return;
-      sidebar.innerHTML = pages[idx];
+    function paginateToWorkspaceHeight(){
+      const sidebar = document.querySelector('#glowbit-project1-step1 .glowbit-left');
+      if(!sidebar) return;
 
-      const navDiv=document.createElement('div');
-      navDiv.className='nav-btns';
-      if(idx>0){
-        const back=document.createElement('button');
-        back.textContent='⬅ Back';
-        back.className='gb-btn back';
-        back.addEventListener('click',()=>renderSidebar(idx-1));
-        navDiv.appendChild(back);
+      // Target = Blockly editor box height (fallback 520)
+      const editor = document.getElementById('glowbit-project1-step1-editor');
+      const targetH = (editor && editor.offsetHeight) ? editor.offsetHeight : 520;
+
+      // Build pages by measuring offscreen
+      const measurer = document.createElement('div');
+      measurer.style.visibility='hidden';
+      measurer.style.position='absolute';
+      measurer.style.left='-9999px';
+      measurer.style.top='-9999px';
+      measurer.style.width = (sidebar.clientWidth || 320) + 'px';
+      document.body.appendChild(measurer);
+
+      const pages = [];
+      let currentPage = [];
+      measurer.innerHTML = '';
+
+      // Small bottom reserve for nav buttons (~56px)
+      const reserve = 56;
+
+      stepCards.forEach(html=>{
+        const card = document.createElement('div');
+        card.innerHTML = html;
+        measurer.appendChild(card);
+
+        const tooTall = measurer.scrollHeight > (targetH - reserve);
+        if(tooTall){
+          // start new page with this card
+          if(currentPage.length===0){
+            // If single card itself exceeds target, force page anyway
+            pages.push([html]);
+            measurer.innerHTML='';
+          } else {
+            pages.push([...currentPage]);
+            currentPage = [html];
+            measurer.innerHTML='';
+            // re-measure currentPage
+            currentPage.forEach(h=>{
+              const c=document.createElement('div'); c.innerHTML=h; measurer.appendChild(c);
+            });
+          }
+        } else {
+          currentPage.push(html);
+        }
+      });
+      if(currentPage.length) pages.push(currentPage);
+
+      document.body.removeChild(measurer);
+
+      // Render with Back/Next
+      function render(idx){
+        sidebar.innerHTML = pages[idx].join('');
+        const nav = document.createElement('div');
+        nav.className='nav-btns';
+        if(idx>0){
+          const back=document.createElement('button');
+          back.textContent='⬅ Back'; back.className='gb-btn back';
+          back.onclick=()=>render(idx-1);
+          nav.appendChild(back);
+        }
+        if(idx<pages.length-1){
+          const next=document.createElement('button');
+          next.textContent='Next ➜'; next.className='gb-btn next';
+          next.onclick=()=>render(idx+1);
+          nav.appendChild(next);
+        }
+        sidebar.appendChild(nav);
       }
-      if(idx<pages.length-1){
-        const next=document.createElement('button');
-        next.textContent='Next ➜';
-        next.className='gb-btn next';
-        next.addEventListener('click',()=>renderSidebar(idx+1));
-        navDiv.appendChild(next);
-      }
-      sidebar.appendChild(navDiv);
+      render(0);
     }
-    renderSidebar(0);
 
-    /* 🧩 Check Your Setup Modal */
+    // First render + on resize (debounced)
+    paginateToWorkspaceHeight();
+    let _rt=null;
+    window.addEventListener('resize',()=>{
+      clearTimeout(_rt);
+      _rt=setTimeout(paginateToWorkspaceHeight,150);
+    });
+
+    /* -------------------------------------------
+       4) Check Your Setup (loads our solutionJson)
+    --------------------------------------------*/
     const modal=document.getElementById('solutionModalP1');
     document.addEventListener('click',function(e){
-      if(e.target.id==='check-setup-btnP1'){
+      if(e.target && e.target.id==='check-setup-btnP1'){
         modal.style.display='block';
         modal.setAttribute('aria-hidden','false');
         if(!window._solutionWorkspaceP1){
@@ -189,14 +263,16 @@
           Blockly.serialization.workspaces.load(solutionJson, window._solutionWorkspaceP1);
         }
       }
-      if(e.target.id==='solutionCloseP1'||e.target.id==='solutionCloseBtnP1'){
+      if(e.target && (e.target.id==='solutionCloseP1'||e.target.id==='solutionCloseBtnP1')){
         modal.style.display='none';
         modal.setAttribute('aria-hidden','true');
       }
     });
 
+    // Friendly hello on the simulator
     if(typeof Glowbit.showIcon==='function') Glowbit.showIcon('smile');
-    console.log('✅ Project 1 – Liam’s Mood Maker ready with Back/Next navigation.');
+
+    console.log('✅ Project 1 – Mood Maker ready with auto-paginated sidebar + centered setup.');
   })();
   </script>
 </body>
