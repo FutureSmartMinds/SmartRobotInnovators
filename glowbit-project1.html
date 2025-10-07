@@ -76,48 +76,47 @@
   (function waitForGlow(){
     if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow,120);
 
-    /* -------------------------------------------
-       1) Build solutionJson programmatically
-       - Shows: On Button A -> clear + 5 plot (smile)
-               On Button B -> clear + 5 plot (sad)
-       - All coords centered for 8×8 (offset +1,+1)
-    --------------------------------------------*/
-    const smile = [[1,2],[2,3],[3,3],[4,3],[5,2]]; // centered from (0,1)(1,2)(2,2)(3,2)(4,1)
-    const sad   = [[1,4],[2,3],[3,3],[4,3],[5,4]]; // centered from (0,3)(1,2)(2,2)(3,2)(4,3)
+   /* -------------------------------------------
+   1) Build solutionJson programmatically
+   - Shows: On Button A -> clear + 5 plot (smile)
+            On Button B -> clear + 5 plot (sad)
+   - Centered coords for 8×8, arranged side-by-side
+--------------------------------------------*/
+const smile = [[1,2],[2,3],[3,3],[4,3],[5,2]];
+const sad   = [[1,4],[2,3],[3,3],[4,3],[5,4]];
 
-    function chainPlots(coords){
-      let first=null, curr=null;
-      coords.forEach(([x,y])=>{
-        const blk = {"type":"plot","fields":{"X":x,"Y":y}};
-        if(!first){ first=blk; curr=blk; }
-        else { curr.next = {"block": blk}; curr = blk; }
-      });
-      return first;
-    }
-    function doClearThenPlots(coords){
-      const chain = chainPlots(coords);
-      return { "block": { "type":"clear_screen", "next": (chain? {"block": chain} : undefined) } };
-    }
-    const solutionJson = {
-      "blocks": {
-        "languageVersion": 0,
-        "blocks": [
-          {
-            "type": "on_button_pressed",
-            "fields": {"BTN":"A"},
-            "x": 24, "y": 20,
-            "inputs": { "DO": doClearThenPlots(smile) }
-          },
-          {
-            "type": "on_button_pressed",
-            "fields": {"BTN":"B"},
-            "x": 260, "y": 20,
-            "inputs": { "DO": doClearThenPlots(sad) }
-          }
-        ]
+function chainPlots(coords){
+  let first=null, curr=null;
+  coords.forEach(([x,y])=>{
+    const blk = {"type":"plot","fields":{"X":x,"Y":y}};
+    if(!first){ first=blk; curr=blk; }
+    else { curr.next = {"block": blk}; curr = blk; }
+  });
+  return first;
+}
+function doClearThenPlots(coords){
+  const chain = chainPlots(coords);
+  return { "block": { "type":"clear_screen", "next": (chain? {"block": chain} : undefined) } };
+}
+const solutionJson = {
+  "blocks": {
+    "languageVersion": 0,
+    "blocks": [
+      {
+        "type": "on_button_pressed",
+        "fields": {"BTN":"A"},
+        "x": 20, "y": 20,            // left group
+        "inputs": { "DO": doClearThenPlots(smile) }
+      },
+      {
+        "type": "on_button_pressed",
+        "fields": {"BTN":"B"},
+        "x": 280, "y": 20,           // right group so they appear side by side
+        "inputs": { "DO": doClearThenPlots(sad) }
       }
-    };
-
+    ]
+  }
+};
     /* -------------------------------------------
        2) Create Lesson UI (re-uses your global.js)
     --------------------------------------------*/
@@ -133,7 +132,7 @@
     --------------------------------------------*/
     const stepCards = [
       // Step 1 – Happy (centered)
-      `<h3 style="text-align:center;color:#00A1D6;">Step 1: Happy Face (Centered) 😊</h3>
+      `<h3 style="text-align:center;color:#00A1D6;">Step 1: Happy Face  😊</h3>
        <div style="margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;">
        • From <strong>LED</strong>, drag five <strong>Plot (x,y)</strong> blocks.<br>
        • Use centered coords on the 8×8 grid: <code>(1,2) (2,3) (3,3) (4,3) (5,2)</code>.<br>
@@ -141,7 +140,7 @@
        • Click <strong>Run</strong> and verify the smile is centered.</div>`,
 
       // Step 2 – Sad (centered)
-      `<h3 style="text-align:center;color:#00A1D6;">Step 2: Sad Face (Centered) 😢</h3>
+      `<h3 style="text-align:center;color:#00A1D6;">Step 2: Sad Face  😢</h3>
        <div style="margin:10px 0;padding:10px;border-radius:8px;background:#7B2CBF;color:#fff;">
        • Duplicate your five Plot blocks.<br>
        • Use centered coords for sad mouth: <code>(1,4) (2,3) (3,3) (4,3) (5,4)</code>.<br>
