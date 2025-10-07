@@ -77,53 +77,43 @@
     if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow,120);
 
     /* ✅ Solution JSON for "Check Your Setup" */
-   const solutionJson = {
+  const solutionJson = {
   "blocks": {
     "languageVersion": 0,
     "blocks": [
       {
+        "id": "onstart1",
         "type": "on_start",
-        "x": 20, "y": 20,
+        "x": 30, "y": 20,
         "inputs": {
           "DO": {
             "block": {
-              "type": "set_pixel", "fields": {"X":0,"Y":1,"COL":"#00FF00"},
-              "next": {
-                "block": {"type":"set_pixel","fields":{"X":1,"Y":2,"COL":"#00FF00"},
-                "next": {
-                  "block": {"type":"set_pixel","fields":{"X":2,"Y":2,"COL":"#00FF00"},
-                  "next": {
-                    "block": {"type":"set_pixel","fields":{"X":3,"Y":2,"COL":"#00FF00"},
-                    "next": {
-                      "block": {"type":"set_pixel","fields":{"X":4,"Y":1,"COL":"#00FF00"}}
-                    }}}}}}
+              "type": "set_pixel",
+              "fields": {"X":0,"Y":1,"COL":"#00FF00"},
+              "next": {"block": {"type": "set_pixel","fields": {"X":1,"Y":2,"COL":"#00FF00"}}}
             }
           }
         }
       },
       {
+        "id": "onbuttonA",
         "type": "on_button_pressed",
         "fields": {"BTN":"A"},
-        "x": 20, "y": 160,
+        "x": 30, "y": 150,
         "inputs": {
           "DO": {
-            "block": {
-              "type":"clear_screen",
-              "next":{"block":{"type":"set_pixel","fields":{"X":0,"Y":1,"COL":"#00FF00"}}}
-            }
+            "block": {"type": "clear_screen"}
           }
         }
       },
       {
+        "id": "onbuttonB",
         "type": "on_button_pressed",
         "fields": {"BTN":"B"},
-        "x": 220, "y": 160,
+        "x": 240, "y": 150,
         "inputs": {
           "DO": {
-            "block": {
-              "type":"clear_screen",
-              "next":{"block":{"type":"set_pixel","fields":{"X":0,"Y":3,"COL":"#00FF00"}}}
-            }
+            "block": {"type": "clear_screen"}
           }
         }
       }
