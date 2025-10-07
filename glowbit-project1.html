@@ -30,7 +30,7 @@
     .gb-btn {padding:8px 14px;border:none;border-radius:6px;font-weight:700;cursor:pointer;flex:1;text-align:center;}
     .gb-btn.next {background:#00A1D6;color:#fff;}
     .gb-btn.back {background:#6B7280;color:#fff;}
-    .gb-btn.check {background:#10B981;color:#fff;display:block;margin:12px auto 0;} /* centered */
+    .gb-btn.check {background:#10B981;color:#fff;display:block;margin:12px auto 0;}
 
     /* Solution modal */
     #solutionModalP1 {display:none;position:fixed;top:60px;right:20px;width:640px;max-width:42%;
@@ -76,49 +76,50 @@
   (function waitForGlow(){
     if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow,120);
 
-   /* -------------------------------------------
-   1) Build solutionJson programmatically
-   - Shows: On Button A -> clear + 5 plot (smile)
-            On Button B -> clear + 5 plot (sad)
-   - Centered coords for 8×8, arranged side-by-side
---------------------------------------------*/
-const smile = [[1,2],[2,3],[3,3],[4,3],[5,2]];
-const sad   = [[1,4],[2,3],[3,3],[4,3],[5,4]];
-
-function chainPlots(coords){
-  let first=null, curr=null;
-  coords.forEach(([x,y])=>{
-    const blk = {"type":"plot","fields":{"X":x,"Y":y}};
-    if(!first){ first=blk; curr=blk; }
-    else { curr.next = {"block": blk}; curr = blk; }
-  });
-  return first;
-}
-function doClearThenPlots(coords){
-  const chain = chainPlots(coords);
-  return { "block": { "type":"clear_screen", "next": (chain? {"block": chain} : undefined) } };
-}
-const solutionJson = {
-  "blocks": {
-    "languageVersion": 0,
-    "blocks": [
-      {
-        "type": "on_button_pressed",
-        "fields": {"BTN":"A"},
-        "x": 20, "y": 20,            // left group
-        "inputs": { "DO": doClearThenPlots(smile) }
-      },
-      {
-        "type": "on_button_pressed",
-        "fields": {"BTN":"B"},
-        "x": 280, "y": 20,           // right group so they appear side by side
-        "inputs": { "DO": doClearThenPlots(sad) }
-      }
-    ]
-  }
-};
     /* -------------------------------------------
-       2) Create Lesson UI (re-uses your global.js)
+       1) Build solutionJson programmatically
+       - Button A → clear + smile
+       - Button B → clear + sad
+       - Centered coords for 8×8, side by side
+    --------------------------------------------*/
+    const smile = [[1,2],[2,3],[3,3],[4,3],[5,2]];
+    const sad   = [[1,4],[2,3],[3,3],[4,3],[5,4]];
+
+    function chainPlots(coords){
+      let first=null, curr=null;
+      coords.forEach(([x,y])=>{
+        const blk = {"type":"plot","fields":{"X":x,"Y":y}};
+        if(!first){ first=blk; curr=blk; }
+        else { curr.next = {"block": blk}; curr = blk; }
+      });
+      return first;
+    }
+    function doClearThenPlots(coords){
+      const chain = chainPlots(coords);
+      return { "block": { "type":"clear_screen", "next": (chain? {"block": chain} : undefined) } };
+    }
+    const solutionJson = {
+      "blocks": {
+        "languageVersion": 0,
+        "blocks": [
+          {
+            "type": "on_button_pressed",
+            "fields": {"BTN":"A"},
+            "x": 20, "y": 20,
+            "inputs": { "DO": doClearThenPlots(smile) }
+          },
+          {
+            "type": "on_button_pressed",
+            "fields": {"BTN":"B"},
+            "x": 280, "y": 20,
+            "inputs": { "DO": doClearThenPlots(sad) }
+          }
+        ]
+      }
+    };
+
+    /* -------------------------------------------
+       2) Create Lesson UI
     --------------------------------------------*/
     const lesson = Glowbit.createLessonUI('glowbit-project1-step1', {
       title:'', instructions:'', pixelSize:28, defaultJson:null
@@ -126,116 +127,82 @@ const solutionJson = {
     if(lesson && lesson.workspace) lesson.workspace.clear();
 
     /* -------------------------------------------
-       3) Auto-paginate sidebar to fill to the
-          bottom of the Blockly workspace height
-          (uses #...-editor height as the target)
+       3) Sidebar Steps (auto-paginate)
     --------------------------------------------*/
     const stepCards = [
-      // Step 1 – Happy (centered)
-      `<h3 style="text-align:center;color:#00A1D6;">Step 1: Happy Face  😊</h3>
+      // Step 1 – Happy Face
+      `<h3 style="text-align:center;color:#00A1D6;">Step 1: Happy Face 😊</h3>
        <div style="margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;">
-       • From <strong>LED</strong>, drag five <strong>Plot (x,y)</strong> blocks.<br>
-       • Use centered coords on the 8×8 grid: <code>(1,2) (2,3) (3,3) (4,3) (5,2)</code>.<br>
-       • Add <strong>on start</strong> from Basic and (optionally) try it there to preview.<br>
-       • Click <strong>Run</strong> and verify the smile is centered.</div>`,
+       • From the <strong>LED</strong> tab, drag five <strong>Plot (x,y)</strong> blocks.<br>
+       • Use centered coords for the smile: <code>(1,2) (2,3) (3,3) (4,3) (5,2)</code>.<br>
+       • Add an <strong>on start</strong> block (Basic tab) and place them inside.<br>
+       • Click <strong>Run</strong> to preview your happy face on the grid!</div>`,
 
-      // Step 2 – Sad (centered)
-      `<h3 style="text-align:center;color:#00A1D6;">Step 2: Sad Face  😢</h3>
+      // Step 2 – Sad Face
+      `<h3 style="text-align:center;color:#00A1D6;">Step 2: Sad Face 😢</h3>
        <div style="margin:10px 0;padding:10px;border-radius:8px;background:#7B2CBF;color:#fff;">
        • Duplicate your five Plot blocks.<br>
-       • Use centered coords for sad mouth: <code>(1,4) (2,3) (3,3) (4,3) (5,4)</code>.<br>
-       • (Optional) Preview in <strong>on start</strong> to check shape.</div>`,
+       • Use centered coords for the frown: <code>(1,4) (2,3) (3,3) (4,3) (5,4)</code>.<br>
+       • Add a <strong>Clear Screen</strong> block first (Basic tab) if needed.<br>
+       • Run again to see the sad face appear!</div>`,
 
-      // Step 3 – Switch moods
+      // Step 3 – Switch moods (includes Clear Screen)
       `<h3 style="text-align:center;color:#00A1D6;">Step 3: Switch Moods 🔄</h3>
        <div style="margin:10px 0;padding:10px;border-radius:8px;background:#00A1D6;color:#fff;">
-• Add <strong>on button A pressed</strong> (Input).  
-&nbsp;&nbsp;👉 From the <strong>Basic</strong> tab, drag a <strong>Clear Screen</strong> block and place it first inside A.  
-&nbsp;&nbsp;Then add your 5 Plot (x,y) blocks for the <strong>happy face</strong>.<br><br>
-• Add <strong>on button B pressed</strong> (Input).  
-&nbsp;&nbsp;👉 Again add a <strong>Clear Screen</strong> block first,  
-&nbsp;&nbsp;then your 5 Plot (x,y) blocks for the <strong>sad face</strong>.<br><br>
-• Click <strong>Run</strong>, then press A or B to change moods on a clean screen!
-</div>
+       • Add <strong>on button A pressed</strong> (Input).<br>
+       &nbsp;&nbsp;👉 From the <strong>Basic</strong> tab, add a <strong>Clear Screen</strong> block first.<br>
+       &nbsp;&nbsp;Then add your 5 Plot (x,y) blocks for the <strong>happy face</strong>.<br><br>
+       • Add <strong>on button B pressed</strong> (Input).<br>
+       &nbsp;&nbsp;👉 Add another <strong>Clear Screen</strong> block first.<br>
+       &nbsp;&nbsp;Then your 5 Plot (x,y) blocks for the <strong>sad face</strong>.<br><br>
+       • Click <strong>Run</strong>, then press A or B to switch GlowBit’s mood!</div>`,
 
-      // Tips to help fill first page neatly
+      // Helpful tip card
       `<div style="margin:10px 0;padding:10px;border-radius:8px;background:#065F46;color:#fff;">
-       ✅ Tip: If a face looks offset, double-check the x,y pairs.<br>
-       ✅ Tip: Use <strong>Plot</strong> (no color) to match the solution view.</div>`,
+       ✅ Tip: Always clear the screen before drawing to avoid leftover pixels.<br>
+       ✅ Tip: Use Plot (x,y) without color to match the solution view.</div>`,
 
-      // Last page: Check Setup + Did you know
+      // Final page: Check setup
       `<button id="check-setup-btnP1" class="gb-btn check">✅ Check Your Setup</button>
-       <div class="didyouknow">💡 <strong>Did you know?</strong> Emotions on robots are often shown with LEDs and sounds — you’re doing the same with GlowBit!</div>`
+       <div class="didyouknow">💡 <strong>Did you know?</strong> Robots often express emotions using LEDs and sounds — just like GlowBit!</div>`
     ];
 
+    /* Auto pagination to workspace height */
     function paginateToWorkspaceHeight(){
       const sidebar = document.querySelector('#glowbit-project1-step1 .glowbit-left');
       if(!sidebar) return;
-
-      // Target = Blockly editor box height (fallback 520)
       const editor = document.getElementById('glowbit-project1-step1-editor');
       const targetH = (editor && editor.offsetHeight) ? editor.offsetHeight : 520;
-
-      // Build pages by measuring offscreen
       const measurer = document.createElement('div');
-      measurer.style.visibility='hidden';
-      measurer.style.position='absolute';
-      measurer.style.left='-9999px';
-      measurer.style.top='-9999px';
+      measurer.style.visibility='hidden'; measurer.style.position='absolute';
+      measurer.style.left='-9999px'; measurer.style.top='-9999px';
       measurer.style.width = (sidebar.clientWidth || 320) + 'px';
       document.body.appendChild(measurer);
 
-      const pages = [];
-      let currentPage = [];
-      measurer.innerHTML = '';
-
-      // Small bottom reserve for nav buttons (~56px)
-      const reserve = 56;
-
+      const pages=[]; let current=[];
+      const reserve=56;
       stepCards.forEach(html=>{
-        const card = document.createElement('div');
-        card.innerHTML = html;
-        measurer.appendChild(card);
-
+        const c=document.createElement('div'); c.innerHTML=html; measurer.appendChild(c);
         const tooTall = measurer.scrollHeight > (targetH - reserve);
         if(tooTall){
-          // start new page with this card
-          if(currentPage.length===0){
-            // If single card itself exceeds target, force page anyway
-            pages.push([html]);
-            measurer.innerHTML='';
-          } else {
-            pages.push([...currentPage]);
-            currentPage = [html];
-            measurer.innerHTML='';
-            // re-measure currentPage
-            currentPage.forEach(h=>{
-              const c=document.createElement('div'); c.innerHTML=h; measurer.appendChild(c);
-            });
-          }
-        } else {
-          currentPage.push(html);
-        }
+          if(current.length===0){ pages.push([html]); measurer.innerHTML=''; }
+          else{ pages.push([...current]); current=[html]; measurer.innerHTML=''; current.forEach(h=>{const d=document.createElement('div');d.innerHTML=h;measurer.appendChild(d);}); }
+        } else current.push(html);
       });
-      if(currentPage.length) pages.push(currentPage);
-
+      if(current.length) pages.push(current);
       document.body.removeChild(measurer);
 
-      // Render with Back/Next
       function render(idx){
         sidebar.innerHTML = pages[idx].join('');
-        const nav = document.createElement('div');
-        nav.className='nav-btns';
+        const nav=document.createElement('div'); nav.className='nav-btns';
         if(idx>0){
           const back=document.createElement('button');
-          back.textContent='⬅ Back'; back.className='gb-btn back';
-          back.onclick=()=>render(idx-1);
+          back.textContent='⬅ Back'; back.className='gb-btn back'; back.onclick=()=>render(idx-1);
           nav.appendChild(back);
         }
         if(idx<pages.length-1){
           const next=document.createElement('button');
-          next.textContent='Next ➜'; next.className='gb-btn next';
-          next.onclick=()=>render(idx+1);
+          next.textContent='Next ➜'; next.className='gb-btn next'; next.onclick=()=>render(idx+1);
           nav.appendChild(next);
         }
         sidebar.appendChild(nav);
@@ -243,16 +210,12 @@ const solutionJson = {
       render(0);
     }
 
-    // First render + on resize (debounced)
     paginateToWorkspaceHeight();
     let _rt=null;
-    window.addEventListener('resize',()=>{
-      clearTimeout(_rt);
-      _rt=setTimeout(paginateToWorkspaceHeight,150);
-    });
+    window.addEventListener('resize',()=>{clearTimeout(_rt);_rt=setTimeout(paginateToWorkspaceHeight,150);});
 
     /* -------------------------------------------
-       4) Check Your Setup (loads our solutionJson)
+       4) Check-Your-Setup modal
     --------------------------------------------*/
     const modal=document.getElementById('solutionModalP1');
     document.addEventListener('click',function(e){
@@ -271,10 +234,8 @@ const solutionJson = {
       }
     });
 
-    // Friendly hello on the simulator
     if(typeof Glowbit.showIcon==='function') Glowbit.showIcon('smile');
-
-    console.log('✅ Project 1 – Mood Maker ready with auto-paginated sidebar + centered setup.');
+    console.log('✅ Project 1 – Mood Maker fully ready.');
   })();
   </script>
 </body>
