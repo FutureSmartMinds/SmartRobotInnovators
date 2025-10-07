@@ -77,55 +77,59 @@
     if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow,120);
 
     /* ✅ Solution JSON for "Check Your Setup" */
-    const solutionJson = {
-      "blocks": {
-        "languageVersion": 0,
-        "blocks": [
-          {
-            "type": "on_start",
-            "x": 20, "y": 20,
-            "inputs": {
-              "DO": {
-                "block": {
-                  "type": "set_pixel", "fields": {"X":0,"Y":1,"COL":"#00FF00"},
-                  "next": {"block": {"type": "set_pixel", "fields": {"X":1,"Y":2,"COL":"#00FF00"},
-                  "next": {"block": {"type": "set_pixel", "fields": {"X":2,"Y":2,"COL":"#00FF00"},
-                  "next": {"block": {"type": "set_pixel", "fields": {"X":3,"Y":2,"COL":"#00FF00"},
-                  "next": {"block": {"type": "set_pixel", "fields": {"X":4,"Y":1,"COL":"#00FF00"}}}}}}}}
-                }
-              }
-            }
-          },
-          {
-            "type": "on_button_pressed",
-            "fields": {"BTN":"A"},
-            "x": 20, "y": 160,
-            "inputs": {
-              "DO": {
-                "block": {
-                  "type":"clear_screen",
-                  "next":{"block":{"type":"set_pixel","fields":{"X":0,"Y":1,"COL":"#00FF00"}}}
-                }
-              }
-            }
-          },
-          {
-            "type": "on_button_pressed",
-            "fields": {"BTN":"B"},
-            "x": 220, "y": 160,
-            "inputs": {
-              "DO": {
-                "block": {
-                  "type":"clear_screen",
-                  "next":{"block":{"type":"set_pixel","fields":{"X":0,"Y":3,"COL":"#00FF00"}}}
-                }
-              }
+   const solutionJson = {
+  "blocks": {
+    "languageVersion": 0,
+    "blocks": [
+      {
+        "type": "on_start",
+        "x": 20, "y": 20,
+        "inputs": {
+          "DO": {
+            "block": {
+              "type": "set_pixel", "fields": {"X":0,"Y":1,"COL":"#00FF00"},
+              "next": {
+                "block": {"type":"set_pixel","fields":{"X":1,"Y":2,"COL":"#00FF00"},
+                "next": {
+                  "block": {"type":"set_pixel","fields":{"X":2,"Y":2,"COL":"#00FF00"},
+                  "next": {
+                    "block": {"type":"set_pixel","fields":{"X":3,"Y":2,"COL":"#00FF00"},
+                    "next": {
+                      "block": {"type":"set_pixel","fields":{"X":4,"Y":1,"COL":"#00FF00"}}
+                    }}}}}}
             }
           }
-        ]
+        }
+      },
+      {
+        "type": "on_button_pressed",
+        "fields": {"BTN":"A"},
+        "x": 20, "y": 160,
+        "inputs": {
+          "DO": {
+            "block": {
+              "type":"clear_screen",
+              "next":{"block":{"type":"set_pixel","fields":{"X":0,"Y":1,"COL":"#00FF00"}}}
+            }
+          }
+        }
+      },
+      {
+        "type": "on_button_pressed",
+        "fields": {"BTN":"B"},
+        "x": 220, "y": 160,
+        "inputs": {
+          "DO": {
+            "block": {
+              "type":"clear_screen",
+              "next":{"block":{"type":"set_pixel","fields":{"X":0,"Y":3,"COL":"#00FF00"}}}
+            }
+          }
+        }
       }
-    };
-
+    ]
+  }
+};
     /* 🧱 Lesson setup */
     const lesson = Glowbit.createLessonUI('glowbit-project1-step1', {
       title:'', instructions:'', pixelSize:28, defaultJson:null
