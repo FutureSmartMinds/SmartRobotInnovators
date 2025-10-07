@@ -46,6 +46,24 @@
       #solutionModalP1{left:10px;right:10px;width:auto;max-width:calc(100% - 20px);top:40px;}
       #solutionWorkspaceP1{height:260px;}
     }
+.character-frame {
+  text-align:center;
+  margin-top:18px;
+}
+.character-frame img {
+  width:85%;
+  max-width:260px;       /* larger visible size */
+  height:auto;
+  border-radius:12px;    /* softer corners (not forced circle) */
+  box-shadow:0 4px 12px rgba(0,0,0,0.25);
+  object-fit:cover;
+}
+.character-name {
+  margin-top:8px;
+  font-weight:700;
+  color:#374151;
+  font-size:15px;
+}
   </style>
 </head>
 
@@ -164,8 +182,15 @@
        ✅ Tip: Use Plot (x,y) without color to match the solution view.</div>`,
 
       // Final page: Check setup
-      `<button id="check-setup-btnP1" class="gb-btn check">✅ Check Your Setup</button>
-       <div class="didyouknow">💡 <strong>Did you know?</strong> Robots often express emotions using LEDs and sounds — just like GlowBit!</div>`
+     `<button id="check-setup-btnP1" class="gb-btn check">✅ Check Your Setup</button>
+ <div class="didyouknow">
+   💡 <strong>Did you know?</strong><br>
+   • Robots can help children learn about emotions by showing them with lights and faces.<br>
+   • Many robots use LEDs or expressive face displays to show feelings like happy, sad, or alert.<br>
+   • Kids often treat social robots like companions—talking to them, mirroring them, and learning through that relationship.<br>
+   • In therapy, simpler or exaggerated expressions are often easier to understand for learners.<br>
+   • In classrooms, robots make abstract ideas (like light, color, and sensing) into something you can see, touch, and change.<br>
+ </div>`
     ];
 
     /* Auto pagination to workspace height */
@@ -194,19 +219,29 @@
       document.body.removeChild(measurer);
 
       function render(idx){
-        sidebar.innerHTML = pages[idx].join('');
-        const nav=document.createElement('div'); nav.className='nav-btns';
-        if(idx>0){
-          const back=document.createElement('button');
-          back.textContent='⬅ Back'; back.className='gb-btn back'; back.onclick=()=>render(idx-1);
-          nav.appendChild(back);
-        }
-        if(idx<pages.length-1){
-          const next=document.createElement('button');
-          next.textContent='Next ➜'; next.className='gb-btn next'; next.onclick=()=>render(idx+1);
-          nav.appendChild(next);
-        }
-        sidebar.appendChild(nav);
+  sidebar.innerHTML = pages[idx].join('');
+  const nav=document.createElement('div');
+  nav.className='nav-btns';
+  if(idx>0){
+    const back=document.createElement('button');
+    back.textContent='⬅ Back'; back.className='gb-btn back'; back.onclick=()=>render(idx-1);
+    nav.appendChild(back);
+  }
+  if(idx<pages.length-1){
+    const next=document.createElement('button');
+    next.textContent='Next ➜'; next.className='gb-btn next'; next.onclick=()=>render(idx+1);
+    nav.appendChild(next);
+  }
+  sidebar.appendChild(nav);
+
+  /* Add Liam’s character image underneath */
+  const charFrame = document.createElement('div');
+  charFrame.className='character-frame';
+  charFrame.innerHTML = `
+    <img src="images/Liam1.png" alt="Liam the Coder">
+    <div class="character-name">Liam</div>
+  `;
+  sidebar.appendChild(charFrame);
       }
       render(0);
     }
