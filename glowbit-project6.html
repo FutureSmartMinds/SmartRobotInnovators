@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GlowBit Project 6 – Mia’s GlowBit Music Maker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Blockly + Glowbit core -->
+  <script src="lib/blockly_compressed.js"></script>
+  <script src="lib/blocks_compressed.js"></script>
+  <script src="lib/javascript_compressed.js"></script>
+  <script src="lib/msg/en.js"></script>
+  <script src="assets/global.js"></script>
+  <script src="lib/blockly_xml_patch.js"></script>
+
+  <style>
+    .gb-wrapper{max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
+    .gb-header{text-align:center;background:#e6f9ff;color:#00A1D6;font-size:22px;font-weight:800;
+                padding:6px 10px;border-radius:8px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+    .gb-header .highlight{color:#7B2CBF;}
+    .gb-intro{text-align:center;font-size:16px;line-height:1.5;margin:0 0 10px;color:#374151;
+               background:#e0f2fe;border-radius:6px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+    .didyouknow{margin-top:18px;background:#fef9c3;border:2px solid #facc15;padding:10px 12px;
+                border-radius:12px;color:#713f12;font-size:15px;font-weight:600;position:relative;
+                box-shadow:0 2px 5px rgba(0,0,0,0.06);}
+    .didyouknow::before{content:"";position:absolute;top:-10px;left:20px;border-width:0 10px 10px 10px;
+                         border-style:solid;border-color:transparent transparent #fef9c3 transparent;}
+    .didyouknow p{text-align:justify;margin:6px 0;}
+    .nav-btns{display:flex;justify-content:space-between;gap:8px;margin-top:10px;flex-wrap:wrap;}
+    .gb-btn{padding:8px 14px;border:none;border-radius:6px;font-weight:700;cursor:pointer;flex:1;text-align:center;}
+    .gb-btn.next{background:#00A1D6;color:#fff;}
+    .gb-btn.back{background:#6B7280;color:#fff;}
+    .gb-btn.check{background:#10B981;color:#fff;display:block;margin:12px auto 0;}
+    #solutionModalP6{display:none;position:fixed;top:60px;right:20px;width:640px;max-width:42%;
+                     background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.28);
+                     z-index:12000;overflow:hidden;user-select:none;}
+    #solutionHeaderP6{cursor:move;padding:10px 12px;background:#00A1D6;color:#fff;font-weight:700;
+                      text-align:left;border-radius:10px 10px 0 0;display:flex;justify-content:space-between;align-items:center;}
+    #solutionWorkspaceP6{height:360px;width:100%;border-top:1px solid #eee;background:#fafafa;}
+    #solutionFooterP6{text-align:center;padding:12px;background:#fff;}
+    #solutionFooterP6 button{background:#00A1D6;color:#fff;border:none;border-radius:8px;
+                              padding:8px 18px;cursor:pointer;font-weight:700;}
+    @media(max-width:900px){
+      #solutionModalP6{left:10px;right:10px;width:auto;max-width:calc(100% - 20px);top:40px;}
+      #solutionWorkspaceP6{height:260px;}
+    }
+    .character-frame{text-align:center;margin-top:18px;}
+    .character-frame img{width:85%;max-width:260px;height:auto;border-radius:12px;
+                         box-shadow:0 4px 12px rgba(0,0,0,0.25);object-fit:cover;}
+  </style>
+</head>
+
+<body>
+  <div class="gb-wrapper">
+    <div class="gb-header">
+      🎵 <span class="highlight">Project 6</span>: Mia’s GlowBit Music Maker — 
+      <span class="highlight">Make GlowBit perform a looping melody!</span>
+    </div>
+
+    <p class="gb-intro">
+      You’ll code GlowBit to play a simple three-note melody (C–E–G) in a loop. Let’s make Mia’s musical robot rock the stage!
+    </p>
+
+    <div id="glowbit-project6-step1"></div>
+  </div>
+
+  <!-- Solution Modal -->
+  <div id="solutionModalP6" aria-hidden="true" role="dialog">
+    <div id="solutionHeaderP6">
+      <div>✅ Correct Setup — GlowBit Music Maker</div>
+      <button id="solutionCloseP6" title="Close">✕</button>
+    </div>
+    <div id="solutionWorkspaceP6" aria-label="Correct solution workspace"></div>
+    <div id="solutionFooterP6"><button id="solutionCloseBtnP6">Close</button></div>
+  </div>
+
+  <script>
+  (function waitForGlow(){
+    if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow,120);
+
+    /* --- Correct Answer JSON --- */
+    // forever:
+    //   play tone C(261Hz) 1 beat → pause(500)
+    //   play tone E(329Hz) 1 beat → pause(500)
+    //   play tone G(392Hz) 1 beat → pause(500)
+    const solutionJson = {
+      blocks: {
+        languageVersion: 0,
+        blocks: [
+          {
+            type: "controls_forever",
+            x: 20,
+            y: 20,
+            inputs: {
+              DO: {
+                block: {
+                  type: "play_tone",
+                  fields: { NOTE: "261", BEAT: "1" },
+                  next: {
+                    block: {
+                      type: "pause_block",
+                      fields: { MS: 500 },
+                      next: {
+                        block: {
+                          type: "play_tone",
+                          fields: { NOTE: "329", BEAT: "1" },
+                          next: {
+                            block: {
+                              type: "pause_block",
+                              fields: { MS: 500 },
+                              next: {
+                                block: {
+                                  type: "play_tone",
+                                  fields: { NOTE: "392", BEAT: "1" },
+                                  next: {
+                                    block: {
+                                      type: "pause_block",
+                                      fields: { MS: 500 }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    };
+
+    /* --- Lesson UI setup --- */
+    const lesson = Glowbit.createLessonUI('glowbit-project6-step1',{title:'',instructions:'',pixelSize:28,defaultJson:null});
+    if(lesson && lesson.workspace) lesson.workspace.clear();
+
+    /* --- Sidebar content --- */
+    const stepCards = [
+`<h3 style="text-align:center;color:#00A1D6;">Step 1: Play Your First Note</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;">
+ • Go to the <strong>Music</strong> tab and drag a <strong>play tone</strong> block.<br>
+ • Select <strong>Middle C (261 Hz)</strong> for your first note.<br>
+ • Drag an <strong>on start</strong> block, add a <strong>Clear Screen</strong>, then place your <strong>play tone</strong> block inside it.<br>
+ • Click <strong>Run</strong> to test — you’ll hear the note through your speakers.<br>
+ 💬 Mia says, “GlowBit’s first note sounds awesome!”<br><br>
+ 🧩 Remove the <strong>play tone</strong> block afterward — we’ll use it again later.</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Step 2: Add Two More Notes</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#7B2CBF;color:#fff;">
+ • Add two more <strong>play tone</strong> blocks from <strong>Music</strong>.<br>
+ • Set them to <strong>Middle E (329 Hz)</strong> and <strong>Middle G (392 Hz)</strong> — each for 1 beat.<br>
+ • Test them inside <strong>on start</strong> (after a <strong>Clear Screen</strong>) to play C–E–G.<br>
+ 💬 Mia claps, “GlowBit’s melody is super catchy!”<br><br>
+ 🧩 If you don’t hear all three, check note order and beat length (1 beat each).</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Step 3: Make GlowBit Play the Melody in a Loop</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#00A1D6;color:#fff;">
+ • Drag a <strong>forever</strong> loop from <strong>Basic</strong>.<br>
+ • Inside it, add in order:<br>
+ &nbsp;&nbsp;① <strong>play tone C (261 Hz) for 1 beat</strong><br>
+ &nbsp;&nbsp;② <strong>pause 500 ms</strong><br>
+ &nbsp;&nbsp;③ <strong>play tone E (329 Hz) for 1 beat</strong><br>
+ &nbsp;&nbsp;④ <strong>pause 500 ms</strong><br>
+ &nbsp;&nbsp;⑤ <strong>play tone G (392 Hz) for 1 beat</strong><br>
+ &nbsp;&nbsp;⑥ <strong>pause 500 ms</strong><br>
+ • Click <strong>Run</strong> to hear GlowBit play C–E–G on repeat!<br>
+ 💬 Mia giggles, “GlowBit’s rocking the stage with this tune!”<br><br>
+ 🪄 Try changing pause times — faster (200 ms) for a lively beat or slower (1000 ms) for a calm rhythm.</div>`,
+
+`<button id="check-setup-btnP6" class="gb-btn check">✅ Check Your Setup</button>
+ <div class="didyouknow">
+   💡 <strong>Did you know?</strong>
+   <p>🎹 The frequencies 261 Hz, 329 Hz and 392 Hz form the C–E–G chord — the basic building block of music used in songs worldwide!</p>
+   <p>🤖 Robots use buzzers and sensors to produce tones for alerts — you just coded your own musical alert system!</p>
+   <p>🎵 LED shows and music often sync together — engineers use timing and loops like your program to create light and sound patterns.</p>
+   <p>🎧 Musicians use software loops to compose songs — you’ve made GlowBit your tiny music studio!</p>
+ </div>`
+    ];
+
+    /* --- Sidebar auto-pagination --- */
+    function paginate(){
+      const sidebar=document.querySelector('#glowbit-project6-step1 .glowbit-left');
+      if(!sidebar)return;
+      const editor=document.getElementById('glowbit-project6-step1-editor');
+      const targetH=(editor&&editor.offsetHeight)?editor.offsetHeight:520;
+      const meas=document.createElement('div');
+      meas.style.visibility='hidden';meas.style.position='absolute';meas.style.left='-9999px';meas.style.top='-9999px';
+      meas.style.width=(sidebar.clientWidth||320)+'px';document.body.appendChild(meas);
+      const pages=[];let current=[];const reserve=56;
+      stepCards.forEach(html=>{
+        const c=document.createElement('div');c.innerHTML=html;meas.appendChild(c);
+        const tooTall=meas.scrollHeight>(targetH-reserve);
+        if(tooTall){
+          if(current.length===0){pages.push([html]);meas.innerHTML='';}
+          else{pages.push([...current]);current=[html];meas.innerHTML='';
+            current.forEach(h=>{const d=document.createElement('div');d.innerHTML=h;meas.appendChild(d);});}
+        }else current.push(html);
+      });
+      if(current.length)pages.push(current);
+      document.body.removeChild(meas);
+      function render(i){
+        sidebar.innerHTML=pages[i].join('');
+        const nav=document.createElement('div');nav.className='nav-btns';
+        if(i>0){const b=document.createElement('button');b.textContent='⬅ Back';b.className='gb-btn back';b.onclick=()=>render(i-1);nav.appendChild(b);}
+        if(i<pages.length-1){const n=document.createElement('button');n.textContent='Next ➜';n.className='gb-btn next';n.onclick=()=>render(i+1);nav.appendChild(n);}
+        sidebar.appendChild(nav);
+        const frame=document.createElement('div');frame.className='character-frame';
+        frame.innerHTML='<img src="images/Mia2.png" alt="Mia the Maker">';sidebar.appendChild(frame);
+      }
+      render(0);
+    }
+    paginate();let _rt=null;
+    window.addEventListener('resize',()=>{clearTimeout(_rt);_rt=setTimeout(paginate,150);});
+
+    /* --- Modal logic --- */
+    const modal=document.getElementById('solutionModalP6');
+    document.addEventListener('click',function(e){
+      if(e.target&&e.target.id==='check-setup-btnP6'){
+        modal.style.display='block';
+        modal.setAttribute('aria-hidden','false');
+        if(!window._solutionWorkspaceP6){
+          const ws=document.getElementById('solutionWorkspaceP6');
+          window._solutionWorkspaceP6=Blockly.inject(ws,{readOnly:true,scrollbars:true,toolbox:null});
+          Blockly.serialization.workspaces.load(solutionJson,window._solutionWorkspaceP6);
+        }
+      }
+      if(e.target&&(e.target.id==='solutionCloseP6'||e.target.id==='solutionCloseBtnP6')){
+        modal.style.display='none';modal.setAttribute('aria-hidden','true');
+      }
+    });
+
+    console.log('✅ Project 6 – Music Maker ready.');
+  })();
+  </script>
+</body>
+</html>
