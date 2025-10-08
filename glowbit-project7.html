@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GlowBit Project 7 – Liam’s GlowBit Number Blinker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Blockly + Glowbit core -->
+  <script src="lib/blockly_compressed.js"></script>
+  <script src="lib/blocks_compressed.js"></script>
+  <script src="lib/javascript_compressed.js"></script>
+  <script src="lib/msg/en.js"></script>
+  <script src="assets/global.js"></script>
+  <script src="lib/blockly_xml_patch.js"></script>
+
+  <style>
+    .gb-wrapper{max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
+    .gb-header{text-align:center;background:#e6f9ff;color:#00A1D6;font-size:22px;font-weight:800;
+                padding:6px 10px;border-radius:8px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+    .gb-header .highlight{color:#7B2CBF;}
+    .gb-intro{text-align:center;font-size:16px;line-height:1.5;margin:0 0 10px;color:#374151;
+               background:#e0f2fe;border-radius:6px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+    .didyouknow{margin-top:18px;background:#fef9c3;border:2px solid #facc15;padding:10px 12px;
+                border-radius:12px;color:#713f12;font-size:15px;font-weight:600;position:relative;
+                box-shadow:0 2px 5px rgba(0,0,0,0.06);}
+    .didyouknow::before{content:"";position:absolute;top:-10px;left:20px;border-width:0 10px 10px 10px;
+                         border-style:solid;border-color:transparent transparent #fef9c3 transparent;}
+    .didyouknow p{text-align:justify;margin:6px 0;}
+    .nav-btns{display:flex;justify-content:space-between;gap:8px;margin-top:10px;flex-wrap:wrap;}
+    .gb-btn{padding:8px 14px;border:none;border-radius:6px;font-weight:700;cursor:pointer;flex:1;text-align:center;}
+    .gb-btn.next{background:#00A1D6;color:#fff;}
+    .gb-btn.back{background:#6B7280;color:#fff;}
+    .gb-btn.check{background:#10B981;color:#fff;display:block;margin:12px auto 0;}
+    #solutionModalP7{display:none;position:fixed;top:60px;right:20px;width:640px;max-width:42%;
+                     background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.28);
+                     z-index:12000;overflow:hidden;user-select:none;}
+    #solutionHeaderP7{cursor:move;padding:10px 12px;background:#00A1D6;color:#fff;font-weight:700;
+                      text-align:left;border-radius:10px 10px 0 0;display:flex;justify-content:space-between;align-items:center;}
+    #solutionWorkspaceP7{height:360px;width:100%;border-top:1px solid #eee;background:#fafafa;}
+    #solutionFooterP7{text-align:center;padding:12px;background:#fff;}
+    #solutionFooterP7 button{background:#00A1D6;color:#fff;border:none;border-radius:8px;
+                              padding:8px 18px;cursor:pointer;font-weight:700;}
+    @media(max-width:900px){
+      #solutionModalP7{left:10px;right:10px;width:auto;max-width:calc(100% - 20px);top:40px;}
+      #solutionWorkspaceP7{height:260px;}
+    }
+    .character-frame{text-align:center;margin-top:18px;}
+    .character-frame img{width:85%;max-width:260px;height:auto;border-radius:12px;
+                         box-shadow:0 4px 12px rgba(0,0,0,0.25);object-fit:cover;}
+  </style>
+</head>
+
+<body>
+  <div class="gb-wrapper">
+    <div class="gb-header">
+      🔢 <span class="highlight">(7) Liam’s GlowBit Number Blinker</span> — 
+      <span class="highlight">Make GlowBit count 1, 2, 3 like a smart robot!</span>
+    </div>
+
+    <p class="gb-intro">
+      You’ll code GlowBit to show the numbers <strong>1</strong>, <strong>2</strong>, and <strong>3</strong> in a repeating loop. Press Button A to show “GO”, then watch GlowBit count like a data-loving robot!
+    </p>
+
+    <div id="glowbit-project7-step1"></div>
+  </div>
+
+  <!-- Solution Modal -->
+  <div id="solutionModalP7" aria-hidden="true" role="dialog">
+    <div id="solutionHeaderP7">
+      <div>✅ Correct Setup — Number Blinker</div>
+      <button id="solutionCloseP7" title="Close">✕</button>
+    </div>
+    <div id="solutionWorkspaceP7" aria-label="Correct solution workspace"></div>
+    <div id="solutionFooterP7"><button id="solutionCloseBtnP7">Close</button></div>
+  </div>
+
+  <script>
+  (function waitForGlow(){
+    if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow,120);
+
+    /* --- Correct Answer JSON ---
+       Top-level 1: on_button_pressed(A) -> show_text "GO"
+       Top-level 2: forever -> pause 500 -> show_number 1 -> pause 500 -> show_number 2 -> pause 500 -> show_number 3 -> pause 500
+    */
+    const solutionJson = {
+      blocks: {
+        languageVersion: 0,
+        blocks: [
+          {
+            type: "on_button_pressed",
+            x: 20, y: 20,
+            fields: { BTN: "A" },
+            inputs: {
+              DO: {
+                block: {
+                  type: "show_text",
+                  fields: { TEXT: "GO" }
+                }
+              }
+            }
+          },
+          {
+            type: "forever",
+            x: 280, y: 20,
+            inputs: {
+              DO: {
+                block: {
+                  type: "pause_block",
+                  fields: { MS: 500 },
+                  next: {
+                    block: {
+                      type: "show_number",
+                      inputs: { NUM: { block: { type: "math_number", fields: { NUM: 1 } } } },
+                      next: {
+                        block: {
+                          type: "pause_block",
+                          fields: { MS: 500 },
+                          next: {
+                            block: {
+                              type: "show_number",
+                              inputs: { NUM: { block: { type: "math_number", fields: { NUM: 2 } } } },
+                              next: {
+                                block: {
+                                  type: "pause_block",
+                                  fields: { MS: 500 },
+                                  next: {
+                                    block: {
+                                      type: "show_number",
+                                      inputs: { NUM: { block: { type: "math_number", fields: { NUM: 3 } } } },
+                                      next: {
+                                        block: {
+                                          type: "pause_block",
+                                          fields: { MS: 500 }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    };
+
+    /* --- Lesson UI setup --- */
+    const lesson = Glowbit.createLessonUI('glowbit-project7-step1',{title:'',instructions:'',pixelSize:28,defaultJson:null});
+    if(lesson && lesson.workspace) lesson.workspace.clear();
+
+    /* --- Sidebar content --- */
+    const stepCards = [
+`<h3 style="text-align:center;color:#00A1D6;">Step 1: Show Number 1</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;">
+ • From <strong>Basic</strong>, drag <strong>show number</strong> to the Workspace.<br>
+ • From <strong>Math</strong>, drag a <strong>number</strong> (shows 0) and change it to <code>1</code>; snap it into <strong>show number</strong>.<br>
+ • From <strong>Basic</strong>, add an <strong>on start</strong> with a <strong>Clear Screen</strong> then place <strong>show number 1</strong> inside to test.<br>
+ • Click <strong>Run</strong> — “1” scrolls across the LED grid.<br>
+ 💬 Liam: “GlowBit’s counting one like a pro!”<br><br>
+ 🧩 Remove <strong>show number</strong> from <strong>on start</strong> after testing.</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Step 2: Add Numbers 2 and 3</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#7B2CBF;color:#fff;">
+ • Add two more <strong>show number</strong> blocks and two more <strong>number</strong> blocks from <strong>Math</strong>.<br>
+ • Set them to <code>2</code> and <code>3</code> for a 1–2–3 sequence.<br>
+ • Test in <strong>on start</strong> (after a <strong>Clear Screen</strong>) in order: 1 → 2 → 3.<br>
+ 💬 Liam: “GlowBit’s counting up like a smart robot!”<br><br>
+ 🧩 Remove them from <strong>on start</strong> after testing.</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Step 3: Start Counting with Button A and a Loop</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#00A1D6;color:#fff;">
+ • From <strong>Input</strong>, drag <strong>on button A pressed</strong> and put <strong>show text "GO"</strong> inside it.<br>
+ • From <strong>Basic</strong>, drag a <strong>forever</strong> loop (not inside the button).<br>
+ • Inside <strong>forever</strong>, add:<br>
+ &nbsp;&nbsp;① <strong>pause 500 ms</strong> → ② <strong>show number 1</strong> → ③ <strong>pause 500 ms</strong> → ④ <strong>show number 2</strong> → ⑤ <strong>pause 500 ms</strong> → ⑥ <strong>show number 3</strong> → ⑦ <strong>pause 500 ms</strong><br>
+ • Click <strong>Run</strong>, press <strong>Button A</strong> to see “GO,” then watch 1 → 2 → 3 loop.<br>
+ 💬 Liam: “GlowBit’s counting like a robot scientist!”<br><br>
+ 🪄 Try variations: speed up (200 ms), slow down (1000 ms), or count even/odd numbers only.</div>`,
+
+`<button id="check-setup-btnP7" class="gb-btn check">✅ Check Your Setup</button>
+ <div class="didyouknow">
+   💡 <strong>Did you know?</strong>
+   <p>📟 Elevators and scoreboards scroll numbers using LEDs — the same idea you just coded!</p>
+   <p>🧮 Sensors on robots count steps, rotations, and items on conveyor belts — numbers drive decisions.</p>
+   <p>🛰️ Satellites and space probes send streams of numbers to Earth; engineers read them to understand what’s happening.</p>
+   <p>🔁 Timing blocks (pauses) are used in real systems to pace messages and prevent overload — just like your 500 ms gaps.</p>
+ </div>`
+    ];
+
+    /* --- Sidebar auto-pagination --- */
+    function paginate(){
+      const sidebar=document.querySelector('#glowbit-project7-step1 .glowbit-left');
+      if(!sidebar)return;
+      const editor=document.getElementById('glowbit-project7-step1-editor');
+      const targetH=(editor&&editor.offsetHeight)?editor.offsetHeight:520;
+      const meas=document.createElement('div');
+      meas.style.visibility='hidden';meas.style.position='absolute';meas.style.left='-9999px';meas.style.top='-9999px';
+      meas.style.width=(sidebar.clientWidth||320)+'px';document.body.appendChild(meas);
+      const pages=[];let current=[];const reserve=56;
+      stepCards.forEach(html=>{
+        const c=document.createElement('div');c.innerHTML=html;meas.appendChild(c);
+        const tooTall=meas.scrollHeight>(targetH-reserve);
+        if(tooTall){
+          if(current.length===0){pages.push([html]);meas.innerHTML='';}
+          else{pages.push([...current]);current=[html];meas.innerHTML='';
+            current.forEach(h=>{const d=document.createElement('div');d.innerHTML=h;meas.appendChild(d);});}
+        }else current.push(html);
+      });
+      if(current.length)pages.push(current);
+      document.body.removeChild(meas);
+      function render(i){
+        sidebar.innerHTML=pages[i].join('');
+        const nav=document.createElement('div');nav.className='nav-btns';
+        if(i>0){const b=document.createElement('button');b.textContent='⬅ Back';b.className='gb-btn back';b.onclick=()=>render(i-1);nav.appendChild(b);}
+        if(i<pages.length-1){const n=document.createElement('button');n.textContent='Next ➜';n.className='gb-btn next';n.onclick=()=>render(i+1);nav.appendChild(n);}
+        sidebar.appendChild(nav);
+        const frame=document.createElement('div');frame.className='character-frame';
+        frame.innerHTML='<img src="images/Liam1.png" alt="Liam the Coder">';sidebar.appendChild(frame);
+      }
+      render(0);
+    }
+    paginate();let _rt=null;
+    window.addEventListener('resize',()=>{clearTimeout(_rt);_rt=setTimeout(paginate,150);});
+
+    /* --- Modal logic --- */
+    const modal=document.getElementById('solutionModalP7');
+    document.addEventListener('click',function(e){
+      if(e.target&&e.target.id==='check-setup-btnP7'){
+        modal.style.display='block';
+        modal.setAttribute('aria-hidden','false');
+        if(!window._solutionWorkspaceP7){
+          const ws=document.getElementById('solutionWorkspaceP7');
+          window._solutionWorkspaceP7=Blockly.inject(ws,{readOnly:true,scrollbars:true,toolbox:null});
+          Blockly.serialization.workspaces.load(solutionJson,window._solutionWorkspaceP7);
+        }
+      }
+      if(e.target&&(e.target.id==='solutionCloseP7'||e.target.id==='solutionCloseBtnP7')){
+        modal.style.display='none';modal.setAttribute('aria-hidden','true');
+      }
+    });
+
+    console.log('✅ Project 7 – Number Blinker ready.');
+  })();
+  </script>
+</body>
+</html>
