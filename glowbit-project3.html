@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Liam’s GlowBit SOS Blinker</title>
+<link rel="icon" href="assets/favicon.ico">
+<link rel="stylesheet" href="assets/style.css" />
+<script src="lib/blockly_compressed.js"></script>
+<script src="lib/blocks_compressed.js"></script>
+<script src="lib/javascript_compressed.js"></script>
+<script src="lib/msg/en.js"></script>
+<script src="lib/blockly_xml_patch.js"></script>
+<script src="assets/global.js"></script>
+<style>
+  body{background:#fff;margin:0;font-family:'Poppins',sans-serif;}
+  .glowbit-wrapper{display:flex;justify-content:center;align-items:flex-start;padding:10px;}
+  .glowbit-left{width:330px;padding:15px;background:#E11D48;color:#fff;border-radius:10px;min-height:550px;overflow-y:auto;}
+  .glowbit-right{flex:1;display:flex;flex-direction:column;align-items:center;}
+  #blocklyDiv-project3{height:460px;width:480px;border:2px solid #ddd;border-radius:12px;margin-top:10px;}
+  .gb-btn{background:#fff;color:#E11D48;border:none;padding:6px 14px;margin:4px;border-radius:6px;font-weight:600;cursor:pointer;}
+  .gb-btn:hover{background:#FEE2E2;}
+  .character-box{text-align:center;margin-top:8px;}
+  .character-img{width:150px;height:auto;border-radius:10px;}
+  .character-name{font-weight:600;margin-top:6px;}
+  .didyouknow{margin-top:16px;background:#FEF9C3;border:2px solid #FACC15;
+    padding:10px 14px;border-radius:12px;color:#713F12;font-size:15px;line-height:1.4;text-align:justify;}
+  .nav-buttons{margin-top:12px;text-align:center;}
+</style>
+</head>
+
+<body>
+<div class="glowbit-wrapper" id="glowbit-project3">
+  <div class="glowbit-left" id="sidebar">
+    <div id="sidebar-content"></div>
+    <div class="character-box">
+      <img src="images/liam1.png" class="character-img" alt="Liam the Coder">
+      <div class="character-name">Liam the Coder</div>
+    </div>
+    <div class="nav-buttons">
+      <button id="prevBtn" class="gb-btn">⬅ Back</button>
+      <button id="nextBtn" class="gb-btn">Next ➡</button>
+    </div>
+  </div>
+
+  <div class="glowbit-right">
+    <h2>Liam’s GlowBit SOS Blinker</h2>
+    <h4>Let’s make GlowBit flash an SOS signal to save the day!</h4>
+    <div id="blocklyDiv-project3"></div>
+    <button id="check-setup-btnP3" class="gb-btn">✅ Check Your Setup</button>
+  </div>
+</div>
+
+<!-- Check Your Setup modal -->
+<div id="solutionModalP3" class="modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+     background:rgba(0,0,0,0.6);justify-content:center;align-items:center;">
+  <div style="background:#fff;padding:20px;border-radius:10px;width:500px;max-height:600px;overflow:auto;">
+    <h3>✅ Correct Setup</h3>
+    <div id="solutionWorkspaceP3" style="height:420px;width:460px;"></div>
+    <button onclick="document.getElementById('solutionModalP3').style.display='none'"
+      class="gb-btn" style="margin-top:10px;">Close</button>
+  </div>
+</div>
+
+<script>
+// ---------------- Sidebar content (3 slides) ----------------
+const stepCards = [
+`<h3>Step 1 – Set Up Your SOS Signal Pattern</h3>
+<p>🟢 Go to the LED tab and drag five <strong>Plot x y</strong> blocks. Set them to x:1 y:4, x:2 y:4, x:3 y:4, x:4 y:4, x:5 y:4 to form a centered row on the 8×8 LED grid.</p>
+<p>🟢 From the Basic tab, drag an <strong>on start</strong> block and a <strong>Clear Screen</strong> block. Place the Clear Screen inside on start, then add the five Plot blocks to test the row. Click Play to see your lantern row light up. Liam cheers, “That’s our rescue signal!”</p>
+<p>🟢 After testing, remove the Plot blocks from on start—we’ll use them in the next step.</p>`,
+`<h3>Step 2 – Code a Short Flash with Button A</h3>
+<p>💡 Go to the Input tab and drag an <strong>on button A pressed</strong> block. Inside it:</p>
+<ul><li>➕ Add five Plot x y blocks (from Step 1).</li>
+<li>🕒 Add a <strong>pause (200 ms)</strong> block.</li>
+<li>🧼 Add a <strong>clear screen</strong> block.</li>
+<li>🕒 Add another <strong>pause (200 ms)</strong>.</li></ul>
+<p>▶ Click Play then press A on the simulator to see one quick flash. Liam says, “That’s one short flash—quick and cool!”</p>`,
+`<h3>Step 3 – Build the Full SOS Pattern with a Loop</h3>
+<p>💡 To send SOS (three short, three long, three short), use loops:</p>
+<ul><li>🔁 Drag a <strong>repeat 3 times</strong> block. Inside it, place your short flash sequence (200 ms pauses).</li>
+<li>🔁 Duplicate the block for the O section and set pauses to 600 ms each for long flashes.</li>
+<li>🔁 Duplicate once more for the final S (200 ms).</li></ul>
+<p>▶ Click Play and press A to see GlowBit blink SOS! Liam shouts, “GlowBit’s sending an SOS to the stars!”</p>
+<div class="didyouknow">
+💡 <strong>Did you know?</strong><br>
+🔦 Real Morse code uses short and long light pulses or sounds to send messages over long distances.<br>
+🚢 Ships and airplanes still use SOS as a universal emergency signal (“Save Our Ship”).<br>
+🛰️ Astronauts train to recognize light-flash patterns for communication in space.<br>
+💻 Some microcontrollers and IoT devices use LED blinking for status codes — like mini Morse messages!<br>
+</div>`
+];
+
+let currentCard=0;
+const sidebar=document.getElementById('sidebar-content');
+function renderCard(){
+  sidebar.innerHTML=stepCards[currentCard];
+}
+renderCard();
+document.getElementById('nextBtn').onclick=()=>{if(currentCard<stepCards.length-1){currentCard++;renderCard();}};
+document.getElementById('prevBtn').onclick=()=>{if(currentCard>0){currentCard--;renderCard();}};
+
+// ---------------- Blockly + workspace ----------------
+const lesson = Glowbit.createLessonUI('blocklyDiv-project3', {
+  title: "Liam’s GlowBit SOS Blinker",
+  instructions: "",
+  pixelSize: 28,
+  defaultJson: { blocks: { languageVersion: 0, blocks: [] } }
+});
+console.log("✅ Project 3 – SOS Blinker ready.");
+
+// ---------------- Solution (Check Your Setup) ----------------
+const solutionJson = {
+  "blocks": {
+    "languageVersion": 0,
+    "blocks": [
+      {
+        "type": "on_button_pressed",
+        "fields": {"BTN": "A"},
+        "x": 40, "y": 40,
+        "inputs": {
+          "DO": {
+            "block": {
+              "type": "controls_repeat_ext",
+              "inputs": {
+                "TIMES": {"block": {"type": "math_number","fields": {"NUM": 3}}},
+                "DO": {
+                  "block": {
+                    "type": "plot",
+                    "fields": {"X":1,"Y":4},
+                    "next": {
+                      "block": {
+                        "type": "plot","fields": {"X":2,"Y":4},
+                        "next": {
+                          "block": {
+                            "type": "plot","fields": {"X":3,"Y":4},
+                            "next": {
+                              "block": {
+                                "type": "plot","fields": {"X":4,"Y":4},
+                                "next": {
+                                  "block": {
+                                    "type": "plot","fields": {"X":5,"Y":4},
+                                    "next": {
+                                      "block": {
+                                        "type": "pause_block","fields": {"ms":200},
+                                        "next": {
+                                          "block": {
+                                            "type": "clear_screen",
+                                            "next": {
+                                              "block": {"type":"pause_block","fields":{"ms":200}}
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "next": {
+                "block": {
+                  "type": "controls_repeat_ext",
+                  "inputs": {
+                    "TIMES": {"block": {"type": "math_number","fields": {"NUM": 3}}},
+                    "DO": {
+                      "block": {
+                        "type": "plot","fields":{"X":1,"Y":4},
+                        "next": {
+                          "block": {
+                            "type": "plot","fields":{"X":2,"Y":4},
+                            "next": {
+                              "block": {
+                                "type": "plot","fields":{"X":3,"Y":4},
+                                "next": {
+                                  "block": {
+                                    "type": "plot","fields":{"X":4,"Y":4},
+                                    "next": {
+                                      "block": {
+                                        "type": "plot","fields":{"X":5,"Y":4},
+                                        "next": {
+                                          "block": {
+                                            "type": "pause_block","fields":{"ms":600},
+                                            "next": {
+                                              "block": {
+                                                "type": "clear_screen",
+                                                "next": {
+                                                  "block": {"type":"pause_block","fields":{"ms":600}}
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "next": {
+                    "block": {
+                      "type": "controls_repeat_ext",
+                      "inputs": {
+                        "TIMES": {"block":{"type":"math_number","fields":{"NUM":3}}},
+                        "DO": {
+                          "block": {
+                            "type": "plot","fields":{"X":1,"Y":4},
+                            "next": {
+                              "block": {
+                                "type": "plot","fields":{"X":2,"Y":4},
+                                "next": {
+                                  "block": {
+                                    "type": "plot","fields":{"X":3,"Y":4},
+                                    "next": {
+                                      "block": {
+                                        "type": "plot","fields":{"X":4,"Y":4},
+                                        "next": {
+                                          "block": {
+                                            "type": "plot","fields":{"X":5,"Y":4},
+                                            "next": {
+                                              "block": {
+                                                "type": "pause_block","fields":{"ms":200},
+                                                "next": {
+                                                  "block": {
+                                                    "type": "clear_screen",
+                                                    "next": {"block":{"type":"pause_block","fields":{"ms":200}}}
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+};
+
+// modal handler
+document.addEventListener('click', e=>{
+  if(e.target.id==='check-setup-btnP3'){
+    const modal=document.getElementById('solutionModalP3');
+    modal.style.display='flex';
+    if(!window._solutionWorkspaceP3){
+      const wsDiv=document.getElementById('solutionWorkspaceP3');
+      window._solutionWorkspaceP3=Blockly.inject(wsDiv,{readOnly:true,scrollbars:true,toolbox:null});
+      Blockly.serialization.workspaces.load(solutionJson, window._solutionWorkspaceP3);
+    }
+  }
+});
+</script>
+</body>
+</html>
