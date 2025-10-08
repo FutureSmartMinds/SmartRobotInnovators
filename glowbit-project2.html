@@ -140,13 +140,46 @@
             "block": {
               "type": "clear_screen",
               "next": {
-                "block": chainPlots(row),
-                "next": {
-                  "block": {
-                    "type": "pause",
-                    "fields": { "ms": 500 },
-                    "next": {
-                      "block": { "type": "clear_screen" }
+                "block": {
+                  "type": "plot",
+                  "fields": {"X":1,"Y":4},
+                  "next": {
+                    "block": {
+                      "type": "plot",
+                      "fields": {"X":2,"Y":4},
+                      "next": {
+                        "block": {
+                          "type": "plot",
+                          "fields": {"X":3,"Y":4},
+                          "next": {
+                            "block": {
+                              "type": "plot",
+                              "fields": {"X":4,"Y":4},
+                              "next": {
+                                "block": {
+                                  "type": "plot",
+                                  "fields": {"X":5,"Y":4},
+                                  "next": {
+                                    "block": {
+                                      "type": "plot",
+                                      "fields": {"X":6,"Y":4},
+                                      "next": {
+                                        "block": {
+                                          "type": "pause",
+                                          "fields": { "ms": 500 },
+                                          "next": {
+                                            "block": { "type": "clear_screen" }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
                     }
                   }
                 }
