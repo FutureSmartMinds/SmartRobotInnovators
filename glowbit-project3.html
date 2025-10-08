@@ -93,72 +93,67 @@
     }
 
     /* ---- Correct setup JSON (Button A → SOS loop) ---- */
-    const solutionJson = {
-      "blocks": {
-        "languageVersion": 0,
-        "blocks": [
-          {
-            "type":"on_button_pressed",
-            "fields":{"BTN":"A"},
-            "x":20,"y":20,
-            "inputs":{
-              "DO":{
-                "block":{
-                  "type":"controls_repeat_ext",
-                  "inputs":{
-                    "TIMES":{"block":{"type":"math_number","fields":{"NUM":3}}},
-                    "DO":{
-                      "block":{
-                        "type":"clear_screen",
-                        "next":{
-                          "block": chainPlots(row),
-                          "next":{
-                            "block":{"type":"pause_block","fields":{"ms":200},
-                              "next":{"block":{"type":"clear_screen",
-                                "next":{"block":{"type":"pause_block","fields":{"ms":200}}}}}}
-                          }
-                        }
-                      }
+   const solutionJson = {
+  "blocks": {
+    "languageVersion": 0,
+    "blocks": [
+      {
+        "type": "on_button_pressed",
+        "fields": { "BTN": "A" },
+        "x": 20, "y": 20,
+        "inputs": {
+          "DO": {
+            "block": {
+              "type": "controls_repeat_ext",
+              "inputs": {
+                "TIMES": { "block": { "type": "math_number", "fields": { "NUM": 3 } } },
+                "DO": {
+                  "block": {
+                    "type": "plot", "fields": {"X":1,"Y":4},
+                    "next": { "block": { "type": "plot", "fields": {"X":2,"Y":4},
+                    "next": { "block": { "type": "plot", "fields": {"X":3,"Y":4},
+                    "next": { "block": { "type": "plot", "fields": {"X":4,"Y":4},
+                    "next": { "block": { "type": "plot", "fields": {"X":5,"Y":4},
+                    "next": { "block": { "type": "plot", "fields": {"X":6,"Y":4},
+                    "next": { "block": { "type": "pause_block", "fields": { "ms": 200 },
+                    "next": { "block": { "type": "clear_screen",
+                    "next": { "block": { "type": "pause_block", "fields": { "ms": 200 } } } } } } } } } } } } } }
+                }
+              },
+              "next": {
+                "block": {
+                  "type": "controls_repeat_ext",
+                  "inputs": {
+                    "TIMES": { "block": { "type": "math_number", "fields": { "NUM": 3 } } },
+                    "DO": {
+                      "block": {
+                        "type": "plot", "fields": {"X":1,"Y":4},
+                        "next": { "block": { "type": "plot", "fields": {"X":2,"Y":4},
+                        "next": { "block": { "type": "plot", "fields": {"X":3,"Y":4},
+                        "next": { "block": { "type": "plot", "fields": {"X":4,"Y":4},
+                        "next": { "block": { "type": "plot", "fields": {"X":5,"Y":4},
+                        "next": { "block": { "type": "plot", "fields": {"X":6,"Y":4},
+                        "next": { "block": { "type": "pause_block", "fields": { "ms": 600 },
+                        "next": { "block": { "type": "clear_screen",
+                        "next": { "block": { "type": "pause_block", "fields": { "ms": 600 } } } } } } } } } } } } } }
                     }
                   },
-                  "next":{
-                    "block":{
-                      "type":"controls_repeat_ext",
-                      "inputs":{
-                        "TIMES":{"block":{"type":"math_number","fields":{"NUM":3}}},
-                        "DO":{
-                          "block":{
-                            "type":"clear_screen",
-                            "next":{
-                              "block": chainPlots(row),
-                              "next":{
-                                "block":{"type":"pause_block","fields":{"ms":600},
-                                  "next":{"block":{"type":"clear_screen",
-                                    "next":{"block":{"type":"pause_block","fields":{"ms":600}}}}}}
-                              }
-                            }
-                          }
-                        }
-                      },
-                      "next":{
-                        "block":{
-                          "type":"controls_repeat_ext",
-                          "inputs":{
-                            "TIMES":{"block":{"type":"math_number","fields":{"NUM":3}}},
-                            "DO":{
-                              "block":{
-                                "type":"clear_screen",
-                                "next":{
-                                  "block": chainPlots(row),
-                                  "next":{
-                                    "block":{"type":"pause_block","fields":{"ms":200},
-                                      "next":{"block":{"type":"clear_screen",
-                                        "next":{"block":{"type":"pause_block","fields":{"ms":200}}}}}}
-                                  }
-                                }
-                              }
-                            }
-                          }
+                  "next": {
+                    "block": {
+                      "type": "controls_repeat_ext",
+                      "inputs": {
+                        "TIMES": { "block": { "type": "math_number", "fields": { "NUM": 3 } } },
+                        "DO": {
+                          "block": {
+                            "type": "plot", "fields": {"X":1,"Y":4},
+                            "next": { "block": { "type": "plot", "fields": {"X":2,"Y":4},
+                            "next": { "block": { "type": "plot", "fields": {"X":3,"Y":4},
+                            "next": { "block": { "type": "plot", "fields": {"X":4,"Y":4},
+                            "next": { "block": { "type": "plot", "fields": {"X":5,"Y":4},
+                            "next": { "block": { "type": "plot", "fields": {"X":6,"Y":4},
+                            "next": { "block": { "type": "pause_block", "fields": { "ms": 200 },
+                            "next": { "block": { "type": "clear_screen",
+                            "next": { "block": { "type": "pause_block", "fields": { "ms": 200 } } } } } } } } } } } } } }
                         }
                       }
                     }
@@ -167,9 +162,11 @@
               }
             }
           }
-        ]
+        }
       }
-    };
+    ]
+  }
+};
 
     /* --- Lesson setup --- */
     const lesson = Glowbit.createLessonUI('glowbit-project3-step1',
