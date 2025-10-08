@@ -1,248 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Liam’s GlowBit SOS Blinker</title>
-<link rel="icon" href="assets/favicon.ico">
-<link rel="stylesheet" href="assets/style.css" />
-<script src="lib/blockly_compressed.js"></script>
-<script src="lib/blocks_compressed.js"></script>
-<script src="lib/javascript_compressed.js"></script>
-<script src="lib/msg/en.js"></script>
-<script src="lib/blockly_xml_patch.js"></script>
-<script src="assets/global.js"></script>
-<style>
-  body{background:#fff;margin:0;font-family:'Poppins',sans-serif;}
-  .glowbit-wrapper{display:flex;justify-content:center;align-items:flex-start;padding:10px;}
-  .glowbit-left{width:330px;padding:15px;background:#E11D48;color:#fff;border-radius:10px;min-height:550px;overflow-y:auto;}
-  .glowbit-right{flex:1;display:flex;flex-direction:column;align-items:center;}
-  #blocklyDiv-project3{height:460px;width:480px;border:2px solid #ddd;border-radius:12px;margin-top:10px;}
-  .gb-btn{background:#fff;color:#E11D48;border:none;padding:6px 14px;margin:4px;border-radius:6px;font-weight:600;cursor:pointer;}
-  .gb-btn:hover{background:#FEE2E2;}
-  .character-box{text-align:center;margin-top:8px;}
-  .character-img{width:150px;height:auto;border-radius:10px;}
-  .character-name{font-weight:600;margin-top:6px;}
-  .didyouknow{margin-top:16px;background:#FEF9C3;border:2px solid #FACC15;
-    padding:10px 14px;border-radius:12px;color:#713F12;font-size:15px;line-height:1.4;text-align:justify;}
-  .nav-buttons{margin-top:12px;text-align:center;}
-</style>
+  <meta charset="UTF-8" />
+  <title>GlowBit Project 3 – Liam’s SOS Blinker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Blockly + Glowbit core -->
+  <script src="lib/blockly_compressed.js"></script>
+  <script src="lib/blocks_compressed.js"></script>
+  <script src="lib/javascript_compressed.js"></script>
+  <script src="lib/msg/en.js"></script>
+  <script src="assets/global.js"></script>
+  <script src="lib/blockly_xml_patch.js"></script>
+
+  <style>
+    .gb-wrapper {max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
+    .gb-header {text-align:center;background:#e6f9ff;color:#00A1D6;font-size:22px;font-weight:800;
+                padding:6px 10px;border-radius:8px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+    .gb-header .highlight {color:#7B2CBF;}
+    .gb-intro {text-align:center;font-size:16px;line-height:1.5;margin:0 0 10px;color:#374151;
+               background:#e0f2fe;border-radius:6px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+    .didyouknow {margin-top:18px;background:#fef9c3;border:2px solid #facc15;padding:10px 12px;
+                 border-radius:12px;color:#713f12;font-size:15px;font-weight:600;position:relative;
+                 box-shadow:0 2px 5px rgba(0,0,0,0.06);}
+    .didyouknow::before {content:"";position:absolute;top:-10px;left:20px;border-width:0 10px 10px 10px;
+                         border-style:solid;border-color:transparent transparent #fef9c3 transparent;}
+    .didyouknow p {text-align:justify;margin:6px 0;}
+    .nav-btns {display:flex;justify-content:space-between;gap:8px;margin-top:10px;flex-wrap:wrap;}
+    .gb-btn {padding:8px 14px;border:none;border-radius:6px;font-weight:700;cursor:pointer;flex:1;text-align:center;}
+    .gb-btn.next {background:#00A1D6;color:#fff;}
+    .gb-btn.back {background:#6B7280;color:#fff;}
+    .gb-btn.check {background:#10B981;color:#fff;display:block;margin:12px auto 0;}
+
+    #solutionModalP3 {display:none;position:fixed;top:60px;right:20px;width:640px;max-width:42%;
+                     background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.28);
+                     z-index:12000;overflow:hidden;user-select:none;}
+    #solutionHeaderP3 {cursor:move;padding:10px 12px;background:#00A1D6;color:#fff;font-weight:700;
+                      text-align:left;border-radius:10px 10px 0 0;display:flex;justify-content:space-between;align-items:center;}
+    #solutionWorkspaceP3 {height:360px;width:100%;border-top:1px solid #eee;background:#fafafa;}
+    #solutionFooterP3 {text-align:center;padding:12px;background:#fff;}
+    #solutionFooterP3 button {background:#00A1D6;color:#fff;border:none;border-radius:8px;
+                              padding:8px 18px;cursor:pointer;font-weight:700;}
+    @media (max-width:900px){
+      #solutionModalP3{left:10px;right:10px;width:auto;max-width:calc(100% - 20px);top:40px;}
+      #solutionWorkspaceP3{height:260px;}
+    }
+    .character-frame {text-align:center;margin-top:18px;}
+    .character-frame img {width:85%;max-width:260px;height:auto;border-radius:12px;
+                          box-shadow:0 4px 12px rgba(0,0,0,0.25);object-fit:cover;}
+    .character-name {margin-top:8px;font-weight:700;color:#374151;font-size:15px;}
+  </style>
 </head>
 
 <body>
-<div class="glowbit-wrapper" id="glowbit-project3">
-  <div class="glowbit-left" id="sidebar">
-    <div id="sidebar-content"></div>
-    <div class="character-box">
-      <img src="images/Liam2.png" class="character-img" alt="Liam the Coder">
-      <div class="character-name">Liam the Coder</div>
+  <div class="gb-wrapper">
+    <div class="gb-header">
+      🌟 <span class="highlight">Project 3</span>: Liam’s GlowBit SOS Blinker — <span class="highlight">Let’s make GlowBit flash an SOS signal to save the day!</span>
     </div>
-    <div class="nav-buttons">
-      <button id="prevBtn" class="gb-btn">⬅ Back</button>
-      <button id="nextBtn" class="gb-btn">Next ➡</button>
+
+    <p class="gb-intro">
+      You’ll code GlowBit to blink the Morse code pattern for SOS (three short flashes, three long flashes, three short flashes). Follow the steps on the right.
+    </p>
+
+    <div id="glowbit-project3-step1"></div>
+  </div>
+
+  <!-- Solution Modal -->
+  <div id="solutionModalP3" aria-hidden="true" role="dialog">
+    <div id="solutionHeaderP3">
+      <div>✅ Correct Setup — GlowBit SOS Blinker</div>
+      <button id="solutionCloseP3" title="Close">✕</button>
     </div>
+    <div id="solutionWorkspaceP3" aria-label="Correct solution workspace"></div>
+    <div id="solutionFooterP3"><button id="solutionCloseBtnP3">Close</button></div>
   </div>
 
-  <div class="glowbit-right">
-    <h2>Liam’s GlowBit SOS Blinker</h2>
-    <h4>Let’s make GlowBit flash an SOS signal to save the day!</h4>
-    <div id="blocklyDiv-project3"></div>
-    <button id="check-setup-btnP3" class="gb-btn">✅ Check Your Setup</button>
-  </div>
-</div>
+  <script>
+  (function waitForGlow(){
+    if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow,120);
 
-<!-- Check Your Setup modal -->
-<div id="solutionModalP3" class="modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;
-     background:rgba(0,0,0,0.6);justify-content:center;align-items:center;">
-  <div style="background:#fff;padding:20px;border-radius:10px;width:500px;max-height:600px;overflow:auto;">
-    <h3>✅ Correct Setup</h3>
-    <div id="solutionWorkspaceP3" style="height:420px;width:460px;"></div>
-    <button onclick="document.getElementById('solutionModalP3').style.display='none'"
-      class="gb-btn" style="margin-top:10px;">Close</button>
-  </div>
-</div>
+    /* --- Coordinates for the row across the middle (centered for 8×8) --- */
+    const row = [[1,4],[2,4],[3,4],[4,4],[5,4],[6,4]];
 
-<script>
-// ---------------- Sidebar content (3 slides) ----------------
-const stepCards = [
-`<h3>Step 1 – Set Up Your SOS Signal Pattern</h3>
-<p>🟢 Go to the LED tab and drag five <strong>Plot x y</strong> blocks. Set them to x:1 y:4, x:2 y:4, x:3 y:4, x:4 y:4, x:5 y:4 to form a centered row on the 8×8 LED grid.</p>
-<p>🟢 From the Basic tab, drag an <strong>on start</strong> block and a <strong>Clear Screen</strong> block. Place the Clear Screen inside on start, then add the five Plot blocks to test the row. Click Play to see your lantern row light up. Liam cheers, “That’s our rescue signal!”</p>
-<p>🟢 After testing, remove the Plot blocks from on start—we’ll use them in the next step.</p>`,
-`<h3>Step 2 – Code a Short Flash with Button A</h3>
-<p>💡 Go to the Input tab and drag an <strong>on button A pressed</strong> block. Inside it:</p>
-<ul><li>➕ Add five Plot x y blocks (from Step 1).</li>
-<li>🕒 Add a <strong>pause (200 ms)</strong> block.</li>
-<li>🧼 Add a <strong>clear screen</strong> block.</li>
-<li>🕒 Add another <strong>pause (200 ms)</strong>.</li></ul>
-<p>▶ Click Play then press A on the simulator to see one quick flash. Liam says, “That’s one short flash—quick and cool!”</p>`,
-`<h3>Step 3 – Build the Full SOS Pattern with a Loop</h3>
-<p>💡 To send SOS (three short, three long, three short), use loops:</p>
-<ul><li>🔁 Drag a <strong>repeat 3 times</strong> block. Inside it, place your short flash sequence (200 ms pauses).</li>
-<li>🔁 Duplicate the block for the O section and set pauses to 600 ms each for long flashes.</li>
-<li>🔁 Duplicate once more for the final S (200 ms).</li></ul>
-<p>▶ Click Play and press A to see GlowBit blink SOS! Liam shouts, “GlowBit’s sending an SOS to the stars!”</p>
-<div class="didyouknow">
-💡 <strong>Did you know?</strong><br>
-🔦 Real Morse code uses short and long light pulses or sounds to send messages over long distances.<br>
-🚢 Ships and airplanes still use SOS as a universal emergency signal (“Save Our Ship”).<br>
-🛰️ Astronauts train to recognize light-flash patterns for communication in space.<br>
-💻 Some microcontrollers and IoT devices use LED blinking for status codes — like mini Morse messages!<br>
-</div>`
-];
+    /* Helper to chain blocks */
+    function chainPlots(coords){
+      let first=null,curr=null;
+      coords.forEach(([x,y])=>{
+        const blk={"type":"plot","fields":{"X":x,"Y":y}};
+        if(!first){first=blk;curr=blk;} else {curr.next={"block":blk};curr=blk;}
+      });
+      return first;
+    }
 
-let currentCard=0;
-const sidebar=document.getElementById('sidebar-content');
-function renderCard(){
-  sidebar.innerHTML=stepCards[currentCard];
-}
-renderCard();
-document.getElementById('nextBtn').onclick=()=>{if(currentCard<stepCards.length-1){currentCard++;renderCard();}};
-document.getElementById('prevBtn').onclick=()=>{if(currentCard>0){currentCard--;renderCard();}};
-
-// ---------------- Blockly + workspace ----------------
-const lesson = Glowbit.createLessonUI('blocklyDiv-project3', {
-  title: "Liam’s GlowBit SOS Blinker",
-  instructions: "",
-  pixelSize: 28,
-  defaultJson: { blocks: { languageVersion: 0, blocks: [] } }
-});
-console.log("✅ Project 3 – SOS Blinker ready.");
-
-// ---------------- Solution (Check Your Setup) ----------------
-const solutionJson = {
-  "blocks": {
-    "languageVersion": 0,
-    "blocks": [
-      {
-        "type": "on_button_pressed",
-        "fields": {"BTN": "A"},
-        "x": 40, "y": 40,
-        "inputs": {
-          "DO": {
-            "block": {
-              "type": "controls_repeat_ext",
-              "inputs": {
-                "TIMES": {"block": {"type": "math_number","fields": {"NUM": 3}}},
-                "DO": {
-                  "block": {
-                    "type": "plot",
-                    "fields": {"X":1,"Y":4},
-                    "next": {
-                      "block": {
-                        "type": "plot","fields": {"X":2,"Y":4},
-                        "next": {
-                          "block": {
-                            "type": "plot","fields": {"X":3,"Y":4},
-                            "next": {
-                              "block": {
-                                "type": "plot","fields": {"X":4,"Y":4},
-                                "next": {
-                                  "block": {
-                                    "type": "plot","fields": {"X":5,"Y":4},
-                                    "next": {
-                                      "block": {
-                                        "type": "pause_block","fields": {"ms":200},
-                                        "next": {
-                                          "block": {
-                                            "type": "clear_screen",
-                                            "next": {
-                                              "block": {"type":"pause_block","fields":{"ms":200}}
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              "next": {
-                "block": {
-                  "type": "controls_repeat_ext",
-                  "inputs": {
-                    "TIMES": {"block": {"type": "math_number","fields": {"NUM": 3}}},
-                    "DO": {
-                      "block": {
-                        "type": "plot","fields":{"X":1,"Y":4},
-                        "next": {
-                          "block": {
-                            "type": "plot","fields":{"X":2,"Y":4},
-                            "next": {
-                              "block": {
-                                "type": "plot","fields":{"X":3,"Y":4},
-                                "next": {
-                                  "block": {
-                                    "type": "plot","fields":{"X":4,"Y":4},
-                                    "next": {
-                                      "block": {
-                                        "type": "plot","fields":{"X":5,"Y":4},
-                                        "next": {
-                                          "block": {
-                                            "type": "pause_block","fields":{"ms":600},
-                                            "next": {
-                                              "block": {
-                                                "type": "clear_screen",
-                                                "next": {
-                                                  "block": {"type":"pause_block","fields":{"ms":600}}
-                                                }
-                                              }
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
+    /* ---- Correct setup JSON (Button A → SOS loop) ---- */
+    const solutionJson = {
+      "blocks": {
+        "languageVersion": 0,
+        "blocks": [
+          {
+            "type":"on_button_pressed",
+            "fields":{"BTN":"A"},
+            "x":20,"y":20,
+            "inputs":{
+              "DO":{
+                "block":{
+                  "type":"controls_repeat_ext",
+                  "inputs":{
+                    "TIMES":{"block":{"type":"math_number","fields":{"NUM":3}}},
+                    "DO":{
+                      "block":{
+                        "type":"clear_screen",
+                        "next":{
+                          "block": chainPlots(row),
+                          "next":{
+                            "block":{"type":"pause_block","fields":{"ms":200},
+                              "next":{"block":{"type":"clear_screen",
+                                "next":{"block":{"type":"pause_block","fields":{"ms":200}}}}}}
                           }
                         }
                       }
                     }
                   },
-                  "next": {
-                    "block": {
-                      "type": "controls_repeat_ext",
-                      "inputs": {
-                        "TIMES": {"block":{"type":"math_number","fields":{"NUM":3}}},
-                        "DO": {
-                          "block": {
-                            "type": "plot","fields":{"X":1,"Y":4},
-                            "next": {
-                              "block": {
-                                "type": "plot","fields":{"X":2,"Y":4},
-                                "next": {
-                                  "block": {
-                                    "type": "plot","fields":{"X":3,"Y":4},
-                                    "next": {
-                                      "block": {
-                                        "type": "plot","fields":{"X":4,"Y":4},
-                                        "next": {
-                                          "block": {
-                                            "type": "plot","fields":{"X":5,"Y":4},
-                                            "next": {
-                                              "block": {
-                                                "type": "pause_block","fields":{"ms":200},
-                                                "next": {
-                                                  "block": {
-                                                    "type": "clear_screen",
-                                                    "next": {"block":{"type":"pause_block","fields":{"ms":200}}}
-                                                  }
-                                                }
-                                              }
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
+                  "next":{
+                    "block":{
+                      "type":"controls_repeat_ext",
+                      "inputs":{
+                        "TIMES":{"block":{"type":"math_number","fields":{"NUM":3}}},
+                        "DO":{
+                          "block":{
+                            "type":"clear_screen",
+                            "next":{
+                              "block": chainPlots(row),
+                              "next":{
+                                "block":{"type":"pause_block","fields":{"ms":600},
+                                  "next":{"block":{"type":"clear_screen",
+                                    "next":{"block":{"type":"pause_block","fields":{"ms":600}}}}}}
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "next":{
+                        "block":{
+                          "type":"controls_repeat_ext",
+                          "inputs":{
+                            "TIMES":{"block":{"type":"math_number","fields":{"NUM":3}}},
+                            "DO":{
+                              "block":{
+                                "type":"clear_screen",
+                                "next":{
+                                  "block": chainPlots(row),
+                                  "next":{
+                                    "block":{"type":"pause_block","fields":{"ms":200},
+                                      "next":{"block":{"type":"clear_screen",
+                                        "next":{"block":{"type":"pause_block","fields":{"ms":200}}}}}}
                                   }
                                 }
                               }
@@ -256,24 +167,116 @@ const solutionJson = {
               }
             }
           }
+        ]
+      }
+    };
+
+    /* --- Lesson setup --- */
+    const lesson = Glowbit.createLessonUI('glowbit-project3-step1',
+      {title:'',instructions:'',pixelSize:28,defaultJson:null});
+    if(lesson && lesson.workspace) lesson.workspace.clear();
+
+    /* --- Step cards (auto paginated) --- */
+    const stepCards=[
+`<h3 style="text-align:center;color:#00A1D6;">Step 1: Set Up Your SOS Signal Pattern</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;">
+ • From the <strong>LED</strong> tab, drag five <strong>Plot (x,y)</strong> blocks.<br>
+ • Use centered coords: <code>(1,4)(2,4)(3,4)(4,4)(5,4)(6,4)</code>.<br>
+ • Add <strong>on start</strong> (Basic tab) and a <strong>Clear Screen</strong> inside it.<br>
+ • Place your Plot blocks inside to test the row.<br>
+ • Click <strong>Run</strong> to light the row. Liam says, “That’s our rescue signal!”</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Step 2: Code a Short Flash with Button A</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#7B2CBF;color:#fff;">
+ • Drag <strong>on button A pressed</strong> from <strong>Input</strong>.<br>
+ • Inside it:<br>
+ &nbsp;&nbsp;➕ Add your five Plot blocks.<br>
+ &nbsp;&nbsp;🕒 Add <strong>pause (200 ms)</strong>.<br>
+ &nbsp;&nbsp;🧼 Add <strong>clear screen</strong>.<br>
+ &nbsp;&nbsp;🕒 Add another <strong>pause (200 ms)</strong>.<br>
+ • Press A → watch the short flash! Liam says, “Quick and cool!”</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Step 3: Build the Full SOS Pattern</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#00A1D6;color:#fff;">
+ • Use <strong>repeat 3 times</strong> to make three short flashes (S).<br>
+ • Duplicate → set pauses to <strong>600 ms</strong> for long flashes (O).<br>
+ • Duplicate again for the final S.<br>
+ • Click <strong>Run</strong> and press A to send SOS! Liam shouts, “GlowBit’s saving the day!”</div>`,
+
+`<button id="check-setup-btnP3" class="gb-btn check">✅ Check Your Setup</button>
+ <div class="didyouknow">
+   💡 <strong>Did you know?</strong>
+   <p>🔦 <strong>Morse code</strong> is still used by ships and aircraft for emergencies — SOS means “Save Our Ship”.</p>
+   <p>🛰️ Astronauts train to recognize light-flash patterns for silent communication in space.</p>
+   <p>💡 Some devices blink LEDs in patterns (like SOS) to show status or errors — a real-life coding signal!</p>
+ </div>`
+    ];
+
+    /* --- Auto-pagination identical to Project 1 --- */
+    function paginateToWorkspaceHeight(){
+      const sidebar=document.querySelector('#glowbit-project3-step1 .glowbit-left');
+      if(!sidebar)return;
+      const editor=document.getElementById('glowbit-project3-step1-editor');
+      const targetH=(editor&&editor.offsetHeight)?editor.offsetHeight:520;
+      const measurer=document.createElement('div');
+      measurer.style.visibility='hidden';measurer.style.position='absolute';
+      measurer.style.left='-9999px';measurer.style.top='-9999px';
+      measurer.style.width=(sidebar.clientWidth||320)+'px';
+      document.body.appendChild(measurer);
+      const pages=[];let current=[];const reserve=56;
+      stepCards.forEach(html=>{
+        const c=document.createElement('div');c.innerHTML=html;measurer.appendChild(c);
+        const tooTall=measurer.scrollHeight>(targetH-reserve);
+        if(tooTall){
+          if(current.length===0){pages.push([html]);measurer.innerHTML='';}
+          else{pages.push([...current]);current=[html];measurer.innerHTML='';
+            current.forEach(h=>{const d=document.createElement('div');d.innerHTML=h;measurer.appendChild(d);});}
+        }else current.push(html);
+      });
+      if(current.length)pages.push(current);
+      document.body.removeChild(measurer);
+      function render(idx){
+        sidebar.innerHTML=pages[idx].join('');
+        const nav=document.createElement('div');nav.className='nav-btns';
+        if(idx>0){const back=document.createElement('button');
+          back.textContent='⬅ Back';back.className='gb-btn back';
+          back.onclick=()=>render(idx-1);nav.appendChild(back);}
+        if(idx<pages.length-1){const next=document.createElement('button');
+          next.textContent='Next ➜';next.className='gb-btn next';
+          next.onclick=()=>render(idx+1);nav.appendChild(next);}
+        sidebar.appendChild(nav);
+        const charFrame=document.createElement('div');
+        charFrame.className='character-frame';
+        charFrame.innerHTML=`<img src="images/Liam1.png" alt="Liam the Coder">`;
+        sidebar.appendChild(charFrame);
+      }
+      render(0);
+    }
+    paginateToWorkspaceHeight();
+    let _rt=null;
+    window.addEventListener('resize',()=>{clearTimeout(_rt);_rt=setTimeout(paginateToWorkspaceHeight,150);});
+
+    /* --- Modal logic identical to Project 1 --- */
+    const modal=document.getElementById('solutionModalP3');
+    document.addEventListener('click',function(e){
+      if(e.target && e.target.id==='check-setup-btnP3'){
+        modal.style.display='block';
+        modal.setAttribute('aria-hidden','false');
+        if(!window._solutionWorkspaceP3){
+          const wsDiv=document.getElementById('solutionWorkspaceP3');
+          window._solutionWorkspaceP3=Blockly.inject(wsDiv,{readOnly:true,scrollbars:true,toolbox:null});
+          Blockly.serialization.workspaces.load(solutionJson,window._solutionWorkspaceP3);
         }
       }
-    ]
-  }
-};
+      if(e.target && (e.target.id==='solutionCloseP3'||e.target.id==='solutionCloseBtnP3')){
+        modal.style.display='none';
+        modal.setAttribute('aria-hidden','true');
+      }
+    });
 
-// modal handler
-document.addEventListener('click', e=>{
-  if(e.target.id==='check-setup-btnP3'){
-    const modal=document.getElementById('solutionModalP3');
-    modal.style.display='flex';
-    if(!window._solutionWorkspaceP3){
-      const wsDiv=document.getElementById('solutionWorkspaceP3');
-      window._solutionWorkspaceP3=Blockly.inject(wsDiv,{readOnly:true,scrollbars:true,toolbox:null});
-      Blockly.serialization.workspaces.load(solutionJson, window._solutionWorkspaceP3);
-    }
-  }
-});
-</script>
+    console.log('✅ Project 3 – SOS Blinker fully ready.');
+  })();
+  </script>
 </body>
 </html>
+
