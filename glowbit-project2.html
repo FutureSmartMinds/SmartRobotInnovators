@@ -127,7 +127,7 @@
         }
       }
     };
-    const solutionJson = {
+   const solutionJson = {
   "blocks": {
     "languageVersion": 0,
     "blocks": [
@@ -145,7 +145,9 @@
                   "block": {
                     "type": "pause",
                     "fields": { "ms": 500 },
-                    "next": { "block": { "type": "clear_screen" } }
+                    "next": {
+                      "block": { "type": "clear_screen" }
+                    }
                   }
                 }
               }
@@ -178,7 +180,7 @@
        • Click <strong>Run Program</strong> to see your bright lantern row glow!</div>`,
 
       `<h3 style="text-align:center;color:#E11D48;">Step 2: Make the Lantern Flicker ✨</h3>
-       <div style="margin:10px 0;padding:10px;border-radius:8px;background:#FB7185;color:#fff;">
+       <div style="margin:10px 0;padding:10px;border-radius:8px;background:#E11D48;color:#fff;">
        • From the <strong>Basic</strong> tab, drag a <strong>forever</strong> loop.<br>
        • Move your Plot (x,y) blocks into the loop below a <strong>Clear Screen</strong> block.<br>
        • Add a <strong>pause (ms)</strong> block underneath and set it to <strong>500</strong>.<br>
