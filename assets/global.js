@@ -155,6 +155,26 @@
           [0,0,0,0,0,0,0,0],
           [0,0,0,0,0,0,0,0]
         ],
+         square: [
+  [1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1]
+],
+         square_border: [
+  [1,1,1,1,1,1,1,1],
+  [1,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,1],
+  [1,1,1,1,1,1,1,1]
+],
         arrow_right: [
           [0,0,0,0,0,0,0,0],
           [0,0,0,0,1,0,0,0],
@@ -685,7 +705,20 @@
         { "type":"clear_screen","message0":"clear screen","previousStatement":null,"nextStatement":null,"colour":0 },
 
         // Icons / Arrows
-        { "type":"show_icon","message0":"show icon %1","args0":[{"type":"field_dropdown","name":"ICON","options":[["heart","heart"],["smile","smile"]]}],"previousStatement":null,"nextStatement":null,"colour":22 },
+       { 
+  "type":"show_icon",
+  "message0":"show icon %1",
+  "args0":[
+    {"type":"field_dropdown","name":"ICON",
+     "options":[
+       ["heart","heart"],
+       ["smile","smile"],
+       ["square","square"],
+       ["square (border)","square_border"]   // (optional)
+     ]}
+  ],
+  "previousStatement":null,"nextStatement":null,"colour":22
+},
         { "type":"show_arrow","message0":"show arrow %1","args0":[{"type":"field_dropdown","name":"ARROW","options":[["N","arrow_up"],["S","arrow_down"],["E","arrow_right"],["W","arrow_left"],["NE","arrow_ne"],["NW","arrow_nw"],["SE","arrow_se"],["SW","arrow_sw"]]}],"previousStatement":null,"nextStatement":null,"colour":22 },
 
         // Input / Events / Gestures
