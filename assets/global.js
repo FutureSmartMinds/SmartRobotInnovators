@@ -42,7 +42,7 @@
       brightness: 255,
       tempoBPM: 120,         // for beats → ms (music)
       lastGesture: null,     // updated when gestures are triggered
-      count: 0               // simple counter reporter
+      count: 0,               // simple counter reporter
        // NEW: simulated microphone level (0–255)
   soundLevel: 30
     };
