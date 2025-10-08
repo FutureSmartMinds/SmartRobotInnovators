@@ -768,45 +768,56 @@
       // Sensors
       reg("sound_level", () => [`Math.floor(Math.random()*200)`, G.ORDER_FUNCTION_CALL]);
 
-      // Music
-      function beatsToMs(beats) {
-        const msPerBeat = 60000 / Math.max(20, Math.min(300, state.tempoBPM || 120));
-        return Math.round(msPerBeat * beats);
-      }
-      reg("play_tone", (b) => {
-        const f = Number(b.getFieldValue("FREQ") || 440);
-        const d = Number(b.getFieldValue("DUR") || 200);
-        return `Glowbit.playSound(${f}, ${d});\n`;
+     // --- Music ---
+function beatsToMs(beats) {
+  // use Glowbit._state instead of undefined 'state'
+  const bpm = (Glowbit && Glowbit._state && Glowbit._state.tempoBPM) ? Glowbit._state.tempoBPM : 120;
+  const msPerBeat = 60000 / Math.max(20, Math.min(300, bpm));
+  return Math.round(msPerBeat * beats);
+}
+
+// Play a tone using frequency and duration (ms)
+reg("play_tone", (b) => {
+  const f = Number(b.getFieldValue("FREQ") || 440);
+  const d = Number(b.getFieldValue("DUR") || 200);
+  return `Glowbit.playSound(${f}, ${d});\n`;
+});
+
+// Play a tone using note name and beats
+reg("play_tone_note", (b) => {
+  const note = b.getFieldValue("NOTE") || "C4";
+  const beats = Number(b.getFieldValue("BEATS") || 1);
+  // safer wrapper that calls beatsToMs() correctly
+  return `(function(){var _ms=(${beatsToMs.toString()})(${beats}); Glowbit.playSound(${JSON.stringify(note)}, _ms);}());\n`;
+});
+
+// Set tempo BPM globally
+reg("set_tempo", (b) => {
+  const bpm = Number(b.getFieldValue("BPM") || 120);
+  return `Glowbit._state.tempoBPM=${bpm};\n`;
+});
+
+// Play sequence of tones (C4:1, D4:1, etc.)
+reg("play_until_done", (b) => {
+  const list = G.valueToCode(b, "NOTES", G.ORDER_NONE) || '"C4:1"';
+  const helper = function schedule(listStr){
+    try {
+      const items = String(listStr).split(/\s*,\s*/).filter(Boolean);
+      items.forEach(pair=>{
+        const m = String(pair).trim().match(/^([A-G][#b]?\d)\s*:\s*([\d.]+)$/i);
+        if(m){
+          const note = m[1].toUpperCase();
+          const beats = parseFloat(m[2]) || 1;
+          const bpm = (window.Glowbit && window.Glowbit._state && window.Glowbit._state.tempoBPM) ? window.Glowbit._state.tempoBPM : 120;
+          const ms = (60000 / Math.max(20, Math.min(300, bpm))) * beats;
+          (window.Glowbit||{}).playSound(note, Math.round(ms));
+          (window.Glowbit||{}).pause(Math.round(ms) + 10);
+        }
       });
-      reg("play_tone_note", (b) => {
-        const note = b.getFieldValue("NOTE") || "C4";
-        const beats = Number(b.getFieldValue("BEATS") || 1);
-        return `(function(){var _ms=${beatsToMs.toString()}(${beats}); Glowbit.playSound(${JSON.stringify(note)}, _ms);}());\n`;
-      });
-      reg("set_tempo", (b) => {
-        const bpm = Number(b.getFieldValue("BPM") || 120);
-        return `Glowbit._state.tempoBPM=${bpm};\n`;
-      });
-      reg("play_until_done", (b) => {
-        // NOTES value: "C4:1, D4:1, E4:2"
-        const list = G.valueToCode(b, "NOTES", G.ORDER_NONE) || '"C4:1"';
-        const helper = function schedule(listStr){
-          try{
-            const items = String(listStr).split(/\s*,\s*/).filter(Boolean);
-            items.forEach(pair=>{
-              const m=String(pair).trim().match(/^([A-G][#b]?\d)\s*:\s*([\d.]+)$/i);
-              if(m){
-                const note=m[1].toUpperCase();
-                const beats=parseFloat(m[2])||1;
-                const ms=(60000/Math.max(20,Math.min(300, (window.Glowbit?Glowbit._state.tempoBPM:120))))*beats;
-                (window.Glowbit||{}).playSound(note, Math.round(ms));
-                (window.Glowbit||{}).pause(Math.round(ms)+10);
-              }
-            });
-          }catch(e){ console.warn("play_until_done parse error", e); }
-        };
-        return `(${helper.toString()})(${list});\n`;
-      });
+    } catch(e){ console.warn("play_until_done parse error", e); }
+  };
+  return `(${helper.toString()})(${list});\n`;
+});
 
       // Math extras
       reg("pick_random", (b) => {
