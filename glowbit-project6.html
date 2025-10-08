@@ -84,40 +84,38 @@
     //   play tone E(329Hz) 1 beat → pause(500)
     //   play tone G(392Hz) 1 beat → pause(500)
     const solutionJson = {
-      blocks: {
-        languageVersion: 0,
-        blocks: [
-          {
-            type: "controls_repeat_ext",
-            x: 20,
-            y: 20,
-            inputs: {
-              DO: {
+  blocks: {
+    languageVersion: 0,
+    blocks: [
+      {
+        type: "forever",
+        x: 20,
+        y: 20,
+        inputs: {
+          DO: {
+            block: {
+              type: "play_tone_note",
+              fields: { NOTE: "C4", BEATS: 1 },
+              next: {
                 block: {
-                  type: "play_tone",
-                  fields: { NOTE: "261", BEAT: "1" },
+                  type: "pause_block",
+                  fields: { MS: 500 },
                   next: {
                     block: {
-                      type: "pause_block",
-                      fields: { MS: 500 },
+                      type: "play_tone_note",
+                      fields: { NOTE: "E4", BEATS: 1 },
                       next: {
                         block: {
-                          type: "play_tone",
-                          fields: { NOTE: "329", BEAT: "1" },
+                          type: "pause_block",
+                          fields: { MS: 500 },
                           next: {
                             block: {
-                              type: "pause_block",
-                              fields: { MS: 500 },
+                              type: "play_tone_note",
+                              fields: { NOTE: "G4", BEATS: 1 },
                               next: {
                                 block: {
-                                  type: "play_tone",
-                                  fields: { NOTE: "392", BEAT: "1" },
-                                  next: {
-                                    block: {
-                                      type: "pause_block",
-                                      fields: { MS: 500 }
-                                    }
-                                  }
+                                  type: "pause_block",
+                                  fields: { MS: 500 }
                                 }
                               }
                             }
@@ -130,9 +128,11 @@
               }
             }
           }
-        ]
+        }
       }
-    };
+    ]
+  }
+};
 
     /* --- Lesson UI setup --- */
     const lesson = Glowbit.createLessonUI('glowbit-project6-step1',{title:'',instructions:'',pixelSize:28,defaultJson:null});
