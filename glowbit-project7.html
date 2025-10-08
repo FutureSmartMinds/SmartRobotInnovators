@@ -82,34 +82,14 @@
        Top-level 1: on_button_pressed(A) -> show_text "GO"
        Top-level 2: forever -> pause 500 -> show_number 1 -> pause 500 -> show_number 2 -> pause 500 -> show_number 3 -> pause 500
     */
-    const solutionJson = {
+   const solutionJson = {
   blocks: {
     languageVersion: 0,
-    variables: [
-      { name: "counting", id: "counting" }
-    ],
     blocks: [
-      /* on start: counting = false */
       {
-        type: "on_start",
-        x: 20, y: 20,
-        inputs: {
-          DO: {
-            block: {
-              type: "variables_set",
-              fields: { VAR: { id: "counting", name: "counting" } },
-              inputs: {
-                VALUE: { block: { type: "logic_boolean", fields: { BOOL: "FALSE" } } }
-              }
-            }
-          }
-        }
-      },
-
-      /* on button A: show "GO", pause 500, counting = true */
-      {
+        // When A is pressed: show "GO", wait, clear, then start looping 1→2→3
         type: "on_button_pressed",
-        x: 280, y: 20,
+        x: 20, y: 20,
         fields: { BTN: "A" },
         inputs: {
           DO: {
@@ -122,63 +102,52 @@
                   fields: { MS: 500 },
                   next: {
                     block: {
-                      type: "variables_set",
-                      fields: { VAR: { id: "counting", name: "counting" } },
-                      inputs: {
-                        VALUE: { block: { type: "logic_boolean", fields: { BOOL: "TRUE" } } }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-
-      /* forever: if counting then (pause→1→pause→2→pause→3→pause) */
-      {
-        type: "forever",
-        x: 20, y: 210,
-        inputs: {
-          DO: {
-            block: {
-              type: "controls_if",
-              inputs: {
-                IF0: {
-                  block: {
-                    type: "variables_get",
-                    fields: { VAR: { id: "counting", name: "counting" } }
-                  }
-                },
-                DO0: {
-                  block: {
-                    type: "pause_block",
-                    fields: { MS: 500 },
-                    next: {
-                      block: {
-                        type: "show_number",
-                        inputs: { NUM: { block: { type: "math_number", fields: { NUM: 1 } } } },
-                        next: {
-                          block: {
-                            type: "pause_block",
-                            fields: { MS: 500 },
-                            next: {
+                      type: "clear_screen",
+                      next: {
+                        block: {
+                          // Effectively-forever loop under the same handler
+                          type: "controls_repeat_ext",
+                          inputs: {
+                            TIMES: {
                               block: {
-                                type: "show_number",
-                                inputs: { NUM: { block: { type: "math_number", fields: { NUM: 2 } } } },
+                                type: "math_number",
+                                fields: { NUM: 9999 }
+                              }
+                            },
+                            DO: {
+                              block: {
+                                type: "pause_block",
+                                fields: { MS: 500 },
                                 next: {
                                   block: {
-                                    type: "pause_block",
-                                    fields: { MS: 500 },
+                                    type: "show_number",
+                                    inputs: { NUM: { block: { type: "math_number", fields: { NUM: 1 } } } },
                                     next: {
                                       block: {
-                                        type: "show_number",
-                                        inputs: { NUM: { block: { type: "math_number", fields: { NUM: 3 } } } },
+                                        type: "pause_block",
+                                        fields: { MS: 500 },
                                         next: {
                                           block: {
-                                            type: "pause_block",
-                                            fields: { MS: 500 }
+                                            type: "show_number",
+                                            inputs: { NUM: { block: { type: "math_number", fields: { NUM: 2 } } } },
+                                            next: {
+                                              block: {
+                                                type: "pause_block",
+                                                fields: { MS: 500 },
+                                                next: {
+                                                  block: {
+                                                    type: "show_number",
+                                                    inputs: { NUM: { block: { type: "math_number", fields: { NUM: 3 } } } },
+                                                    next: {
+                                                      block: {
+                                                        type: "pause_block",
+                                                        fields: { MS: 500 }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
                                           }
                                         }
                                       }
@@ -201,7 +170,6 @@
     ]
   }
 };
-
     /* --- Lesson UI setup --- */
     const lesson = Glowbit.createLessonUI('glowbit-project7-step1',{title:'',instructions:'',pixelSize:28,defaultJson:null});
     if(lesson && lesson.workspace) lesson.workspace.clear();
