@@ -147,53 +147,103 @@
     const lesson = Glowbit.createLessonUI('glowbit-project8-step1',{title:'',instructions:'',pixelSize:28,defaultJson:null});
     if(lesson && lesson.workspace) lesson.workspace.clear();
 
-    /* --- Sidebar content (steps adapted to available blocks) --- */
-    const stepCards = [
+   /* --- Sidebar content (expanded logic steps with mutator + compare, with inline SVG hints) --- */
+const stepCards = [
 `<h3 style="text-align:center;color:#00A1D6;">Step 1: Set Up a Bright Flash</h3>
  <div style="margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;">
- • From <strong>LED</strong>, drag <strong>set brightness</strong> and set it to <code>255</code> (max).<br>
- • From <strong>Icon</strong>, drag <strong>show icon</strong> and choose <strong>square</strong> (fills the grid).<br>
+ • From <strong>LED</strong>, drag <strong>set brightness</strong> and set it to <code>255</code> (maximum).<br>
+ • From <strong>Icon</strong>, drag <strong>show icon</strong> and choose <strong>square</strong> (full grid).<br>
  • Test inside <strong>on start</strong>: add <strong>Clear Screen</strong>, then <strong>set brightness 255</strong> → <strong>show icon square</strong>.<br>
  • Click <strong>Run</strong> — GlowBit shines super bright!<br>
  💬 Mia: “GlowBit’s shining super bright!”<br><br>
- 🧩 After testing, remove these blocks from <strong>on start</strong>.</div>`,
+ 🧩 After testing, remove these from <strong>on start</strong> so we can use them in logic.</div>`,
 
 `<h3 style="text-align:center;color:#00A1D6;">Step 2: Add a Dim Flash</h3>
  <div style="margin:10px 0;padding:10px;border-radius:8px;background:#7B2CBF;color:#fff;">
  • From <strong>LED</strong>, add another <strong>set brightness</strong> and set it to <code>50</code> (low).<br>
  • Reuse <strong>show icon → square</strong> to light the whole grid dimly.<br>
- • Test in <strong>on start</strong>: <strong>Clear Screen</strong> → <strong>set brightness 50</strong> → <strong>show icon square</strong>.<br>
- 💬 Mia: “GlowBit’s got a cool, soft glow now!”<br><br>
- 🧩 Remove the test blocks after you confirm it looks dim.</div>`,
+ • Test quickly in <strong>on start</strong> (after <strong>Clear Screen</strong>) then remove — we’ll place these in the <em>else</em> later.</div>`,
 
 `<h3 style="text-align:center;color:#00A1D6;">Step 3: Check the Sound Level</h3>
  <div style="margin:10px 0;padding:10px;border-radius:8px;background:#00A1D6;color:#fff;">
  • From <strong>Input</strong>, drag <strong>sound level</strong> (0–255).<br>
- • To see its value, place it in <strong>show number</strong> (Basic) and put that inside <strong>on start</strong> temporarily.<br>
- • Click <strong>Run</strong>, then use the microphone icon’s volume bar — the number changes with volume.<br>
- 💬 Mia: “GlowBit’s hearing how loud we are!”<br><br>
- 🧩 Remove the <strong>show number</strong> test after checking.</div>`,
+ • To see its value, put it inside <strong>show number</strong> (Basic) and run once.<br>
+ • Use the <strong>Sound Level</strong> slider under the canvas to raise/lower the value.<br>
+ • Remove the test blocks — next we’ll use this reporter in a comparison.</div>`,
 
-`<h3 style="text-align:center;color:#00A1D6;">Step 4: Make GlowBit React to Loud Sounds</h3>
+`<h3 style="text-align:center;color:#00A1D6;">Step 4A: Create the Forever Loop</h3>
  <div style="margin:10px 0;padding:10px;border-radius:8px;background:#10B981;color:#0f5132;">
- • From <strong>Basic</strong>, drag a <strong>forever</strong> loop.<br>
- • Inside it, add an <strong>if / else</strong> (Logic). Put a <strong>&gt;</strong> compare inside the <em>if</em>: <strong>sound level &gt; 120</strong>.<br>
- • In the <em>if</em> (loud): <strong>set brightness 255</strong> → <strong>show icon square</strong>.<br>
- • In the <em>else</em> (quiet): <strong>set brightness 50</strong> → <strong>show icon square</strong> → <strong>clear screen</strong>.<br>
- • Add a <strong>pause 500 ms</strong> after the if/else so updates are readable.<br>
- • Click <strong>Run</strong> and move the mic slider above/below 120 to see bright vs. dim alerts.<br>
- 💬 Mia: “GlowBit’s shining bright when it’s loud!”</div>`,
+ • From <strong>Basic</strong>, drag a <strong>forever</strong> loop to the Workspace.<br>
+ • We will place our decision logic <em>inside</em> this loop so GlowBit keeps checking sound.</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Step 4B: Build an If–Then–Else (with the Wheel)
+  <span aria-hidden="true" style="vertical-align:middle;display:inline-block;margin-left:6px;">
+    <!-- tiny gear icon -->
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff" style="vertical-align:-2px;">
+      <path d="M19.14,12.94c.04-.31,.06-.63,.06-.94s-.02-.63-.06-.94l2.03-1.58c.18-.14,.23-.4,.12-.61l-1.92-3.32c-.11-.21-.36-.3-.58-.22l-2.39,.96c-.5-.38-1.03-.69-1.62-.92l-.36-2.54c-.04-.23-.23-.4-.47-.4h-3.84c-.24,0-.43,.17-.47,.4l-.36,2.54c-.59,.23-1.12,.54-1.62,.92l-2.39-.96c-.22-.09-.47,0-.58,.22l-1.92,3.32c-.11,.21-.06,.47,.12,.61l2.03,1.58c-.04,.31-.06,.63-.06,.94s.02,.63,.06,.94l-2.03,1.58c-.18,.14-.23,.4-.12,.61l1.92,3.32c.11,.21,.36,.3,.58,.22l2.39-.96c.5,.38,1.03,.69,1.62,.92l.36,2.54c.04,.23,.23,.4,.47,.4h3.84c.24,0,.43-.17,.47-.4l.36-2.54c.59-.23,1.12-.54,1.62-.92l2.39,.96c.22,.09,.47,0,.58-.22l1.92-3.32c.11-.21,.06-.47-.12-.61l-2.03-1.58ZM12,15.5c-1.93,0-3.5-1.57-3.5-3.5s1.57-3.5,3.5-3.5,3.5,1.57,3.5,3.5-1.57,3.5-3.5,3.5Z"/>
+    </svg>
+  </span>
+</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#10B981;color:#0f5132;">
+ • From <strong>Logic</strong>, drag an <strong>if</strong> block into the <strong>forever</strong> loop.<br>
+ • Click the tiny gear 
+   <span aria-hidden="true" style="display:inline-block;vertical-align:middle;">
+     <svg width="14" height="14" viewBox="0 0 24 24" fill="#0f5132" style="vertical-align:-2px;">
+       <path d="M19.14,12.94c.04-.31,.06-.63,.06-.94s-.02-.63-.06-.94l2.03-1.58c.18-.14,.23-.4,.12-.61l-1.92-3.32c-.11-.21-.36-.3-.58-.22l-2.39,.96c-.5-.38-1.03-.69-1.62-.92l-.36-2.54c-.04-.23-.23-.4-.47-.4h-3.84c-.24,0-.43,.17-.47,.4l-.36,2.54c-.59,.23-1.12,.54-1.62,.92l-2.39-.96c-.22-.09-.47,0-.58,.22l-1.92,3.32c-.11,.21-.06,.47,.12,.61l2.03,1.58c-.04,.31-.06,.63-.06,.94s.02,.63,.06,.94l-2.03,1.58c-.18,.14-.23,.4-.12,.61l1.92,3.32c.11,.21,.36,.3,.58,.22l2.39-.96c.5,.38,1.03,.69,1.62,.92l.36,2.54c.04,.23,.23,.4,.47,.4h3.84c.24,0,.43-.17,.47-.4l.36-2.54c.59-.23,1.12-.54,1.62-.92l2.39,.96c.22,.09,.47,0,.58-.22l1.92-3.32c.11-.21,.06-.47-.12-.61l-2.03-1.58ZM12,15.5c-1.93,0-3.5-1.57-3.5-3.5s1.57-3.5,3.5-3.5,3.5,1.57,3.5,3.5-1.57,3.5-3.5,3.5Z"/>
+     </svg>
+   </span> on the if block to open the <strong>mutator</strong> panel.<br>
+ • In the mutator:<br>
+ &nbsp;&nbsp;— Drag an <strong>else</strong> piece into the structure so it reads <em>if … do … else …</em>.<br>
+ &nbsp;&nbsp;— Close the mutator. You now have a full <strong>if–then–else</strong> block.</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Step 4C: Build the Comparison (sound &gt; 120)
+  <span aria-hidden="true" style="vertical-align:middle;display:inline-block;margin-left:6px;">
+    <!-- tiny compare glyph -->
+    <svg width="46" height="16" viewBox="0 0 92 32" style="vertical-align:-3px">
+      <rect x="1" y="1" width="90" height="30" rx="4" ry="4" fill="#e2e8f0" stroke="#94a3b8"></rect>
+      <text x="12" y="21" font-family="monospace" font-size="14" fill="#334155">A &gt; B ▾</text>
+    </svg>
+  </span>
+</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#10B981;color:#0f5132;">
+ • From <strong>Logic</strong>, drag a <strong>compare</strong> block (looks like <code>A = B</code>) and drop it into the <strong>if</strong> slot.<br>
+ • Click the operator dropdown 
+   <span aria-hidden="true" style="display:inline-block;vertical-align:-2px;">
+     <svg width="16" height="16" viewBox="0 0 24 24">
+       <path fill="#0f5132" d="M7 10l5-5 5 5H7zM7 14l5 5 5-5H7z"/>
+     </svg>
+   </span>
+   and change it to <strong>&gt;</strong> (greater than).<br>
+ • In the left input (A), place the <strong>sound level</strong> block from <strong>Input</strong>.<br>
+ • In the right input (B), place <strong>math number</strong> (from <strong>Math</strong>) and set it to <code>120</code>.<br>
+ • Your condition should read: <strong>sound level &gt; 120</strong>.</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Step 4D: Fill the Then / Else Parts</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#10B981;color:#0f5132;">
+ • In the <strong>then</strong> area (loud):<br>
+ &nbsp;&nbsp;① <strong>set brightness 255</strong> → ② <strong>show icon square</strong>.<br>
+ • In the <strong>else</strong> area (quiet):<br>
+ &nbsp;&nbsp;① <strong>set brightness 50</strong> → ② <strong>show icon square</strong> → ③ <strong>clear screen</strong>.<br>
+ • After the if–else (still inside <strong>forever</strong>): add <strong>pause 500 ms</strong> so changes are readable.</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Step 5: Run &amp; Tune</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#e0f2fe;color:#0f172a;">
+ • Click <strong>Run</strong>. Use the <strong>Sound Level</strong> slider below the canvas.<br>
+ • Above <code>120</code> &rarr; bright flash. Below <code>120</code> &rarr; dim flash.<br>
+ • Try variations:<br>
+ &nbsp;&nbsp;— Brightness pairs like <code>200</code>/<code>20</code>.<br>
+ &nbsp;&nbsp;— Thresholds like <code>80</code> (more sensitive) or <code>150</code> (less).<br>
+ &nbsp;&nbsp;— Add a quick <strong>play tone</strong> in the <em>then</em> part for a sound alert.</div>`,
 
 `<button id="check-setup-btnP8" class="gb-btn check">✅ Check Your Setup</button>
  <div class="didyouknow">
    💡 <strong>Did you know?</strong>
-   <p>🚨 Sound meters (like decibel meters) use LEDs to warn about loud environments—your logic is the same idea!</p>
-   <p>👂 Smart speakers use microphones to detect wake words; they also change LED brightness to show listening status.</p>
-   <p>🏭 In factories, “andon” lights change brightness or color when machines get too noisy or need attention.</p>
-   <p>🧪 Engineers use thresholds (like your 120) to trigger alerts—tuning the threshold and brightness helps people notice changes.</p>
-   <p>🛠️ Try variations: set brightness 200/20, or change the threshold to 80/150, or add a brief <em>beep</em> when it’s loud.</p>
+   <p>🚨 Noise monitors in classrooms and libraries use thresholds to flash lights when it’s too loud—exactly like your if–then–else!</p>
+   <p>🏭 Factory “andon” towers change brightness/color to warn operators; engineers pick thresholds just like your 120.</p>
+   <p>🧠 Conditional logic is how computers make decisions: “if this, then do that, else do something different.”</p>
+   <p>🎛️ Brightness and timing control (pauses) make alerts readable and less distracting—an important UX skill.</p>
  </div>`
-    ];
+];
 
     /* --- Sidebar auto-pagination --- */
     function paginate(){
