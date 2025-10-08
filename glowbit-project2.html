@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GlowBit Project 2 – Mia’s Lantern Glow</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Blockly + Glowbit core -->
+  <script src="lib/blockly_compressed.js"></script>
+  <script src="lib/blocks_compressed.js"></script>
+  <script src="lib/javascript_compressed.js"></script>
+  <script src="lib/msg/en.js"></script>
+  <script src="assets/global.js"></script>
+  <script src="lib/blockly_xml_patch.js"></script>
+
+  <style>
+    .gb-wrapper {max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
+    .gb-header {text-align:center;background:#fff8f8;color:#E11D48;font-size:22px;font-weight:800;
+                padding:6px 10px;border-radius:8px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+    .gb-header .highlight {color:#00A1D6;}
+    .gb-intro {text-align:center;font-size:16px;line-height:1.5;margin:0 0 10px;color:#374151;
+               background:#ffe4e6;border-radius:6px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+    .didyouknow {margin-top:18px;background:#fef9c3;border:2px solid #facc15;padding:10px 12px;
+                 border-radius:12px;color:#713f12;font-size:15px;font-weight:600;position:relative;
+                 box-shadow:0 2px 5px rgba(0,0,0,0.06);}
+    .didyouknow::before {content:"";position:absolute;top:-10px;left:20px;border-width:0 10px 10px 10px;
+                         border-style:solid;border-color:transparent transparent #fef9c3 transparent;}
+    .didyouknow p {text-align:justify;margin:6px 0;}
+    .nav-btns {display:flex;justify-content:space-between;gap:8px;margin-top:10px;flex-wrap:wrap;}
+    .gb-btn {padding:8px 14px;border:none;border-radius:6px;font-weight:700;cursor:pointer;flex:1;text-align:center;}
+    .gb-btn.next {background:#E11D48;color:#fff;}
+    .gb-btn.back {background:#6B7280;color:#fff;}
+    .gb-btn.check {background:#10B981;color:#fff;display:block;margin:12px auto 0;}
+
+    /* Solution modal */
+    #solutionModalP2 {display:none;position:fixed;top:60px;right:20px;width:640px;max-width:42%;
+                     background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.28);
+                     z-index:12000;overflow:hidden;user-select:none;}
+    #solutionHeaderP2 {cursor:move;padding:10px 12px;background:#E11D48;color:#fff;font-weight:700;
+                      text-align:left;border-radius:10px 10px 0 0;display:flex;justify-content:space-between;align-items:center;}
+    #solutionWorkspaceP2 {height:360px;width:100%;border-top:1px solid #eee;background:#fafafa;}
+    #solutionFooterP2 {text-align:center;padding:12px;background:#fff;}
+    #solutionFooterP2 button {background:#E11D48;color:#fff;border:none;border-radius:8px;
+                              padding:8px 18px;cursor:pointer;font-weight:700;}
+    @media (max-width:900px){
+      #solutionModalP2{left:10px;right:10px;width:auto;max-width:calc(100% - 20px);top:40px;}
+      #solutionWorkspaceP2{height:260px;}
+    }
+.character-frame {
+  text-align:center;
+  margin-top:18px;
+}
+.character-frame img {
+  width:85%;
+  max-width:260px;
+  height:auto;
+  border-radius:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.25);
+  object-fit:cover;
+}
+.character-name {
+  margin-top:8px;
+  font-weight:700;
+  color:#374151;
+  font-size:15px;
+}
+  </style>
+</head>
+
+<body>
+  <div class="gb-wrapper">
+    <div class="gb-header">
+      🌟 <span class="highlight">Project 2</span>: Mia’s GlowBit Lantern Glow — <span class="highlight">Let’s make GlowBit shine like a starry lantern!</span>
+    </div>
+
+    <p class="gb-intro">
+      Code GlowBit’s LEDs to flicker like a glowing lantern! You’ll build a steady light, then make it twinkle using loops and pauses.
+    </p>
+
+    <div id="glowbit-project2-step1"></div>
+  </div>
+
+  <!-- Solution Modal -->
+  <div id="solutionModalP2" aria-hidden="true" role="dialog">
+    <div id="solutionHeaderP2">
+      <div>✅ Correct Setup — Lantern Glow</div>
+      <button id="solutionCloseP2" title="Close">✕</button>
+    </div>
+    <div id="solutionWorkspaceP2" aria-label="Correct solution workspace"></div>
+    <div id="solutionFooterP2"><button id="solutionCloseBtnP2">Close</button></div>
+  </div>
+
+  <script>
+  (function waitForGlow(){
+    if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow,120);
+
+    /* -------------------------------
+       1) Solution JSON – Flickering Lantern
+    --------------------------------*/
+    const row = [[1,4],[2,4],[3,4],[4,4],[5,4],[6,4]];
+    function chainPlots(coords){
+      let first=null, curr=null;
+      coords.forEach(([x,y])=>{
+        const blk={"type":"plot","fields":{"X":x,"Y":y}};
+        if(!first){first=blk;curr=blk;}else{curr.next={"block":blk};curr=blk;}
+      });
+      return first;
+    }
+    const flickerChain={
+      "block":{
+        "type":"forever",
+        "inputs":{
+          "DO":{
+            "block":{
+              "type":"clear_screen",
+              "next":{"block":chainPlots(row)}
+            }
+          }
+        },
+        "next":{
+          "block":{"type":"pause","fields":{"ms":500},"next":{"block":{"type":"clear_screen"}}}
+        }
+      }
+    };
+    const solutionJson={
+      "blocks":{
+        "languageVersion":0,
+        "blocks":[
+          {
+            "type":"on_start",
+            "x":40,"y":40,
+            "inputs":{"DO":{"block":{"type":"clear_screen","next":chainPlots(row)}}}
+          },
+          flickerChain.block
+        ]
+      }
+    };
+
+    /* -------------------------------
+       2) Create Lesson UI
+    --------------------------------*/
+    const lesson = Glowbit.createLessonUI('glowbit-project2-step1', {
+      title:'',instructions:'',pixelSize:28,defaultJson:null
+    });
+    if(lesson && lesson.workspace) lesson.workspace.clear();
+
+    /* -------------------------------
+       3) Sidebar Steps
+    --------------------------------*/
+    const stepCards=[
+      `<h3 style="text-align:center;color:#E11D48;">Step 1: Set Up Your Lantern Row 🏮</h3>
+       <div style="margin:10px 0;padding:10px;border-radius:8px;background:#E11D48;color:#fff;">
+       • From the <strong>LED</strong> tab, drag six <strong>Plot (x,y)</strong> blocks.<br>
+       • Use centered coords for an 8×8 grid row: <code>(1,4) (2,4) (3,4) (4,4) (5,4) (6,4)</code>.<br>
+       • Add an <strong>on start</strong> block and a <strong>Clear Screen</strong> block inside it.<br>
+       • Place all Plot (x,y) blocks inside the on start block.<br>
+       • Click <strong>Run Program</strong> to see your bright lantern row glow!</div>`,
+
+      `<h3 style="text-align:center;color:#E11D48;">Step 2: Make the Lantern Flicker ✨</h3>
+       <div style="margin:10px 0;padding:10px;border-radius:8px;background:#FB7185;color:#fff;">
+       • From the <strong>Basic</strong> tab, drag a <strong>forever</strong> loop.<br>
+       • Move your Plot (x,y) blocks into the loop below a <strong>Clear Screen</strong> block.<br>
+       • Add a <strong>pause (ms)</strong> block underneath and set it to <strong>500</strong>.<br>
+       • Finally, add another <strong>Clear Screen</strong> block after the pause.<br>
+       • Run it and watch your lantern flicker like a star! Mia smiles: “GlowBit’s lantern is alive!”</div>`,
+
+      `<h3 style="text-align:center;color:#E11D48;">Step 3: Adjust the Flicker Speed ⚙️</h3>
+       <div style="margin:10px 0;padding:10px;border-radius:8px;background:#F43F5E;color:#fff;">
+       • Change the pause time to <strong>300 ms</strong> for a faster flicker.<br>
+       • Try <strong>800 ms</strong> for a slower, cozier glow.<br>
+       • Experiment until you find your favorite lantern speed.<br>
+       • Mia giggles: “GlowBit’s light is dancing with joy!”</div>`,
+
+      `<button id="check-setup-btnP2" class="gb-btn check">✅ Check Your Setup</button>
+       <div class="didyouknow">
+        💡 <strong>Did you know?</strong>
+        <p>🌟 <strong>Lantern festivals inspire robot lighting designs.</strong> Engineers study how traditional lanterns flicker to create warm, human-like lighting for robots and smart devices.</p>
+        <p>💡 <strong>LED flicker patterns help save energy.</strong> By turning LEDs on and off rapidly (like our lantern effect), devices reduce power use while keeping brightness.</p>
+        <p>🔭 <strong>Spacecraft use LED status lights.</strong> Engineers use rows of LEDs to signal system health in rockets and rovers — the same principle you used to build GlowBit’s lantern!</p>
+        <p>🪔 <strong>Smart home lights copy nature.</strong> Many smart lamps simulate firelight or candle glows using programmed LED flickers — exactly like your loop!</p>
+       </div>`
+    ];
+
+    /* Auto-pagination & character insertion */
+    function paginateToWorkspaceHeight(){
+      const sidebar=document.querySelector('#glowbit-project2-step1 .glowbit-left');
+      if(!sidebar) return;
+      const editor=document.getElementById('glowbit-project2-step1-editor');
+      const targetH=(editor&&editor.offsetHeight)?editor.offsetHeight:520;
+      const measurer=document.createElement('div');
+      measurer.style.visibility='hidden';measurer.style.position='absolute';
+      measurer.style.left='-9999px';measurer.style.top='-9999px';
+      measurer.style.width=(sidebar.clientWidth||320)+'px';
+      document.body.appendChild(measurer);
+      const pages=[];let current=[];const reserve=56;
+      stepCards.forEach(html=>{
+        const c=document.createElement('div');c.innerHTML=html;measurer.appendChild(c);
+        const tooTall=measurer.scrollHeight>(targetH-reserve);
+        if(tooTall){
+          if(current.length===0){pages.push([html]);measurer.innerHTML='';}
+          else{pages.push([...current]);current=[html];measurer.innerHTML='';current.forEach(h=>{const d=document.createElement('div');d.innerHTML=h;measurer.appendChild(d);});}
+        }else current.push(html);
+      });
+      if(current.length) pages.push(current);
+      document.body.removeChild(measurer);
+
+      function render(idx){
+        sidebar.innerHTML=pages[idx].join('');
+        const nav=document.createElement('div');nav.className='nav-btns';
+        if(idx>0){const back=document.createElement('button');back.textContent='⬅ Back';back.className='gb-btn back';back.onclick=()=>render(idx-1);nav.appendChild(back);}
+        if(idx<pages.length-1){const next=document.createElement('button');next.textContent='Next ➜';next.className='gb-btn next';next.onclick=()=>render(idx+1);nav.appendChild(next);}
+        sidebar.appendChild(nav);
+
+        /* Mia’s character image */
+        const charFrame=document.createElement('div');
+        charFrame.className='character-frame';
+        charFrame.innerHTML=`<img src="images/mia.png" alt="Mia the Inventor">`;
+        sidebar.appendChild(charFrame);
+      }
+      render(0);
+    }
+
+    paginateToWorkspaceHeight();
+    let _rt=null;
+    window.addEventListener('resize',()=>{clearTimeout(_rt);_rt=setTimeout(paginateToWorkspaceHeight,150);});
+
+    /* -------------------------------
+       4) Check-Your-Setup modal
+    --------------------------------*/
+    const modal=document.getElementById('solutionModalP2');
+    document.addEventListener('click',function(e){
+      if(e.target&&e.target.id==='check-setup-btnP2'){
+        modal.style.display='block';
+        modal.setAttribute('aria-hidden','false');
+        if(!window._solutionWorkspaceP2){
+          const wsDiv=document.getElementById('solutionWorkspaceP2');
+          window._solutionWorkspaceP2=Blockly.inject(wsDiv,{readOnly:true,scrollbars:true,toolbox:null});
+          Blockly.serialization.workspaces.load(solutionJson,window._solutionWorkspaceP2);
+        }
+      }
+      if(e.target&&(e.target.id==='solutionCloseP2'||e.target.id==='solutionCloseBtnP2')){
+        modal.style.display='none';
+        modal.setAttribute('aria-hidden','true');
+      }
+    });
+
+    if(typeof Glowbit.showIcon==='function') Glowbit.showIcon('lantern');
+    console.log('✅ Project 2 – Lantern Glow ready.');
+  })();
+  </script>
+</body>
+</html>
