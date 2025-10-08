@@ -53,12 +53,12 @@
 <body>
   <div class="gb-wrapper">
     <div class="gb-header">
-      🔢 <span class="highlight">(7) Liam’s GlowBit Number Blinker</span> — 
-      <span class="highlight">Make GlowBit count 1, 2, 3 like a smart robot!</span>
+      🔢 <span class="highlight">(7) Liam’s GlowBit Number Blinker</span> —
+      <span class="highlight">Make GlowBit blink 1, 2, 3 like a smart robot!</span>
     </div>
 
     <p class="gb-intro">
-      You’ll code GlowBit to show the numbers <strong>1</strong>, <strong>2</strong>, and <strong>3</strong> in a repeating loop. Press Button A to show “GO”, then watch GlowBit count like a data-loving robot!
+      You’ll code GlowBit to loop through <strong>“GO” → 1 → 2 → 3</strong> with pauses in between — like a robot counting data.
     </p>
 
     <div id="glowbit-project7-step1"></div>
@@ -79,71 +79,44 @@
     if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow,120);
 
     /* --- Correct Answer JSON ---
-       Top-level 1: on_button_pressed(A) -> show_text "GO"
-       Top-level 2: forever -> pause 500 -> show_number 1 -> pause 500 -> show_number 2 -> pause 500 -> show_number 3 -> pause 500
+       Single top-level stack:
+       forever → Clear → pause 500 → show_text "GO" → pause 500
+               → show_number 1 → pause 500
+               → show_number 2 → pause 500
+               → show_number 3 → pause 500
     */
-   const solutionJson = {
-  blocks: {
-    languageVersion: 0,
-    blocks: [
-      {
-        // When A is pressed: show "GO", wait, clear, then start looping 1→2→3
-        type: "on_button_pressed",
-        x: 20, y: 20,
-        fields: { BTN: "A" },
-        inputs: {
-          DO: {
-            block: {
-              type: "show_text",
-              fields: { TEXT: "GO" },
-              next: {
+    const solutionJson = {
+      blocks: {
+        languageVersion: 0,
+        blocks: [
+          {
+            type: "forever",
+            x: 20, y: 20,
+            inputs: {
+              DO: {
                 block: {
-                  type: "pause_block",
-                  fields: { MS: 500 },
+                  type: "clear_screen",
                   next: {
-                    block: {
-                      type: "clear_screen",
+                    block: { type: "pause_block", fields: { MS: 500 },
                       next: {
-                        block: {
-                          // Effectively-forever loop under the same handler
-                          type: "controls_repeat_ext",
-                          inputs: {
-                            TIMES: {
-                              block: {
-                                type: "math_number",
-                                fields: { NUM: 9999 }
-                              }
-                            },
-                            DO: {
-                              block: {
-                                type: "pause_block",
-                                fields: { MS: 500 },
-                                next: {
-                                  block: {
-                                    type: "show_number",
-                                    inputs: { NUM: { block: { type: "math_number", fields: { NUM: 1 } } } },
-                                    next: {
-                                      block: {
-                                        type: "pause_block",
-                                        fields: { MS: 500 },
-                                        next: {
-                                          block: {
-                                            type: "show_number",
-                                            inputs: { NUM: { block: { type: "math_number", fields: { NUM: 2 } } } },
-                                            next: {
-                                              block: {
-                                                type: "pause_block",
-                                                fields: { MS: 500 },
-                                                next: {
-                                                  block: {
-                                                    type: "show_number",
-                                                    inputs: { NUM: { block: { type: "math_number", fields: { NUM: 3 } } } },
-                                                    next: {
-                                                      block: {
-                                                        type: "pause_block",
-                                                        fields: { MS: 500 }
-                                                      }
-                                                    }
+                        block: { type: "show_text", fields: { TEXT: "GO" },
+                          next: {
+                            block: { type: "pause_block", fields: { MS: 500 },
+                              next: {
+                                block: { type: "show_number",
+                                  inputs: { NUM: { block: { type: "math_number", fields: { NUM: 1 } } } },
+                                  next: {
+                                    block: { type: "pause_block", fields: { MS: 500 },
+                                      next: {
+                                        block: { type: "show_number",
+                                          inputs: { NUM: { block: { type: "math_number", fields: { NUM: 2 } } } },
+                                          next: {
+                                            block: { type: "pause_block", fields: { MS: 500 },
+                                              next: {
+                                                block: { type: "show_number",
+                                                  inputs: { NUM: { block: { type: "math_number", fields: { NUM: 3 } } } },
+                                                  next: {
+                                                    block: { type: "pause_block", fields: { MS: 500 } }
                                                   }
                                                 }
                                               }
@@ -165,22 +138,21 @@
               }
             }
           }
-        }
+        ]
       }
-    ]
-  }
-};
+    };
+
     /* --- Lesson UI setup --- */
     const lesson = Glowbit.createLessonUI('glowbit-project7-step1',{title:'',instructions:'',pixelSize:28,defaultJson:null});
     if(lesson && lesson.workspace) lesson.workspace.clear();
 
-    /* --- Sidebar content --- */
+    /* --- Sidebar content (updated: no Button A) --- */
     const stepCards = [
 `<h3 style="text-align:center;color:#00A1D6;">Step 1: Show Number 1</h3>
  <div style="margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;">
  • From <strong>Basic</strong>, drag <strong>show number</strong> to the Workspace.<br>
  • From <strong>Math</strong>, drag a <strong>number</strong> (shows 0) and change it to <code>1</code>; snap it into <strong>show number</strong>.<br>
- • From <strong>Basic</strong>, add an <strong>on start</strong> with a <strong>Clear Screen</strong> then place <strong>show number 1</strong> inside to test.<br>
+ • From <strong>Basic</strong>, add <strong>on start</strong> with a <strong>Clear Screen</strong>, then place <strong>show number 1</strong> inside to test.<br>
  • Click <strong>Run</strong> — “1” scrolls across the LED grid.<br>
  💬 Liam: “GlowBit’s counting one like a pro!”<br><br>
  🧩 Remove <strong>show number</strong> from <strong>on start</strong> after testing.</div>`,
@@ -193,23 +165,23 @@
  💬 Liam: “GlowBit’s counting up like a smart robot!”<br><br>
  🧩 Remove them from <strong>on start</strong> after testing.</div>`,
 
-`<h3 style="text-align:center;color:#00A1D6;">Step 3: Start Counting with Button A and a Loop</h3>
+`<h3 style="text-align:center;color:#00A1D6;">Step 3: Build the Forever Counting Loop</h3>
  <div style="margin:10px 0;padding:10px;border-radius:8px;background:#00A1D6;color:#fff;">
- • From <strong>Input</strong>, drag <strong>on button A pressed</strong> and put <strong>show text "GO"</strong> inside it.<br>
- • From <strong>Basic</strong>, drag a <strong>forever</strong> loop (not inside the button).<br>
- • Inside <strong>forever</strong>, add:<br>
- &nbsp;&nbsp;① <strong>pause 500 ms</strong> → ② <strong>show number 1</strong> → ③ <strong>pause 500 ms</strong> → ④ <strong>show number 2</strong> → ⑤ <strong>pause 500 ms</strong> → ⑥ <strong>show number 3</strong> → ⑦ <strong>pause 500 ms</strong><br>
- • Click <strong>Run</strong>, press <strong>Button A</strong> to see “GO,” then watch 1 → 2 → 3 loop.<br>
+ • From <strong>Basic</strong>, drag a <strong>forever</strong> loop to the Workspace.<br>
+ • Inside <strong>forever</strong>, add in order:<br>
+ &nbsp;&nbsp;① <strong>Clear Screen</strong> → ② <strong>pause 500 ms</strong> → ③ <strong>show text "GO"</strong> → ④ <strong>pause 500 ms</strong><br>
+ &nbsp;&nbsp;⑤ <strong>show number 1</strong> → ⑥ <strong>pause 500 ms</strong> → ⑦ <strong>show number 2</strong> → ⑧ <strong>pause 500 ms</strong> → ⑨ <strong>show number 3</strong> → ⑩ <strong>pause 500 ms</strong><br>
+ • Click <strong>Run</strong> — watch “GO” then 1 → 2 → 3 repeat like a robot counting data.<br>
  💬 Liam: “GlowBit’s counting like a robot scientist!”<br><br>
- 🪄 Try variations: speed up (200 ms), slow down (1000 ms), or count even/odd numbers only.</div>`,
+ 🪄 Try variations: speed up (200 ms), slow down (1000 ms), count evens (2, 4, 6…) or odds (1, 3, 5…).</div>`,
 
 `<button id="check-setup-btnP7" class="gb-btn check">✅ Check Your Setup</button>
  <div class="didyouknow">
    💡 <strong>Did you know?</strong>
-   <p>📟 Elevators and scoreboards scroll numbers using LEDs — the same idea you just coded!</p>
-   <p>🧮 Sensors on robots count steps, rotations, and items on conveyor belts — numbers drive decisions.</p>
-   <p>🛰️ Satellites and space probes send streams of numbers to Earth; engineers read them to understand what’s happening.</p>
-   <p>🔁 Timing blocks (pauses) are used in real systems to pace messages and prevent overload — just like your 500 ms gaps.</p>
+   <p>📟 Elevators, scoreboards, and bus signs scroll numbers using LED matrices — just like your GlowBit!</p>
+   <p>🧮 Robots count steps, rotations, and items on conveyor belts — numbers drive real decisions.</p>
+   <p>🛰️ Satellites send streams of numbers (telemetry) to Earth — engineers read them to understand health and status.</p>
+   <p>⏱️ Timing (pauses) prevents overload and keeps information readable — exactly what your 500 ms gaps do.</p>
  </div>`
     ];
 
@@ -241,7 +213,7 @@
         if(i<pages.length-1){const n=document.createElement('button');n.textContent='Next ➜';n.className='gb-btn next';n.onclick=()=>render(i+1);nav.appendChild(n);}
         sidebar.appendChild(nav);
         const frame=document.createElement('div');frame.className='character-frame';
-        frame.innerHTML='<img src="images/Liam4.png" alt="Liam the Coder">';sidebar.appendChild(frame);
+        frame.innerHTML='<img src="images/Liam1.png" alt="Liam the Coder">';sidebar.appendChild(frame);
       }
       render(0);
     }
