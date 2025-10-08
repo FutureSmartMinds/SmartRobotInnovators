@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GlowBit Project 8 – Mia’s GlowBit Sound Alert</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Blockly + Glowbit core -->
+  <script src="lib/blockly_compressed.js"></script>
+  <script src="lib/blocks_compressed.js"></script>
+  <script src="lib/javascript_compressed.js"></script>
+  <script src="lib/msg/en.js"></script>
+  <script src="assets/global.js"></script>
+  <script src="lib/blockly_xml_patch.js"></script>
+
+  <style>
+    .gb-wrapper{max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
+    .gb-header{text-align:center;background:#e6f9ff;color:#00A1D6;font-size:22px;font-weight:800;
+                padding:6px 10px;border-radius:8px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+    .gb-header .highlight{color:#7B2CBF;}
+    .gb-intro{text-align:center;font-size:16px;line-height:1.5;margin:0 0 10px;color:#374151;
+               background:#e0f2fe;border-radius:6px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+    .didyouknow{margin-top:18px;background:#fef9c3;border:2px solid #facc15;padding:10px 12px;
+                border-radius:12px;color:#713f12;font-size:15px;font-weight:600;position:relative;
+                box-shadow:0 2px 5px rgba(0,0,0,0.06);}
+    .didyouknow::before{content:"";position:absolute;top:-10px;left:20px;border-width:0 10px 10px 10px;
+                         border-style:solid;border-color:transparent transparent #fef9c3 transparent;}
+    .didyouknow p{text-align:justify;margin:6px 0;}
+    .nav-btns{display:flex;justify-content:space-between;gap:8px;margin-top:10px;flex-wrap:wrap;}
+    .gb-btn{padding:8px 14px;border:none;border-radius:6px;font-weight:700;cursor:pointer;flex:1;text-align:center;}
+    .gb-btn.next{background:#00A1D6;color:#fff;}
+    .gb-btn.back{background:#6B7280;color:#fff;}
+    .gb-btn.check{background:#10B981;color:#fff;display:block;margin:12px auto 0;}
+    #solutionModalP8{display:none;position:fixed;top:60px;right:20px;width:640px;max-width:42%;
+                     background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.28);
+                     z-index:12000;overflow:hidden;user-select:none;}
+    #solutionHeaderP8{cursor:move;padding:10px 12px;background:#00A1D6;color:#fff;font-weight:700;
+                      text-align:left;border-radius:10px 10px 0 0;display:flex;justify-content:space-between;align-items:center;}
+    #solutionWorkspaceP8{height:360px;width:100%;border-top:1px solid #eee;background:#fafafa;}
+    #solutionFooterP8{text-align:center;padding:12px;background:#fff;}
+    #solutionFooterP8 button{background:#00A1D6;color:#fff;border:none;border-radius:8px;
+                              padding:8px 18px;cursor:pointer;font-weight:700;}
+    @media(max-width:900px){
+      #solutionModalP8{left:10px;right:10px;width:auto;max-width:calc(100% - 20px);top:40px;}
+      #solutionWorkspaceP8{height:260px;}
+    }
+    .character-frame{text-align:center;margin-top:18px;}
+    .character-frame img{width:85%;max-width:260px;height:auto;border-radius:12px;
+                         box-shadow:0 4px 12px rgba(0,0,0,0.25);object-fit:cover;}
+  </style>
+</head>
+
+<body>
+  <div class="gb-wrapper">
+    <div class="gb-header">
+      🔊 <span class="highlight">Mia’s GlowBit Sound Alert</span> —
+      <span class="highlight">Bright vs. dim flashes based on sound level!</span>
+    </div>
+
+    <p class="gb-intro">
+      You’ll code GlowBit to check the <strong>sound level</strong> and show a <strong>bright</strong> flash when it’s loud, or a <strong>dim</strong> flash when it’s quiet—just like a robot reacting to noise.
+    </p>
+
+    <div id="glowbit-project8-step1"></div>
+  </div>
+
+  <!-- Solution Modal -->
+  <div id="solutionModalP8" aria-hidden="true" role="dialog">
+    <div id="solutionHeaderP8">
+      <div>✅ Correct Setup — Sound Alert</div>
+      <button id="solutionCloseP8" title="Close">✕</button>
+    </div>
+    <div id="solutionWorkspaceP8" aria-label="Correct solution workspace"></div>
+    <div id="solutionFooterP8"><button id="solutionCloseBtnP8">Close</button></div>
+  </div>
+
+  <script>
+  (function waitForGlow(){
+    if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow,120);
+
+    /* --- Correct Answer JSON ---
+       forever:
+         if (sound_level > 120)
+           set_brightness 255
+           show_icon "square"   // full grid bright
+         else
+           set_brightness 50
+           show_icon "square"   // full grid dim
+           clear_screen
+         pause 500
+    */
+    const solutionJson = {
+      blocks: {
+        languageVersion: 0,
+        blocks: [
+          {
+            type: "forever",
+            x: 20, y: 20,
+            inputs: {
+              DO: {
+                block: {
+                  type: "controls_if",
+                  inputs: {
+                    IF0: {
+                      block: {
+                        type: "logic_compare",
+                        fields: { OP: "GT" },
+                        inputs: {
+                          A: { block: { type: "sound_level" } },
+                          B: { block: { type: "math_number", fields: { NUM: 120 } } }
+                        }
+                      }
+                    },
+                    DO0: {
+                      block: {
+                        type: "set_brightness",
+                        inputs: { VALUE: { block: { type: "math_number", fields: { NUM: 255 } } } },
+                        next: {
+                          block: { type: "show_icon", fields: { ICON: "square" } }
+                        }
+                      }
+                    },
+                    ELSE: {
+                      block: {
+                        type: "set_brightness",
+                        inputs: { VALUE: { block: { type: "math_number", fields: { NUM: 50 } } } },
+                        next: {
+                          block: {
+                            type: "show_icon",
+                            fields: { ICON: "square" },
+                            next: { block: { type: "clear_screen" } }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  next: { block: { type: "pause_block", fields: { MS: 500 } } }
+                }
+              }
+            }
+          }
+        ]
+      }
+    };
+
+    /* --- Lesson UI setup --- */
+    const lesson = Glowbit.createLessonUI('glowbit-project8-step1',{title:'',instructions:'',pixelSize:28,defaultJson:null});
+    if(lesson && lesson.workspace) lesson.workspace.clear();
+
+    /* --- Sidebar content (steps adapted to available blocks) --- */
+    const stepCards = [
+`<h3 style="text-align:center;color:#00A1D6;">Step 1: Set Up a Bright Flash</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;">
+ • From <strong>LED</strong>, drag <strong>set brightness</strong> and set it to <code>255</code> (max).<br>
+ • From <strong>Icon</strong>, drag <strong>show icon</strong> and choose <strong>square</strong> (fills the grid).<br>
+ • Test inside <strong>on start</strong>: add <strong>Clear Screen</strong>, then <strong>set brightness 255</strong> → <strong>show icon square</strong>.<br>
+ • Click <strong>Run</strong> — GlowBit shines super bright!<br>
+ 💬 Mia: “GlowBit’s shining super bright!”<br><br>
+ 🧩 After testing, remove these blocks from <strong>on start</strong>.</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Step 2: Add a Dim Flash</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#7B2CBF;color:#fff;">
+ • From <strong>LED</strong>, add another <strong>set brightness</strong> and set it to <code>50</code> (low).<br>
+ • Reuse <strong>show icon → square</strong> to light the whole grid dimly.<br>
+ • Test in <strong>on start</strong>: <strong>Clear Screen</strong> → <strong>set brightness 50</strong> → <strong>show icon square</strong>.<br>
+ 💬 Mia: “GlowBit’s got a cool, soft glow now!”<br><br>
+ 🧩 Remove the test blocks after you confirm it looks dim.</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Step 3: Check the Sound Level</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#00A1D6;color:#fff;">
+ • From <strong>Input</strong>, drag <strong>sound level</strong> (0–255).<br>
+ • To see its value, place it in <strong>show number</strong> (Basic) and put that inside <strong>on start</strong> temporarily.<br>
+ • Click <strong>Run</strong>, then use the microphone icon’s volume bar — the number changes with volume.<br>
+ 💬 Mia: “GlowBit’s hearing how loud we are!”<br><br>
+ 🧩 Remove the <strong>show number</strong> test after checking.</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Step 4: Make GlowBit React to Loud Sounds</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#10B981;color:#0f5132;">
+ • From <strong>Basic</strong>, drag a <strong>forever</strong> loop.<br>
+ • Inside it, add an <strong>if / else</strong> (Logic). Put a <strong>&gt;</strong> compare inside the <em>if</em>: <strong>sound level &gt; 120</strong>.<br>
+ • In the <em>if</em> (loud): <strong>set brightness 255</strong> → <strong>show icon square</strong>.<br>
+ • In the <em>else</em> (quiet): <strong>set brightness 50</strong> → <strong>show icon square</strong> → <strong>clear screen</strong>.<br>
+ • Add a <strong>pause 500 ms</strong> after the if/else so updates are readable.<br>
+ • Click <strong>Run</strong> and move the mic slider above/below 120 to see bright vs. dim alerts.<br>
+ 💬 Mia: “GlowBit’s shining bright when it’s loud!”</div>`,
+
+`<button id="check-setup-btnP8" class="gb-btn check">✅ Check Your Setup</button>
+ <div class="didyouknow">
+   💡 <strong>Did you know?</strong>
+   <p>🚨 Sound meters (like decibel meters) use LEDs to warn about loud environments—your logic is the same idea!</p>
+   <p>👂 Smart speakers use microphones to detect wake words; they also change LED brightness to show listening status.</p>
+   <p>🏭 In factories, “andon” lights change brightness or color when machines get too noisy or need attention.</p>
+   <p>🧪 Engineers use thresholds (like your 120) to trigger alerts—tuning the threshold and brightness helps people notice changes.</p>
+   <p>🛠️ Try variations: set brightness 200/20, or change the threshold to 80/150, or add a brief <em>beep</em> when it’s loud.</p>
+ </div>`
+    ];
+
+    /* --- Sidebar auto-pagination --- */
+    function paginate(){
+      const sidebar=document.querySelector('#glowbit-project8-step1 .glowbit-left');
+      if(!sidebar)return;
+      const editor=document.getElementById('glowbit-project8-step1-editor');
+      const targetH=(editor&&editor.offsetHeight)?editor.offsetHeight:520;
+      const meas=document.createElement('div');
+      meas.style.visibility='hidden';meas.style.position='absolute';meas.style.left='-9999px';meas.style.top='-9999px';
+      meas.style.width=(sidebar.clientWidth||320)+'px';document.body.appendChild(meas);
+      const pages=[];let current=[];const reserve=56;
+      stepCards.forEach(html=>{
+        const c=document.createElement('div');c.innerHTML=html;meas.appendChild(c);
+        const tooTall=meas.scrollHeight>(targetH-reserve);
+        if(tooTall){
+          if(current.length===0){pages.push([html]);meas.innerHTML='';}
+          else{pages.push([...current]);current=[html];meas.innerHTML='';
+            current.forEach(h=>{const d=document.createElement('div');d.innerHTML=h;meas.appendChild(d);});}
+        }else current.push(html);
+      });
+      if(current.length)pages.push(current);
+      document.body.removeChild(meas);
+      function render(i){
+        sidebar.innerHTML=pages[i].join('');
+        const nav=document.createElement('div');nav.className='nav-btns';
+        if(i>0){const b=document.createElement('button');b.textContent='⬅ Back';b.className='gb-btn back';b.onclick=()=>render(i-1);nav.appendChild(b);}
+        if(i<pages.length-1){const n=document.createElement('button');n.textContent='Next ➜';n.className='gb-btn next';n.onclick=()=>render(i+1);nav.appendChild(n);}
+        sidebar.appendChild(nav);
+        const frame=document.createElement('div');frame.className='character-frame';
+        frame.innerHTML='<img src="images/Mia3.png" alt="Mia the Maker">';sidebar.appendChild(frame);
+      }
+      render(0);
+    }
+    paginate();let _rt=null;
+    window.addEventListener('resize',()=>{clearTimeout(_rt);_rt=setTimeout(paginate,150);});
+
+    /* --- Modal logic --- */
+    const modal=document.getElementById('solutionModalP8');
+    document.addEventListener('click',function(e){
+      if(e.target&&e.target.id==='check-setup-btnP8'){
+        modal.style.display='block';
+        modal.setAttribute('aria-hidden','false');
+        if(!window._solutionWorkspaceP8){
+          const ws=document.getElementById('solutionWorkspaceP8');
+          window._solutionWorkspaceP8=Blockly.inject(ws,{readOnly:true,scrollbars:true,toolbox:null});
+          Blockly.serialization.workspaces.load(solutionJson,window._solutionWorkspaceP8);
+        }
+      }
+      if(e.target&&(e.target.id==='solutionCloseP8'||e.target.id==='solutionCloseBtnP8')){
+        modal.style.display='none';modal.setAttribute('aria-hidden','true');
+      }
+    });
+
+    console.log('✅ Project 8 – Sound Alert ready.');
+  })();
+  </script>
+</body>
+</html>
