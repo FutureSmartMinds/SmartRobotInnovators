@@ -64,6 +64,11 @@
   color:#374151;
   font-size:15px;
 }
+    #glowbit-project2-step1 .glowbit-left {
+  background-color: #FFF0F3;     /* light pinkish background */
+  border-radius: 8px;
+  padding: 6px;
+}
   </style>
 </head>
 
@@ -122,19 +127,35 @@
         }
       }
     };
-    const solutionJson={
-      "blocks":{
-        "languageVersion":0,
-        "blocks":[
-          {
-            "type":"on_start",
-            "x":40,"y":40,
-            "inputs":{"DO":{"block":{"type":"clear_screen","next":chainPlots(row)}}}
-          },
-          flickerChain.block
-        ]
+    const solutionJson = {
+  "blocks": {
+    "languageVersion": 0,
+    "blocks": [
+      {
+        "type": "forever",
+        "x": 40,
+        "y": 40,
+        "inputs": {
+          "DO": {
+            "block": {
+              "type": "clear_screen",
+              "next": {
+                "block": chainPlots(row),
+                "next": {
+                  "block": {
+                    "type": "pause",
+                    "fields": { "ms": 500 },
+                    "next": { "block": { "type": "clear_screen" } }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
-    };
+    ]
+  }
+};
 
     /* -------------------------------
        2) Create Lesson UI
