@@ -43,6 +43,8 @@
       tempoBPM: 120,         // for beats → ms (music)
       lastGesture: null,     // updated when gestures are triggered
       count: 0               // simple counter reporter
+       // NEW: simulated microphone level (0–255)
+  soundLevel: 30
     };
 
     // ---------- Polyfill missing fields (avoid registry warnings) ----------
@@ -472,6 +474,22 @@
         const btnB = button("Button B", "glowbit-btn event gb-button-b");
         const shakeBtn = button("Shake", "glowbit-btn secondary gb-button-shake");
         controls.append(runBtn, stopBtn, btnA, btnB, shakeBtn);
+         // --- Sound Level slider (0–255) ---
+const sndWrap = el("div", "glowbit-sound");
+sndWrap.innerHTML = `
+  <label style="font-weight:700;display:block;margin-top:6px;">🎤 Sound Level</label>
+  <input id="${containerId}-sound" type="range" min="0" max="255" value="${state.soundLevel||0}" style="width:100%">
+  <div style="font:12px/1.2 monospace;color:#334155;margin-top:2px;">
+    value: <span id="${containerId}-sound-val">${state.soundLevel||0}</span>
+  </div>`;
+controls.appendChild(sndWrap);
+
+const sndSlider = sndWrap.querySelector(`#${containerId}-sound`);
+const sndVal = sndWrap.querySelector(`#${containerId}-sound-val`);
+sndSlider.addEventListener("input", (e) => {
+  state.soundLevel = Number(e.target.value) || 0;
+  sndVal.textContent = state.soundLevel;
+});
 
         const canvasWrap = el("div", "glowbit-canvas-wrap");
         const canvas = document.createElement("canvas"); canvas.id = containerId + "-canvas"; canvas.className = "glowbit-canvas";
@@ -799,7 +817,7 @@
       reg("is_gesture", (b) => { const g=b.getFieldValue("GEST")||"screen_up"; return [`(Glowbit._state.lastGesture===${JSON.stringify(g)})`, G.ORDER_ATOMIC]; });
 
       // Sensors
-      reg("sound_level", () => [`Math.floor(Math.random()*200)`, G.ORDER_FUNCTION_CALL]);
+      reg("sound_level", () => [`(Glowbit._state.soundLevel|0)`, G.ORDER_ATOMIC]);
 
      // --- Music ---
 function beatsToMs(beats) {
