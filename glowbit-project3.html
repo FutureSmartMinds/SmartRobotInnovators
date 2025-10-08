@@ -86,11 +86,11 @@
       for(let i=coords.length-1;i>=0;i--){chain=makePlot(coords[i][0],coords[i][1],chain);}return chain;
     }
     function makeFlash(ms){
-      const after={type:"pause_block",fields:{ms:ms}};
-      const clear={type:"clear_screen",next:{block:after}};
-      const before={type:"pause_block",fields:{ms:ms},next:{block:clear}};
-      return makePlotRow(before);
-    }
+  const after = { type: "pause_block", fields: { MS: ms } };
+  const clear = { type: "clear_screen", next: { block: after } };
+  const before = { type: "pause_block", fields: { MS: ms }, next: { block: clear } };
+  return makePlotRow(before);
+}
     function repeat(times,body,next=null){
       return{type:"controls_repeat_ext",
         inputs:{TIMES:{block:{type:"math_number",fields:{NUM:times}}},DO:{block:body}},
