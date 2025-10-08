@@ -93,80 +93,73 @@
     }
 
     /* ---- Correct setup JSON (Button A → SOS loop) ---- */
-   const solutionJson = {
-  "blocks": {
-    "languageVersion": 0,
-    "blocks": [
+   <script>
+// ... everything above unchanged ...
+
+// --- Helper to make a plot block ---
+function makePlot(x, y, next = null) {
+  const block = { type: "plot", fields: { X: x, Y: y } };
+  if (next) block.next = { block: next };
+  return block;
+}
+
+// --- Helper to chain six plot blocks ---
+function makePlotRow(next = null) {
+  const coords = [[1,4],[2,4],[3,4],[4,4],[5,4],[6,4]];
+  let chain = next;
+  for (let i = coords.length - 1; i >= 0; i--) {
+    chain = makePlot(coords[i][0], coords[i][1], chain);
+  }
+  return chain;
+}
+
+// --- Helper to make the short/long flash sequence ---
+function makeFlash(pauseMs) {
+  // pause → clear → pause
+  const pauseAfter = { type: "pause_block", fields: { ms: pauseMs } };
+  const clear = { type: "clear_screen", next: { block: pauseAfter } };
+  const pauseBefore = { type: "pause_block", fields: { ms: pauseMs }, next: { block: clear } };
+  // six plots followed by pause-clear-pause
+  return makePlotRow(pauseBefore);
+}
+
+// --- Repeat block builder ---
+function repeat(times, body, next = null) {
+  return {
+    type: "controls_repeat_ext",
+    inputs: {
+      TIMES: { block: { type: "math_number", fields: { NUM: times } } },
+      DO: { block: body }
+    },
+    next: next ? { block: next } : undefined
+  };
+}
+
+// --- Build the 3-part SOS pattern ---
+const shortFlash = repeat(3, makeFlash(200));
+const longFlash = repeat(3, makeFlash(600), repeat(3, makeFlash(200))); // long → short chained
+
+// --- Final JSON ---
+const solutionJson = {
+  blocks: {
+    languageVersion: 0,
+    blocks: [
       {
-        "type": "on_button_pressed",
-        "fields": { "BTN": "A" },
-        "x": 20, "y": 20,
-        "inputs": {
-          "DO": {
-            "block": {
-              "type": "controls_repeat_ext",
-              "inputs": {
-                "TIMES": { "block": { "type": "math_number", "fields": { "NUM": 3 } } },
-                "DO": {
-                  "block": {
-                    "type": "plot", "fields": {"X":1,"Y":4},
-                    "next": { "block": { "type": "plot", "fields": {"X":2,"Y":4},
-                    "next": { "block": { "type": "plot", "fields": {"X":3,"Y":4},
-                    "next": { "block": { "type": "plot", "fields": {"X":4,"Y":4},
-                    "next": { "block": { "type": "plot", "fields": {"X":5,"Y":4},
-                    "next": { "block": { "type": "plot", "fields": {"X":6,"Y":4},
-                    "next": { "block": { "type": "pause_block", "fields": { "ms": 200 },
-                    "next": { "block": { "type": "clear_screen",
-                    "next": { "block": { "type": "pause_block", "fields": { "ms": 200 } } } } } } } } } } } } } }
-                }
-              },
-              "next": {
-                "block": {
-                  "type": "controls_repeat_ext",
-                  "inputs": {
-                    "TIMES": { "block": { "type": "math_number", "fields": { "NUM": 3 } } },
-                    "DO": {
-                      "block": {
-                        "type": "plot", "fields": {"X":1,"Y":4},
-                        "next": { "block": { "type": "plot", "fields": {"X":2,"Y":4},
-                        "next": { "block": { "type": "plot", "fields": {"X":3,"Y":4},
-                        "next": { "block": { "type": "plot", "fields": {"X":4,"Y":4},
-                        "next": { "block": { "type": "plot", "fields": {"X":5,"Y":4},
-                        "next": { "block": { "type": "plot", "fields": {"X":6,"Y":4},
-                        "next": { "block": { "type": "pause_block", "fields": { "ms": 600 },
-                        "next": { "block": { "type": "clear_screen",
-                        "next": { "block": { "type": "pause_block", "fields": { "ms": 600 } } } } } } } } } } } } } }
-                    }
-                  },
-                  "next": {
-                    "block": {
-                      "type": "controls_repeat_ext",
-                      "inputs": {
-                        "TIMES": { "block": { "type": "math_number", "fields": { "NUM": 3 } } },
-                        "DO": {
-                          "block": {
-                            "type": "plot", "fields": {"X":1,"Y":4},
-                            "next": { "block": { "type": "plot", "fields": {"X":2,"Y":4},
-                            "next": { "block": { "type": "plot", "fields": {"X":3,"Y":4},
-                            "next": { "block": { "type": "plot", "fields": {"X":4,"Y":4},
-                            "next": { "block": { "type": "plot", "fields": {"X":5,"Y":4},
-                            "next": { "block": { "type": "plot", "fields": {"X":6,"Y":4},
-                            "next": { "block": { "type": "pause_block", "fields": { "ms": 200 },
-                            "next": { "block": { "type": "clear_screen",
-                            "next": { "block": { "type": "pause_block", "fields": { "ms": 200 } } } } } } } } } } } } } }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+        type: "on_button_pressed",
+        fields: { BTN: "A" },
+        x: 20,
+        y: 20,
+        inputs: { DO: { block: shortFlash } }
       }
     ]
   }
 };
+
+// Chain the short → long → short
+shortFlash.next = { block: longFlash };
+
+// --- Done ---
+</script>
 
     /* --- Lesson setup --- */
     const lesson = Glowbit.createLessonUI('glowbit-project3-step1',
