@@ -83,54 +83,103 @@
        Top-level 2: forever -> pause 500 -> show_number 1 -> pause 500 -> show_number 2 -> pause 500 -> show_number 3 -> pause 500
     */
     const solutionJson = {
-      blocks: {
-        languageVersion: 0,
-        blocks: [
-          {
-            type: "on_button_pressed",
-            x: 20, y: 20,
-            fields: { BTN: "A" },
-            inputs: {
-              DO: {
-                block: {
-                  type: "show_text",
-                  fields: { TEXT: "GO" }
-                }
+  blocks: {
+    languageVersion: 0,
+    variables: [
+      { name: "counting", id: "counting" }
+    ],
+    blocks: [
+      /* on start: counting = false */
+      {
+        type: "on_start",
+        x: 20, y: 20,
+        inputs: {
+          DO: {
+            block: {
+              type: "variables_set",
+              fields: { VAR: { id: "counting", name: "counting" } },
+              inputs: {
+                VALUE: { block: { type: "logic_boolean", fields: { BOOL: "FALSE" } } }
               }
             }
-          },
-          {
-            type: "forever",
-            x: 280, y: 20,
-            inputs: {
-              DO: {
+          }
+        }
+      },
+
+      /* on button A: show "GO", pause 500, counting = true */
+      {
+        type: "on_button_pressed",
+        x: 280, y: 20,
+        fields: { BTN: "A" },
+        inputs: {
+          DO: {
+            block: {
+              type: "show_text",
+              fields: { TEXT: "GO" },
+              next: {
                 block: {
                   type: "pause_block",
                   fields: { MS: 500 },
                   next: {
                     block: {
-                      type: "show_number",
-                      inputs: { NUM: { block: { type: "math_number", fields: { NUM: 1 } } } },
-                      next: {
-                        block: {
-                          type: "pause_block",
-                          fields: { MS: 500 },
-                          next: {
-                            block: {
-                              type: "show_number",
-                              inputs: { NUM: { block: { type: "math_number", fields: { NUM: 2 } } } },
-                              next: {
-                                block: {
-                                  type: "pause_block",
-                                  fields: { MS: 500 },
-                                  next: {
-                                    block: {
-                                      type: "show_number",
-                                      inputs: { NUM: { block: { type: "math_number", fields: { NUM: 3 } } } },
-                                      next: {
-                                        block: {
-                                          type: "pause_block",
-                                          fields: { MS: 500 }
+                      type: "variables_set",
+                      fields: { VAR: { id: "counting", name: "counting" } },
+                      inputs: {
+                        VALUE: { block: { type: "logic_boolean", fields: { BOOL: "TRUE" } } }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+
+      /* forever: if counting then (pause→1→pause→2→pause→3→pause) */
+      {
+        type: "forever",
+        x: 20, y: 210,
+        inputs: {
+          DO: {
+            block: {
+              type: "controls_if",
+              inputs: {
+                IF0: {
+                  block: {
+                    type: "variables_get",
+                    fields: { VAR: { id: "counting", name: "counting" } }
+                  }
+                },
+                DO0: {
+                  block: {
+                    type: "pause_block",
+                    fields: { MS: 500 },
+                    next: {
+                      block: {
+                        type: "show_number",
+                        inputs: { NUM: { block: { type: "math_number", fields: { NUM: 1 } } } },
+                        next: {
+                          block: {
+                            type: "pause_block",
+                            fields: { MS: 500 },
+                            next: {
+                              block: {
+                                type: "show_number",
+                                inputs: { NUM: { block: { type: "math_number", fields: { NUM: 2 } } } },
+                                next: {
+                                  block: {
+                                    type: "pause_block",
+                                    fields: { MS: 500 },
+                                    next: {
+                                      block: {
+                                        type: "show_number",
+                                        inputs: { NUM: { block: { type: "math_number", fields: { NUM: 3 } } } },
+                                        next: {
+                                          block: {
+                                            type: "pause_block",
+                                            fields: { MS: 500 }
+                                          }
                                         }
                                       }
                                     }
@@ -147,9 +196,11 @@
               }
             }
           }
-        ]
+        }
       }
-    };
+    ]
+  }
+};
 
     /* --- Lesson UI setup --- */
     const lesson = Glowbit.createLessonUI('glowbit-project7-step1',{title:'',instructions:'',pixelSize:28,defaultJson:null});
