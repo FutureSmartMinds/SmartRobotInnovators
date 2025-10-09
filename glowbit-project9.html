@@ -122,46 +122,39 @@
       setTimeout(()=>Blockly.svgResize(lesson.workspace),0);
     }
 
-    /* ---------- Sidebar slides (emoji steps + exact tabs/blocks + Did You Know) ---------- */
-    const stepCards = [
-`<h3 style="text-align:center;color:#3730a3;">Step 1 — Test Arrows (one at a time)</h3>
-<div class="callout">
-  1️⃣ 🧰 <strong>Icon</strong> tab → drag <strong>show arrow</strong> block.<br>
-  2️⃣ 🔽 In the arrow menu, pick <strong>N (up)</strong>.<br>
-  3️⃣ ▶️ From <strong>Basic</strong> tab, drag <strong>on start</strong> and drop <em>show arrow (N)</em> inside it.<br>
-  4️⃣ ⏱ From <strong>Basic</strong>, add <strong>pause</strong> (set <code>MS = 500</code>) under it.<br>
-  5️⃣ 🧹 From <strong>Basic</strong>, add <strong>clear screen</strong> under the pause.<br>
-  6️⃣ ▶️ Click <strong>Run</strong> — you’ll see the up arrow, then clear!<br>
-  💬 Liam: “GlowBit’s pointing up!”<br><br>
-  🧪 Try changing the arrow menu to <strong>E</strong>, <strong>S</strong>, or <strong>W</strong> to see all directions.
-</div>`,
+  * Sidebar slides (include the Check button; global.js handles the modal) */
+const stepCards = [
 
-`<h3 style="text-align:center;color:#3730a3;">Step 2 — Map each Command to an Arrow</h3>
+`<h3 style="text-align:center;color:#3730a3;">Step 1 — Show an Up Arrow</h3>
 <div class="callout">
-  • 🟢 <strong>On Start</strong> → <strong>show arrow: E</strong> (right)<br>
-  • 🅰️ <strong>on button pressed (A)</strong> → <strong>show arrow: N</strong> (up)<br>
-  • 🅱️ <strong>on button pressed (B)</strong> → <strong>show arrow: S</strong> (down)<br>
-  • 📳 <strong>on shake</strong> → <strong>show arrow: W</strong> (left)
+ 🧰 Go to the <strong>Icon</strong> tab and drag a <strong>show arrow</strong> block.<br>
+ 🔽 Choose <strong>N</strong> (north/up).<br>
+ 🚀 Drag an <strong>on start</strong> block and place <em>show arrow → N</em> inside it.<br>
+ ▶️ Click <strong>Run</strong> to see the up arrow. Liam: “GlowBit’s pointing up!”
 </div>
-<div class="callout">
-  1️⃣ 🔘 From <strong>Input</strong>, drag <strong>on button pressed</strong> and set <strong>BTN = A</strong>.<br>
-  &nbsp;&nbsp;&nbsp;• From <strong>Basic</strong>, add <strong>pause</strong> (MS=500).<br>
-  &nbsp;&nbsp;&nbsp;• From <strong>Icon</strong>, add <strong>show arrow</strong> → pick <strong>N</strong>.<br>
-  &nbsp;&nbsp;&nbsp;• From <strong>Basic</strong>, add <strong>clear screen</strong>.<br><br>
-  2️⃣ 🔘 From <strong>Input</strong>, drag another <strong>on button pressed</strong> and set <strong>BTN = B</strong>.<br>
-  &nbsp;&nbsp;&nbsp;• Then <strong>pause (500)</strong> → <strong>show arrow: S</strong> → <strong>clear</strong>.<br><br>
-  3️⃣ 📳 From <strong>Input</strong>, drag <strong>on shake</strong>.<br>
-  &nbsp;&nbsp;&nbsp;• Then <strong>pause (500)</strong> → <strong>show arrow: W</strong> → <strong>clear</strong>.<br><br>
-  4️⃣ 🟢 From <strong>Basic</strong>, drag <strong>on start</strong>.<br>
-  &nbsp;&nbsp;&nbsp;• Then <strong>pause (500)</strong> → <strong>show arrow: E</strong> → <strong>clear</strong>.<br><br>
-  ✅ Press <strong>Run</strong>, then click <strong>Button A</strong>, <strong>Button B</strong>, or <strong>Shake</strong> to see each arrow!
-</div>`,
+<div class="callout"><span class="tip">Cleanup</span> Remove the test block from <em>on start</em> after you try it.</div>`,
 
-`<h3 style="text-align:center;color:#0e7490;">Step 3 — Bonus Shine (optional)</h3>
+`<h3 style="text-align:center;color:#3730a3;">Step 2 — Add Other Arrow Directions</h3>
 <div class="callout">
-  ✨ From <strong>LED</strong>, add <strong>set brightness</strong> before each arrow:<br>
-  • A/N = <code>200</code>, B/S = <code>120</code>, Shake/W = <code>80</code>, Start/E = <code>255</code>.<br>
-  (Use <strong>math number</strong> shadow if needed.)
+  1) Drag three more <strong>show arrow</strong> blocks. Set them to <strong>S</strong> (down), <strong>W</strong> (left), and <strong>E</strong> (right).<br>
+  2) Test each in <em>on start</em> (one at a time) and hit <strong>Run</strong>.<br>
+  3) Liam: “GlowBit can point all ways!”
+</div>
+<div class="callout"><span class="tip">Cleanup</span> Remove the extra test blocks from <em>on start</em>.</div>`,
+
+`<h3 style="text-align:center;color:#0e7490;">Step 3 — Map 4 Commands to 4 Arrows</h3>
+<div class="callout">
+  We’ll trigger arrows with four commands:<br>
+  • 🟢 <strong>On Start</strong> → <strong>E</strong> (right)<br>
+  • 🅰️ <strong>Button A</strong> → <strong>N</strong> (up)<br>
+  • 🅱️ <strong>Button B</strong> → <strong>S</strong> (down)<br>
+  • 📳 <strong>Shake</strong> → <strong>W</strong> (left)
+</div>
+<div>
+  1) From <strong>Input</strong> drag <strong>on button A pressed</strong> → add <em>pause 500</em> → <em>show arrow → N</em> → <em>clear</em>.<br>
+  2) Add <strong>on button B pressed</strong> → <em>pause</em> → <em>show arrow → S</em> → <em>clear</em>.<br>
+  3) Add <strong>on shake</strong> → <em>pause</em> → <em>show arrow → W</em> → <em>clear</em>.<br>
+  4) Add <strong>on start</strong> → <em>pause</em> → <em>show arrow → E</em> → <em>clear</em>.
 </div>`,
 
 `<div class="callout" style="text-align:center;">
@@ -170,15 +163,14 @@
 
 `<h3 style="text-align:center;color:#00A1D6;">Did You Know?</h3>
 <div class="callout">
-  🧭 <strong>Real life UIs</strong>: Phones and drones show arrows for direction and heading — we simulate that with buttons and shake.<br>
-  🚗 <strong>Car dashboards</strong>: Turn indicators and GPS prompts are just directional icons mapped to inputs (wheel buttons, sensors).<br>
-  🎮 <strong>Games</strong>: Controllers map inputs (A/B, tilt) to quick on-screen arrows — exactly what we built here!
+  • 🧭 Phones and drones use sensors to decide which arrow to show—our buttons/shake simulate that idea.<br>
+  • 🚗 GPS dashboards draw arrows to guide turns. We’re building the same behavior with kid-friendly inputs.<br>
+  • 🧠 Interfaces often offer multiple inputs for the same action: buttons, shake, or automatic checks.
 </div>
 <div class="callout">
-  <span class="tip">Try this</span> Add a <strong>forever</strong> loop that shows a tiny “idle” dot, and clear it when an input is pressed.
+  <span class="tip">Try this</span> Add <em>set brightness</em> before each arrow to make it brighter/dimmer depending on direction.
 </div>`
-    ];
-
+];
     /* ---------- Pagination (like your Project 8) ---------- */
     function paginate(){
       const sidebar = document.querySelector('#glowbit-project9 .glowbit-left');
