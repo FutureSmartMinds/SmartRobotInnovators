@@ -90,59 +90,66 @@
          pause 500
     */
     const solutionJson = {
-      blocks: {
-        languageVersion: 0,
-        blocks: [
-          {
-            type: "forever",
-            x: 20, y: 20,
-            inputs: {
-              DO: {
-                block: {
-                  type: "controls_if",
-                  inputs: {
-                    IF0: {
-                      block: {
-                        type: "logic_compare",
-                        fields: { OP: "GT" },
-                        inputs: {
-                          A: { block: { type: "sound_level" } },
-                          B: { block: { type: "math_number", fields: { NUM: 120 } } }
-                        }
+  blocks: {
+    languageVersion: 0,
+    blocks: [
+      {
+        type: "forever",
+        x: 20, y: 20,
+        inputs: {
+          DO: {
+            block: {
+              type: "controls_if",
+              inputs: {
+                IF0: {
+                  block: {
+                    type: "logic_compare",
+                    fields: { OP: "GT" },
+                    inputs: {
+                      A: { block: { type: "sound_level" } },
+                      B: { block: { type: "math_number", fields: { NUM: 120 } } }
+                    }
+                  }
+                },
+                DO0: {
+                  block: {
+                    type: "set_brightness",
+                    inputs: {
+                      VALUE: {
+                        shadow: { type: "math_number", fields: { NUM: 255 } }
                       }
                     },
-                    DO0: {
-                      block: {
-                        type: "set_brightness",
-                        inputs: { VALUE: { block: { type: "math_number", fields: { NUM: 255 } } } },
-                        next: {
-                          block: { type: "show_icon", fields: { ICON: "square" } }
-                        }
+                    next: {
+                      block: { type: "show_icon", fields: { ICON: "square" } }
+                    }
+                  }
+                },
+                ELSE: {
+                  block: {
+                    type: "set_brightness",
+                    inputs: {
+                      VALUE: {
+                        shadow: { type: "math_number", fields: { NUM: 50 } }
                       }
                     },
-                    ELSE: {
+                    next: {
                       block: {
-                        type: "set_brightness",
-                        inputs: { VALUE: { block: { type: "math_number", fields: { NUM: 50 } } } },
-                        next: {
-                          block: {
-                            type: "show_icon",
-                            fields: { ICON: "square" },
-                            next: { block: { type: "clear_screen" } }
-                          }
-                        }
+                        type: "show_icon",
+                        fields: { ICON: "square" },
+                        next: { block: { type: "clear_screen" } }
                       }
                     }
-                  },
-                  next: { block: { type: "pause_block", fields: { MS: 500 } } }
+                  }
                 }
-              }
+              },
+              next: { block: { type: "pause_block", fields: { MS: 500 } } }
             }
           }
-        ]
+        }
       }
-    };
-
+    ]
+  }
+};
     /* --- Lesson UI setup --- */
     const lesson = Glowbit.createLessonUI('glowbit-project8-step1',{title:'',instructions:'',pixelSize:28,defaultJson:null});
     if(lesson && lesson.workspace) lesson.workspace.clear();
