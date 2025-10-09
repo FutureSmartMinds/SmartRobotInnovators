@@ -63,11 +63,51 @@
   (function init(){
     if(!(window.Glowbit && window.Blockly)) return setTimeout(init,120);
 
-    // Create the standard two-column UI; workspace stays empty (right pane remains familiar)
+    <script>
+  (function init(){
+    if(!(window.Glowbit && window.Blockly)) return setTimeout(init,120);
+
+    // ✅ Starter program so Button A does something right away
+    const starterJson = {
+      blocks: {
+        languageVersion: 0,
+        blocks: [
+          {
+            type: "on_button_pressed",
+            fields: { BUTTON: "A" },
+            x: 20, y: 20,
+            inputs: {
+              DO: {
+                block: {
+                  type: "show_icon",
+                  fields: { ICON: "heart" },
+                  next: {
+                    block: {
+                      type: "pause_block", fields: { MS: 500 },
+                      next: { block: { type: "clear_screen" } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    };
+
+    // Build the standard UI shell (no defaultJson here)
     const lesson = Glowbit.createLessonUI('glowbit-logic-playground', {
-      title: '', instructions: '', pixelSize: 28, defaultJson: { blocks:{ languageVersion:0, blocks:[] } }
+      title: '',
+      instructions: '',
+      pixelSize: 28,
+      defaultJson: null
     });
-    if (lesson && lesson.workspace) lesson.workspace.clear();
+
+    // Clear once, then load our starter program
+    if (lesson && lesson.workspace) {
+      lesson.workspace.clear();
+      Blockly.serialization.workspaces.load(starterJson, lesson.workspace);
+    }
 
     // Sidebar content with inline SVG hints (gear + compare)
     const stepCards = [
