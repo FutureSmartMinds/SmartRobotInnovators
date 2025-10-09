@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>(9) Liam’s GlowBit Tilt Navigator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Same script order as your working projects -->
+  <script src="lib/blockly_compressed.js"></script>
+  <script src="lib/blocks_compressed.js"></script>
+  <script src="lib/javascript_compressed.js"></script>
+  <script src="lib/msg/en.js"></script>
+  <script src="assets/global.js"></script>
+  <script src="lib/blockly_xml_patch.js"></script>
+
+  <style>
+    .gb-wrapper{max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
+    .gb-header{
+      text-align:center;background:#eef2ff;color:#3730a3;font-size:22px;font-weight:800;
+      padding:10px 12px;border-radius:12px;margin:8px 0 6px;box-shadow:0 1px 4px rgba(0,0,0,0.08);
+    }
+    .gb-subhead{
+      text-align:center;background:#ecfeff;color:#0e7490;font-size:16px;font-weight:800;
+      padding:8px 12px;border-radius:10px;margin:0 0 10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .callout{background:#f1f5f9;border-left:6px solid #64748b;padding:8px 10px;border-radius:8px;color:#0f172a;margin:8px 0;}
+    .tip{display:inline-block;background:#fde68a;color:#92400e;border:1px solid #f59e0b;border-radius:6px;padding:2px 6px;font-size:12px;font-weight:800;}
+
+    .nav-btns{display:flex;justify-content:space-between;gap:8px;margin-top:10px;flex-wrap:wrap;}
+    .gb-btn{padding:8px 14px;border:none;border-radius:6px;font-weight:700;cursor:pointer;flex:1;text-align:center;}
+    .gb-btn.next{background:#00A1D6;color:#fff;}
+    .gb-btn.back{background:#6B7280;color:#fff;}
+
+    .character-frame{text-align:center;margin-top:18px;}
+    .character-frame img{
+      width:85%;max-width:260px;height:auto;border-radius:12px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.25);object-fit:cover;
+    }
+
+    /* Ensure the editor is visible */
+    #glowbit-project9-editor{height:560px;min-height:560px;background:#fff;}
+  </style>
+</head>
+
+<body>
+  <div class="gb-wrapper">
+    <div class="gb-header">(9) Liam’s GlowBit Tilt Navigator</div>
+    <div class="gb-subhead">Let’s make GlowBit point arrows when we shake it!</div>
+
+    <!-- Standard lesson shell -->
+    <div id="glowbit-project9"></div>
+  </div>
+
+  <script>
+  (function boot(){
+    if(!(window.Glowbit && window.Blockly)) return setTimeout(boot,120);
+
+    /* Create standard two-column UI (same as Project 8). Keep defaultJson non-null. */
+    const lesson = Glowbit.createLessonUI('glowbit-project9', {
+      title: '',
+      instructions: '',
+      pixelSize: 28,
+      defaultJson: { blocks:{ languageVersion:0, blocks:[] } }
+    });
+    if (lesson && lesson.workspace) lesson.workspace.clear();
+
+    /* ---------- Step cards (sidebar) ---------- */
+    const stepCards = [
+
+`<h3 style="text-align:center;color:#3730a3;">Step 1 — Show an Up Arrow</h3>
+<div class="callout">
+  1) 🧰 Go to <strong>Basic</strong> and drag a <strong>show text</strong> block.<br>
+  2) ✍️ Click its text and type the up arrow: <strong>↑</strong> (you can also type "UP").<br>
+  3) 🚀 Drag an <strong>on start</strong> block and place <em>show text ↑</em> inside it.<br>
+  4) ▶️ Click <strong>Run</strong> to see the arrow scroll. Liam: “GlowBit’s pointing up!”
+</div>
+<div class="callout"><span class="tip">Cleanup</span> Remove <em>show text ↑</em> from <em>on start</em> after testing.</div>`,
+
+`<h3 style="text-align:center;color:#3730a3;">Step 2 — Add Other Directions</h3>
+<div class="callout">
+  1) Drag three more <strong>show text</strong> blocks and set them to: <strong>↓</strong> (down), <strong>←</strong> (left), <strong>→</strong> (right).<br>
+  2) Test each by putting it in <em>on start</em> (one at a time) and hitting <strong>Run</strong>.<br>
+  3) Liam: “GlowBit can point all ways!”<br>
+</div>
+<div class="callout"><span class="tip">Cleanup</span> Remove extra test blocks from <em>on start</em> after testing.</div>`,
+
+`<h3 style="text-align:center;color:#0e7490;">Step 3 — Commands for Each Arrow</h3>
+<div class="callout">
+  We’ll map 4 commands to 4 arrows:<br>
+  • 🅰️ <strong>Button A</strong> → <strong>↑</strong><br>
+  • 🅱️ <strong>Button B</strong> → <strong>↓</strong><br>
+  • 📳 <strong>Shake</strong> → <strong>←</strong><br>
+  • 🟢 <strong>On Start</strong> → <strong>→</strong> (so we have all 4 directions)
+</div>
+<div>
+  1) From <strong>Input</strong> drag <strong>on button A pressed</strong> and drop a <em>show text ↑</em> inside.<br>
+  2) Add <strong>on button B pressed</strong> → <em>show text ↓</em>.<br>
+  3) Add <strong>on shake</strong> → <em>show text ←</em>.<br>
+  4) Add <strong>on start</strong> → <em>show text →</em>.<br>
+  Optional: after each arrow, add <em>pause (ms) 500</em> then <em>clear screen</em> for a blink effect.
+</div>`,
+
+`<h3 style="text-align:center;color:#0e7490;">Step 4 — (Optional) Conditions</h3>
+<div class="callout">
+  Want arrows to blink until you interact again? Use a <strong>forever</strong> loop with conditional blocks:<br>
+  • Example: If you want a status arrow when <em>sound level &gt; 120</em>, <em>show text →</em> else <em>←</em>.<br>
+  Keep it simple for now—your command arrows above already do the job.
+</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Did You Know?</h3>
+<div class="callout">
+  • 🧭 Phones and drones show arrows based on orientation—just like our GlowBit compass idea!<br>
+  • 🚗 GPS dashboards use arrows to guide turns. We’re mimicking that with button commands.<br>
+  • 🧠 Interfaces often offer <em>multiple inputs</em> for one action: buttons, shake, or automatic checks.
+</div>
+<div class="callout">
+  <span class="tip">Try this</span> Change the arrows to words ("UP", "DOWN", "LEFT", "RIGHT"), or add <em>set brightness</em> before each arrow for emphasis.
+</div>`
+    ];
+
+    /* ---------- Auto-pagination (same as Project 8) ---------- */
+    function paginate(){
+      const sidebar = document.querySelector('#glowbit-project9 .glowbit-left');
+      if(!sidebar) return;
+      const editor = document.getElementById('glowbit-project9-editor');
+      const targetH = (editor && editor.offsetHeight) ? editor.offsetHeight : 520;
+
+      const meas = document.createElement('div');
+      meas.style.visibility='hidden'; meas.style.position='absolute';
+      meas.style.left='-9999px'; meas.style.top='-9999px';
+      meas.style.width = (sidebar.clientWidth || 320) + 'px';
+      document.body.appendChild(meas);
+
+      const pages = []; let current = []; const reserve = 56;
+      stepCards.forEach(html=>{
+        const c = document.createElement('div'); c.innerHTML = html; meas.appendChild(c);
+        const tooTall = meas.scrollHeight > (targetH - reserve);
+        if(tooTall){
+          if(current.length===0){ pages.push([html]); meas.innerHTML=''; }
+          else {
+            pages.push([...current]); current=[html]; meas.innerHTML='';
+            current.forEach(h=>{ const d=document.createElement('div'); d.innerHTML=h; meas.appendChild(d); });
+          }
+        } else current.push(html);
+      });
+      if(current.length) pages.push(current);
+      document.body.removeChild(meas);
+
+      function render(i){
+        sidebar.innerHTML = pages[i].join('');
+        const nav=document.createElement('div');nav.className='nav-btns';
+        if(i>0){const b=document.createElement('button');b.textContent='⬅ Back';b.className='gb-btn back';b.onclick=()=>render(i-1);nav.appendChild(b);}
+        if(i<pages.length-1){const n=document.createElement('button');n.textContent='Next ➜';n.className='gb-btn next';n.onclick=()=>render(i+1);nav.appendChild(n);}
+        sidebar.appendChild(nav);
+
+        const frame=document.createElement('div');frame.className='character-frame';
+        frame.innerHTML='<img src="images/GlowBit3.png" alt="GlowBit buddy">';sidebar.appendChild(frame);
+      }
+      render(0);
+    }
+    paginate();
+
+    /* ---------- Correct Setup (solution) ---------- 
+       Uses only blocks you already have:
+       - on_start, on_button_pressed (BTN A/B), on_shake
+       - show_text, pause_block (MS), clear_screen
+    ----------------------------------------------- */
+    function seqShow(str){
+      return {
+        type:"show_text", fields:{ TEXT:str },
+        next:{ block:{ type:"pause_block", fields:{ MS:500 },
+          next:{ block:{ type:"clear_screen" } } } }
+      };
+    }
+
+    const solutionJson = {
+      blocks:{ languageVersion:0, blocks:[
+        { /* Show RIGHT at start so we have the 4th direction */
+          type:"on_start", x:18, y:18,
+          inputs:{ DO:{ block: seqShow("→") } }
+        },
+        {
+          type:"on_button_pressed", x:18, y:160, fields:{ BTN:"A" },
+          inputs:{ DO:{ block: seqShow("↑") } }
+        },
+        {
+          type:"on_button_pressed", x:18, y:300, fields:{ BTN:"B" },
+          inputs:{ DO:{ block: seqShow("↓") } }
+        },
+        {
+          type:"on_shake", x:18, y:440,
+          inputs:{ DO:{ block: seqShow("←") } }
+        }
+      ]}
+    };
+
+    /* Load the solution into the modal + preload a helpful starter on the workspace */
+    if (lesson && lesson.workspace) {
+      // Starter on the workspace (optional): just Button A (↑) so kids can add the rest
+      const starter = {
+        blocks:{ languageVersion:0, blocks:[
+          { type:"on_button_pressed", x:20, y:20, fields:{ BTN:"A" },
+            inputs:{ DO:{ block: seqShow("↑") } } }
+        ]}
+      };
+      Blockly.serialization.workspaces.load(starter, lesson.workspace);
+      setTimeout(()=>Blockly.svgResize(lesson.workspace),0);
+    }
+    // Expose solutionJson for your global “Check Your Setup” modal
+    window.solutionJson = solutionJson;
+
+    // Simple resize handler
+    window.addEventListener('resize', ()=>{
+      paginate();
+      if (lesson && lesson.workspace) Blockly.svgResize(lesson.workspace);
+    });
+
+    console.log('✅ Project 9 – Tilt Navigator ready.');
+  })();
+  </script>
+</body>
+</html>
