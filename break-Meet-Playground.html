@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Meet GlowBit in the Playground — Learn to drag colorful blocks to code!</title>
+  <title>🌈 Welcome to the GlowBit Playground!</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Same script order as your working project pages -->
@@ -17,7 +17,7 @@
     /* Match project container */
     .gb-wrapper{max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
 
-    /* Distinct header/subhead look for “break” pages */
+    /* Distinct header/subhead look */
     .gb-header{
       text-align:center;background:#FFF4E5;color:#A14A00;font-size:22px;font-weight:800;
       padding:10px 12px;border-radius:12px;margin:8px 0 6px;box-shadow:0 1px 4px rgba(0,0,0,0.08);
@@ -27,7 +27,6 @@
       padding:8px 12px;border-radius:10px;margin:0 0 10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);
     }
 
-    /* Small utility styles used in slides */
     .callout{background:#ecfeff;border-left:6px solid #06b6d4;padding:8px 10px;border-radius:8px;color:#0f172a;margin:8px 0;}
     .tip{display:inline-block;background:#fde68a;color:#92400e;border:1px solid #f59e0b;border-radius:6px;padding:2px 6px;font-size:12px;font-weight:800;}
     .kbd{display:inline-block;padding:2px 6px;border-radius:4px;border:1px solid #94a3b8;background:#f8fafc;color:#0f172a;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:12px;}
@@ -51,10 +50,10 @@
 
 <body>
   <div class="gb-wrapper">
-    <div class="gb-header">✨ Meet GlowBit in the Playground</div>
-    <div class="gb-subhead">Learn to drag colorful blocks to create code!</div>
+    <div class="gb-header">🌈 Welcome to the GlowBit Playground!</div>
+    <div class="gb-subhead">Drag colorful blocks and watch your robot come alive.</div>
 
-    <!-- Standard lesson shell (identical pattern to Project 8 / Logic break) -->
+    <!-- Standard lesson shell -->
     <div id="break-Meet-Playground"></div>
   </div>
 
@@ -62,7 +61,7 @@
   (function boot(){
     if(!(window.Glowbit && window.Blockly)) return setTimeout(boot,120);
 
-    /* Create the standard two-column UI (IMPORTANT: non-null defaultJson) */
+    /* Create the standard two-column UI (non-null defaultJson so toolbox shows) */
     const lesson = Glowbit.createLessonUI('break-Meet-Playground', {
       title: '',
       instructions: '',
@@ -71,85 +70,122 @@
     });
     if (lesson && lesson.workspace) lesson.workspace.clear();
 
-    /* --- Sidebar content (detailed intro slides) --- */
+    /* Starter: On Start → Brightness 255 → Show Text "HELLO!" → Pause 500 → Clear */
+    const starterJson = {
+      blocks:{
+        languageVersion:0,
+        blocks:[
+          {
+            type:"on_start",
+            x:20, y:20,
+            inputs:{
+              DO:{
+                block:{
+                  type:"set_brightness",
+                  inputs:{
+                    VALUE:{
+                      shadow:{ type:"math_number", fields:{ NUM:255 } }
+                    }
+                  },
+                  next:{ block:{
+                    type:"show_text", fields:{ TEXT:"HELLO!" },
+                    next:{ block:{
+                      type:"pause_block", fields:{ MS:500 },
+                      next:{ block:{ type:"clear_screen" } }
+                    }}
+                  }}
+                }
+              }
+            }
+          }
+        ]
+      }
+    };
+
+    /* Load the starter blocks & nudge layout */
+    if (lesson && lesson.workspace) {
+      Blockly.serialization.workspaces.load(starterJson, lesson.workspace);
+      setTimeout(()=>Blockly.svgResize(lesson.workspace), 0);
+    }
+
+    /* Sidebar content (with emoji bullets) */
     const stepCards = [
 
-`<h3 style="text-align:center;color:#A14A00;">Welcome to Your Coding Playground!</h3>
+`<h3 style="text-align:center;color:#A14A00;">👋 Meet Your Coding Playground!</h3>
 <div class="callout">
   This page is your safe place to explore. Try buttons, drag blocks, and see the GlowBit grid respond in real time.
 </div>
 <ul style="margin-left:18px;">
-  <li><strong>Simulator</strong>: The live preview that shows what your code does.</li>
-  <li><strong>8×8 LED Grid</strong> (GlowBit face): Where patterns, icons, and messages appear.</li>
-  <li><strong>Toolbox</strong>: A menu with colorful tabs like <em>Basic</em>, <em>LED</em>, and <em>Input</em>. Each tab has blocks you can drag.</li>
-  <li><strong>Workspace</strong>: Your canvas. Snap blocks together to build programs.</li>
+  <li>🖥️ <strong>Simulator</strong>: The live preview that shows what your code does.</li>
+  <li>🟩 <strong>8×8 LED Grid</strong> (GlowBit face): Where patterns, icons, and messages appear.</li>
+  <li>🧰 <strong>Toolbox</strong>: Colorful tabs like <em>Basic</em>, <em>LED</em>, and <em>Input</em>. Drag blocks from here.</li>
+  <li>🧩 <strong>Workspace</strong>: Your canvas. Snap blocks together to build programs.</li>
 </ul>
 <div class="callout">
   <span class="tip">Try it!</span> Open the Toolbox and drag a block onto the Workspace.
 </div>`,
 
-`<h3 style="text-align:center;color:#0F766E;">Meet the Toolbox Tabs</h3>
+`<h3 style="text-align:center;color:#0F766E;">🗂️ Explore the Toolbox</h3>
 <div style="background:#f1f5f9;border-radius:8px;padding:10px;">
-  <p><strong>Basic</strong>: Core blocks like <em>show text</em> and <em>pause</em>.</p>
-  <p><strong>LED</strong>: Brightness, show LEDs, and LED effects.</p>
-  <p><strong>Input</strong>: Button A/B, shake, and sound level.</p>
-  <p><strong>Logic</strong>: If–Then–Else and Compare (=&nbsp;&lt;&nbsp;&gt;).</p>
-  <p><strong>Math</strong>: Numbers to feed into blocks (like 50, 255, or 120).</p>
+  <p>🟦 <strong>Basic</strong>: Core blocks like <em>show text</em> and <em>pause</em>.</p>
+  <p>💡 <strong>LED</strong>: Brightness and LED patterns.</p>
+  <p>🎛️ <strong>Input</strong>: Button A/B, shake, and sound level.</p>
+  <p>🔀 <strong>Logic</strong>: If–Then–Else and Compare (=&nbsp;&lt;&nbsp;&gt;).</p>
+  <p>🔢 <strong>Math</strong>: Numbers to feed into blocks (50, 255, 120…).</p>
 </div>
 <div class="callout">
-  <span class="tip">Pro tip</span> You can mix blocks from different tabs. For example, use <em>Input → Button A</em> with <em>Basic → show text</em>.
+  <span class="tip">Pro tip</span> Mix blocks! Example: <em>Input → on button A</em> with <em>Basic → show text</em>.
 </div>`,
 
-`<h3 style="text-align:center;color:#A14A00;">Workspace: Your Build Area</h3>
+`<h3 style="text-align:center;color:#A14A00;">🧱 Workspace Tips</h3>
 <div style="background:#fff7ed;border:1px solid #fdba74;border-radius:8px;padding:10px;">
   <ul style="margin-left:18px;">
-    <li><strong>Drag &amp; drop</strong>: Pull blocks from the Toolbox onto the Workspace.</li>
-    <li><strong>Snap together</strong>: Wait for the white highlight—then release to connect.</li>
-    <li><strong>Move around</strong>: Click and drag the background to pan.</li>
-    <li><strong>Zoom</strong>: Use your trackpad/pinch or <span class="kbd">Ctrl</span> + mouse wheel.</li>
-    <li><strong>Delete</strong>: Drag a block back to the Toolbox, or select and press <span class="kbd">Delete</span>.</li>
-    <li><strong>Undo/Redo</strong>: <span class="kbd">Ctrl</span>+<span class="kbd">Z</span> / <span class="kbd">Ctrl</span>+<span class="kbd">Y</span>.</li>
+    <li>🖱️ <strong>Drag &amp; drop</strong>: Pull blocks from Toolbox to Workspace.</li>
+    <li>🧲 <strong>Snap</strong>: Wait for the white glow—then release to connect.</li>
+    <li>🧭 <strong>Pan</strong>: Drag the background to move around.</li>
+    <li>🔍 <strong>Zoom</strong>: Trackpad pinch or <span class="kbd">Ctrl</span> + mouse wheel.</li>
+    <li>🗑️ <strong>Delete</strong>: Drag back to Toolbox, or select + <span class="kbd">Delete</span>.</li>
+    <li>↩️ <strong>Undo/Redo</strong>: <span class="kbd">Ctrl</span>+<span class="kbd">Z</span> / <span class="kbd">Ctrl</span>+<span class="kbd">Y</span>.</li>
   </ul>
 </div>`,
 
-`<h3 style="text-align:center;color:#0F766E;">Buttons & Controls</h3>
+`<h3 style="text-align:center;color:#0F766E;">🎮 Buttons & Controls</h3>
 <div style="background:#ecfeff;border:1px solid #67e8f9;border-radius:8px;padding:10px;">
   <ul style="margin-left:18px;">
-    <li><strong>Run</strong>: Starts your program and activates button/gesture handlers.</li>
-    <li><strong>Stop</strong>: Halts animation/sounds and clears timers.</li>
-    <li><strong>Button A / Button B</strong>: Use <em>Input → on button A/B pressed</em> to react when you click A or B.</li>
-    <li><strong>Shake</strong>: Use <em>Input → on shake</em>, then click the “Shake” control in the simulator.</li>
-    <li><strong>Sound level</strong>: Use the mic slider to simulate volume from 0–255.</li>
+    <li>▶️ <strong>Run</strong>: Starts your program (activates button & gesture handlers).</li>
+    <li>⏹️ <strong>Stop</strong>: Halts animation/sounds and clears timers.</li>
+    <li>🅰️ <strong>Button A / B</strong>: Use <em>Input → on button A/B pressed</em> then click A/B.</li>
+    <li>📳 <strong>Shake</strong>: Use <em>Input → on shake</em>, then click <em>Shake</em> in the simulator.</li>
+    <li>🎙️ <strong>Sound level</strong>: Use the mic slider (0–255) to simulate quiet/loud.</li>
   </ul>
 </div>
 <div class="callout">
-  <span class="tip">Try it!</span> Make a program: <em>on button A pressed → show icon heart → pause → clear screen</em>. Click <strong>Run</strong>, then press <strong>A</strong>.
+  <span class="tip">Try it!</span> Make: <em>on button A pressed → show icon heart → pause 400 → clear</em>. Click <strong>Run</strong>, then press <strong>A</strong>.
 </div>`,
 
-`<h3 style="text-align:center;color:#A14A00;">GlowBit’s 8×8 LED Grid</h3>
+`<h3 style="text-align:center;color:#A14A00;">🔆 GlowBit’s 8×8 LED Grid</h3>
 <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px;">
-  <p>The grid is 8 pixels wide by 8 pixels tall. Icons and text scroll across it when you use <em>show icon</em> or <em>show text</em>.</p>
-  <p>Brightness goes from <strong>0</strong> (off) to <strong>255</strong> (max). Try <em>LED → set brightness</em>!</p>
+  <p>The grid is 8×8 pixels. Text scrolls; icons draw instantly. Brightness ranges <strong>0</strong> (off) → <strong>255</strong> (max).</p>
 </div>
 <div class="callout">
-  <span class="tip">Mini challenge</span> Set brightness to <strong>200</strong>, show the heart icon, wait 400 ms, then clear the screen.
+  <span class="tip">Mini challenge</span> Change “HELLO!” to your name, or add <em>show icon → heart</em> before clearing.
 </div>`,
 
-`<h3 style="text-align:center;color:#0F766E;">Ready to Explore!</h3>
+`<h3 style="text-align:center;color:#0F766E;">🚀 Ready to Explore!</h3>
 <div class="callout">
-  Keep this Playground page open while you learn the 8 simple steps. Come back anytime to try ideas and practice.
+  Keep this Playground open while you learn the 8 simple steps. Come back anytime to try ideas and practice.
 </div>
 <ul style="margin-left:18px;">
-  <li>Try <em>Basic → show text “HI!”</em></li>
-  <li>Try <em>Input → on shake</em> with <em>show icon → smile</em></li>
-  <li>Try <em>Logic → if</em> with a <em>compare</em> (<span class="kbd">&lt;</span> <span class="kbd">&gt;</span> <span class="kbd">=</span>)</li>
+  <li>💬 Try <em>Basic → show text “HI!”</em></li>
+  <li>📳 Try <em>Input → on shake</em> with <em>show icon → smile</em></li>
+  <li>🧠 Try <em>Logic → if</em> with a <em>compare</em> (<span class="kbd">&lt;</span> <span class="kbd">&gt;</span> <span class="kbd">=</span>)</li>
 </ul>
 <div class="callout">
   <strong>Next:</strong> Head to your “8 Simple Steps” page when you’re ready!
 </div>`
     ];
 
-    /* Sidebar auto-pagination (same mechanism as other pages) */
+    /* Sidebar auto-pagination */
     function paginate(){
       const sidebar = document.querySelector('#break-Meet-Playground .glowbit-left');
       if(!sidebar) return;
@@ -192,7 +228,7 @@
     }
     paginate();
 
-    // Simple resize handler (no timers)
+    // Simple resize handler
     window.addEventListener('resize', ()=>{
       paginate();
       if (lesson && lesson.workspace) Blockly.svgResize(lesson.workspace);
