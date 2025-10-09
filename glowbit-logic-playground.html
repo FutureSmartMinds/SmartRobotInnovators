@@ -59,28 +59,51 @@
     <div id="glowbit-logic-playground"></div>
   </div>
 
-  <script>
+<script>
   (function init(){
     if(!(window.Glowbit && window.Blockly)) return setTimeout(init,120);
 
-    // ✅ Starter program so Button A does something right away
+    // ✅ Starter program (works whether field is "BUTTON" or "BTN")
+    //    Also shows the *correct* structure: Event → If–Then–Else inside
     const starterJson = {
       blocks: {
         languageVersion: 0,
         blocks: [
           {
             type: "on_button_pressed",
-            fields: { BUTTON: "A" },
+            // set both; Blockly will ignore the unknown one and use the right one
+            fields: { BUTTON: "A", BTN: "A" },
             x: 20, y: 20,
             inputs: {
               DO: {
                 block: {
-                  type: "show_icon",
-                  fields: { ICON: "heart" },
-                  next: {
-                    block: {
-                      type: "pause_block", fields: { MS: 500 },
-                      next: { block: { type: "clear_screen" } }
+                  type: "controls_if",
+                  extraState: { elseIfCount: 0, hasElse: true },
+                  inputs: {
+                    // Placeholder condition so kids can see it work immediately.
+                    // They can replace this with (sound level > 120), etc.
+                    IF0: { block: { type: "logic_boolean", fields: { BOOL: "TRUE" } } },
+                    DO0: {
+                      block: {
+                        type: "show_icon",
+                        fields: { ICON: "heart" },
+                        next: {
+                          block: { type: "pause_block", fields: { MS: 500 },
+                            next: { block: { type: "clear_screen" } }
+                          }
+                        }
+                      }
+                    },
+                    ELSE: {
+                      block: {
+                        type: "show_icon",
+                        fields: { ICON: "smile" },
+                        next: {
+                          block: { type: "pause_block", fields: { MS: 500 },
+                            next: { block: { type: "clear_screen" } }
+                          }
+                        }
+                      }
                     }
                   }
                 }
