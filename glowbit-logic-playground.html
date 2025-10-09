@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GlowBit Logic Playground — If, Then, Else (and Comparisons!)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Match project pages: core libs -->
+  <script src="../lib/blockly_compressed.js"></script>
+  <script src="../lib/blocks_compressed.js"></script>
+  <script src="../lib/javascript_compressed.js"></script>
+  <script src="../lib/msg/en.js"></script>
+  <script src="../assets/global.js"></script>
+  <script src="../lib/blockly_xml_patch.js"></script>
+
+  <style>
+    /* Same overall feel as projects */
+    .gb-wrapper{max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
+    .gb-header{text-align:center;background:#e6f9ff;color:#00A1D6;font-size:22px;font-weight:800;
+                padding:8px 12px;border-radius:10px;margin:10px 0;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+    .gb-header .highlight{color:#7B2CBF;}
+    .gb-intro{text-align:center;font-size:16px;line-height:1.6;margin:0 0 10px;color:#374151;
+              background:#e0f2fe;border-radius:8px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+    .didyouknow{margin-top:18px;background:#fef9c3;border:2px solid #facc15;padding:10px 12px;
+                border-radius:12px;color:#713f12;font-size:15px;font-weight:600;position:relative;
+                box-shadow:0 2px 5px rgba(0,0,0,0.06);}
+    .didyouknow::before{content:"";position:absolute;top:-10px;left:20px;border-width:0 10px 10px 10px;
+                         border-style:solid;border-color:transparent transparent #fef9c3 transparent;}
+    .didyouknow p{text-align:justify;margin:6px 0;}
+    .nav-btns{display:flex;justify-content:space-between;gap:8px;margin-top:10px;flex-wrap:wrap;}
+    .gb-btn{padding:8px 14px;border:none;border-radius:8px;font-weight:800;cursor:pointer;flex:1;text-align:center;}
+    .gb-btn.next{background:#00A1D6;color:#fff;}
+    .gb-btn.back{background:#6B7280;color:#fff;}
+    .gb-btn.cta{background:#10B981;color:#fff;display:block;margin:12px auto 0;}
+    .character-frame{text-align:center;margin-top:18px;}
+    .character-frame img{width:85%;max-width:260px;height:auto;border-radius:12px;
+                         box-shadow:0 4px 12px rgba(0,0,0,0.25);object-fit:cover;}
+    .pill-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+    .pill{background:#e2e8f0;color:#0f172a;border:1px solid #94a3b8;border-radius:999px;padding:6px 12px;font-weight:700;}
+    .callout{background:#ecfeff;border-left:6px solid #06b6d4;padding:8px 10px;border-radius:8px;color:#0f172a;margin:8px 0;}
+    .mini-badge{display:inline-block;background:#fde68a;color:#92400e;border:1px solid #f59e0b;
+                border-radius:6px;padding:2px 6px;font-size:12px;font-weight:800;margin-left:6px;}
+  </style>
+</head>
+
+<body>
+  <div class="gb-wrapper">
+    <div class="gb-header">
+      🧠 <span class="highlight">Logic Playground — If, Then, Else (and Comparisons!)</span> —
+      <span class="highlight">Teach GlowBit to make decisions like a tiny robot brain</span>
+    </div>
+
+    <p class="gb-intro">
+      This is a fun pit-stop between Projects 7 and 8. You’ll learn <strong>If–Then–Else</strong>
+      and <strong>Comparisons</strong> (<span class="pill">&gt;</span> <span class="pill">&lt;</span> <span class="pill">=</span>)
+      so Project 8 feels easy. Let’s practice!
+    </p>
+
+    <!-- Use standard lesson shell so the layout matches projects -->
+    <div id="glowbit-logic-playground"></div>
+  </div>
+
+  <script>
+  (function init(){
+    if(!(window.Glowbit && window.Blockly)) return setTimeout(init,120);
+
+    /* Create the standard two-column UI so the page looks like other projects.
+       We'll leave the workspace empty; the right side still gives kids the familiar canvas/controls. */
+    const lesson = Glowbit.createLessonUI('glowbit-logic-playground', {
+      title: '', instructions: '', pixelSize: 28, defaultJson: { blocks:{ languageVersion:0, blocks:[] } }
+    });
+    if (lesson && lesson.workspace) lesson.workspace.clear();
+
+    /* --- Sidebar content with inline SVG hints (gear + compare) --- */
+    const stepCards = [
+`<div style="display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:4px;">
+   <!-- HERO ILLUSTRATION placeholder -->
+   <!-- Upload: /images/logic-hero-mia-glowbit.png  (content: Mia high-fiving GlowBit; BG: soft gradient; size: ~1200×500, transparent or light bg) -->
+</div>
+<h3 style="text-align:center;color:#00A1D6;">Welcome to the Logic Playground!</h3>
+<div class="callout">
+ Teach GlowBit to make choices. You’ll learn <strong>If–Then–Else</strong> and <strong>Comparisons</strong> to prepare for Project 8 (Sound Alert).
+</div>
+<div>
+ <strong>Try this real-life logic:</strong><br>
+ • 🌧️ If it’s raining → Then take umbrella → Else wear a cap.<br>
+ • 🎮 If battery &gt; 50 → Then keep playing → Else charge it.<br>
+ • 🚦 If light is green → Then go → Else wait.
+</div>
+<button class="gb-btn cta" onclick="window.location.hash='#logic-steps'">Let’s Practice!</button>`,
+
+`<h3 id="logic-steps" style="text-align:center;color:#00A1D6;">If–Then–Else (Build it with the Gear)</h3>
+<div style="margin:10px 0;padding:10px;border-radius:8px;background:#10B981;color:#0f5132;">
+  <div>1) From <strong>Logic</strong>, drag an <strong>if</strong> block into your Workspace.</div>
+  <div>2) Click the tiny gear 
+    <span aria-hidden="true" style="display:inline-block;vertical-align:-2px;">
+      <!-- tiny gear SVG -->
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#0f5132">
+        <path d="M19.14,12.94c.04-.31,.06-.63,.06-.94s-.02-.63-.06-.94l2.03-1.58c.18-.14,.23-.4,.12-.61l-1.92-3.32c-.11-.21-.36-.3-.58-.22l-2.39,.96c-.5-.38-1.03-.69-1.62-.92l-.36-2.54c-.04-.23-.23-.4-.47-.4h-3.84c-.24,0-.43,.17-.47,.4l-.36,2.54c-.59,.23-1.12,.54-1.62,.92l-2.39-.96c-.22-.09-.47,0-.58,.22l-1.92,3.32c-.11,.21-.06,.47,.12,.61l2.03,1.58c-.04,.31-.06,.63-.06,.94s.02,.63,.06,.94l-2.03,1.58c-.18,.14-.23,.4-.12,.61l1.92,3.32c.11,.21,.36,.3,.58,.22l2.39-.96c.5,.38,1.03,.69,1.62,.92l.36,2.54c.04,.23,.23,.4,.47,.4h3.84c.24,0,.43-.17,.47-.4l.36-2.54c.59-.23,1.12-.54,1.62-.92l2.39,.96c.22,.09,.47,0,.58-.22l1.92-3.32c.11-.21,.06-.47-.12-.61l-2.03-1.58ZM12,15.5c-1.93,0-3.5-1.57-3.5-3.5s1.57-3.5,3.5-3.5,3.5,1.57,3.5,3.5-1.57,3.5-3.5,3.5Z"/>
+      </svg>
+    </span> to open the <strong>mutator</strong> panel.</div>
+  <div>3) Drag an <strong>else</strong> piece into the structure so it reads: <em>if … do … else …</em></div>
+  <div>4) Close the panel — you now have a full <strong>If–Then–Else</strong> block!</div>
+  <div class="mini-badge">Tip</div> Put blocks in the <em>then</em> and <em>else</em> parts to see different results.</div>
+<div class="callout">
+  <strong>Micro-challenge:</strong> If Button A is pressed, then show <em>heart</em>, else show <em>smile</em>.
+</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Comparisons (>, <, =)</h3>
+<div style="margin:10px 0;padding:10px;border-radius:8px;background:#e0f2fe;color:#0f172a;">
+  <div class="pill-row">
+    <span class="pill">&gt;</span>
+    <span class="pill">&lt;</span>
+    <span class="pill">=</span>
+  </div>
+  <div><strong>Meaning:</strong> 150 &gt; 120 ✅ / 80 &lt; 120 ✅ / 120 = 120 ✅</div>
+  <div style="margin-top:8px;">
+    <strong>With sound level (0–255):</strong><br>
+    If <em>sound level &gt; 120</em> → “LOUD!” else “sssh”
+  </div>
+  <div style="margin-top:8px;">
+    <strong>With numbers:</strong><br>
+    If <em>number &lt; 3</em> → show “LOW” else “OK”
+  </div>
+  <!-- NUMBER LINE ILLUSTRATION placeholder
+       Upload: /images/logic-numberline-0-255.png (content: horizontal line 0…255 with a marker at 120; BG: transparent or very light; size: ~900×220) -->
+</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Practice Zone</h3>
+<div style="margin:10px 0;padding:10px;border-radius:8px;background:#10B981;color:#0f5132;">
+  <div><strong>Challenge 1 — “High vs. Low”</strong> <span class="mini-badge">Beginner</span><br>
+  Goal: If <em>sound level &gt; 120</em> → show <strong>“LOUD”</strong>; else show <strong>“sssh”</strong>.<br>
+  Hint: Use <em>if–then–else</em> + <em>compare &gt;</em> + <em>sound level</em>.</div>
+  <hr style="border:none;border-top:1px dashed #0f5132;margin:10px 0;">
+  <div><strong>Challenge 2 — “Bright vs. Dim”</strong> <span class="mini-badge">Next</span><br>
+  Goal: If <em>number &gt; 5</em> → <em>brightness 255</em>; else <em>50</em>.<br>
+  Hint: <em>Math → number</em> + <em>LED → set brightness</em>.</div>
+</div>
+<div class="didyouknow">
+  💡 <strong>Did you know?</strong>
+  <p>🚶 Crosswalks: If the button is pressed → then walk signal; else wait.</p>
+  <p>🌡️ Thermostats: If temperature &lt; target → then heat; else stop.</p>
+  <p>🗣️ Smart speakers: If wake word heard → then listen; else sleep.</p>
+  <p>🏭 Factory lights: If a machine is too loud/hot → then alert.</p>
+</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Quick Quiz</h3>
+<div style="margin:10px 0;padding:10px;border-radius:8px;background:#e0f2fe;color:#0f172a;">
+  <ol style="margin:0 0 6px 18px;">
+    <li>Which symbol means “greater than”? — <strong>&gt;</strong></li>
+    <li>If sound level is 140, which branch runs? — <strong>Then (loud)</strong></li>
+    <li>True/False: If–Then–Else helps GlowBit choose between two actions. — <strong>True</strong></li>
+  </ol>
+  <div class="callout">You’ve got the logic superpower! Ready to build a real <strong>Sound Alert</strong>?</div>
+  <a class="gb-btn cta" href="./glowbit-project8.html">Go to Project 8</a>
+</div>
+
+<div class="character-frame">
+  <!-- CHARACTER IMAGE -->
+  <!-- Upload: /images/Mia3.png (content: Mia smiling / thumbs-up; PNG 400×400, transparent bg; we’ll display at max-width 260px) -->
+  <img src="../images/Mia3.png" alt="Mia the Maker">
+</div>`
+    ];
+
+    /* --- Sidebar auto-pagination (same pattern as projects) --- */
+    function paginate(){
+      const sidebar = document.querySelector('#glowbit-logic-playground .glowbit-left');
+      if(!sidebar) return;
+      const editor = document.getElementById('glowbit-logic-playground-editor');
+      const targetH = (editor && editor.offsetHeight) ? editor.offsetHeight : 520;
+
+      const meas = document.createElement('div');
+      meas.style.visibility='hidden';meas.style.position='absolute';meas.style.left='-9999px';meas.style.top='-9999px';
+      meas.style.width=(sidebar.clientWidth||320)+'px';
+      document.body.appendChild(meas);
+
+      const pages=[]; let current=[]; const reserve=56;
+      stepCards.forEach(html=>{
+        const c=document.createElement('div'); c.innerHTML=html; meas.appendChild(c);
+        const tooTall = meas.scrollHeight > (targetH - reserve);
+        if(tooTall){
+          if(current.length===0){ pages.push([html]); meas.innerHTML=''; }
+          else{
+            pages.push([...current]); current=[html]; meas.innerHTML='';
+            current.forEach(h=>{ const d=document.createElement('div'); d.innerHTML=h; meas.appendChild(d); });
+          }
+        }else current.push(html);
+      });
+      if(current.length) pages.push(current);
+      document.body.removeChild(meas);
+
+      function render(i){
+        sidebar.innerHTML = pages[i].join('');
+        const nav=document.createElement('div'); nav.className='nav-btns';
+        if(i>0){ const b=document.createElement('button'); b.textContent='⬅ Back'; b.className='gb-btn back'; b.onclick=()=>render(i-1); nav.appendChild(b); }
+        if(i<pages.length-1){ const n=document.createElement('button'); n.textContent='Next ➜'; n.className='gb-btn next'; n.onclick=()=>render(i+1); nav.appendChild(n); }
+        if(nav.children.length) sidebar.appendChild(nav);
+      }
+      render(0);
+    }
+    paginate();
+    let _rt=null; window.addEventListener('resize',()=>{ clearTimeout(_rt); _rt=setTimeout(paginate,150); });
+
+    /* Optional: you can show a hero image on the right instead of an empty workspace.
+       If you upload /images/logic-hero-mia-glowbit.png, uncomment the lines below to display it. */
+    // (function swapRightPane(){
+    //   const right = document.querySelector('#glowbit-logic-playground .glowbit-right');
+    //   if(!right) return;
+    //   const hero = document.createElement('div');
+    //   hero.style.cssText='text-align:center;margin-top:10px;';
+    //   hero.innerHTML = '<img src="../images/logic-hero-mia-glowbit.png" alt="Logic hero" style="max-width:96%;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.15)">';
+    //   right.innerHTML = ''; right.appendChild(hero);
+    // })();
+
+    console.log('✅ Logic Playground page ready.');
+  })();
+  </script>
+</body>
+</html>
