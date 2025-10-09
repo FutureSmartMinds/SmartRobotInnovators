@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>GlowBit Logic Playground — If, Then, Else (and Comparisons!)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-store" />
 
   <!-- Core libs (same paths as your working project pages) -->
   <script src="lib/blockly_compressed.js"></script>
@@ -30,26 +31,14 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
     .gb-header.cloud {
-      background: #f3e8ff;    /* soft lilac cloud */
-      color: #6b21a8;         /* deep purple */
+      background: #f3e8ff;
+      color: #6b21a8;
       border: 2px dashed #c084fc;
-      border-radius: 24px;    /* rounded cloud pill */
+      border-radius: 24px;
       padding: 14px 16px;
     }
-    .gb-header .title {
-      font-size: 22px;
-      line-height: 1.2;
-      text-align: center;
-      display: block;
-    }
-    .gb-header .subtitle {
-      font-size: 15px;
-      font-weight: 700;
-      color: #4c1d95;
-      margin-top: 4px;
-      text-align: center;
-      display: block;
-    }
+    .gb-header .title { font-size: 22px; line-height: 1.2; display:block; }
+    .gb-header .subtitle { font-size: 15px; font-weight: 700; color: #4c1d95; margin-top: 4px; display:block; }
 
     /* Intro bubble */
     .gb-intro {
@@ -81,36 +70,21 @@
       box-sizing: border-box;
     }
 
-    /* Optional: keep columns from getting too wide */
     .glowbit-left, .glowbit-right { box-sizing: border-box; }
 
     .didyouknow {
-      margin-top: 18px;
-      background: #fef9c3;
-      border: 2px solid #facc15;
-      padding: 10px 12px;
-      border-radius: 12px;
-      color: #713f12;
-      font-size: 15px;
-      font-weight: 600;
-      position: relative;
+      margin-top: 18px; background: #fef9c3; border: 2px solid #facc15; padding: 10px 12px;
+      border-radius: 12px; color: #713f12; font-size: 15px; font-weight: 600; position: relative;
       box-shadow: 0 2px 5px rgba(0,0,0,0.06);
     }
     .didyouknow::before {
-      content:"";
-      position:absolute; top:-10px; left:20px;
-      border-width:0 10px 10px 10px;
-      border-style:solid;
-      border-color:transparent transparent #fef9c3 transparent;
+      content:""; position:absolute; top:-10px; left:20px; border-width:0 10px 10px 10px;
+      border-style:solid; border-color:transparent transparent #fef9c3 transparent;
     }
     .didyouknow p { text-align: justify; margin: 6px 0; }
 
-    .nav-btns {
-      display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; flex-wrap: wrap;
-    }
-    .gb-btn {
-      padding: 8px 14px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; flex: 1; text-align: center;
-    }
+    .nav-btns { display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .gb-btn { padding: 8px 14px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; flex: 1; text-align: center; }
     .gb-btn.next { background: #00A1D6; color: #fff; }
     .gb-btn.back { background: #6B7280; color: #fff; }
     .gb-btn.cta  { background: #10B981; color: #fff; display: block; margin: 12px auto 0; }
@@ -209,21 +183,20 @@
       defaultJson: null
     });
 
-    // Ensure the editor container exists and has height (CSS) before load
+    // Safety: ensure the editor has height before loading blocks
     const editorEl = document.getElementById('glowbit-logic-playground-editor');
     if (editorEl && !editorEl.style.height) {
-      editorEl.style.height = '560px'; // safety net (CSS also sets this)
+      editorEl.style.height = '560px';
     }
 
-    // Clear once, then load starter blocks, then force a layout pass
+    // Load starter blocks, then force a layout pass
     if (lesson && lesson.workspace) {
       lesson.workspace.clear();
       Blockly.serialization.workspaces.load(starterJson, lesson.workspace);
-      // Nudge Blockly after the DOM paints
       setTimeout(() => Blockly.svgResize(lesson.workspace), 0);
     }
 
-    /* --- Sidebar content (updated as per your requests) --- */
+    /* --- Sidebar content --- */
     const stepCards = [
 `<div style="display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:4px;">
    <!-- Optional hero: images/logic-hero-mia-glowbit.png -->
@@ -246,7 +219,7 @@
   <div>2) Click the tiny gear 
     <span aria-hidden="true" style="display:inline-block;vertical-align:-2px;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="#0f5132">
-        <path d="M19.14,12.94c.04-.31,.06-.63,.06-.94s-.02-.63-.06-.94l2.03-1.58c.18-.14,.23-.4,.12-.61l-1.92-3.32c-.11-.21-.36-.3-.58-.22l-2.39,.96c-.5-.38-1.03-.69-1.62-.92l-.36-2.54c-.04-.23-.23-.4-.47-.4h-3.84c-.24,0-.43,.17-.47,.4l-.36,2.54c-.59,.23-1.12,.54-1.62,.92l-2.39-.96c-.22-.09-.47,0-.58,.22l-1.92,3.32c-.11,.21-.06,.47,.12,.61l2.03,1.58c-.04,.31-.06,.63-.06,.94s.02,.63,.06,.94l-2.03,1.58c-.18,.14-.23,.4-.12,.61l1.92,3.32c.11,.21,.36,.3,.58,.22l2.39-.96c.5,.38,1.03,.69,1.62,.92l.36,2.54c.04,.23,.23,.4,.47,.4h3.84c.24,0,.43-.17,.47-.4l.36-2.54c.59-.23,1.12-.54,1.62-.92l2.39,.96c.22,.09,.47,0,.58-.22l1.92-3.32c.11-.21,.06-.47-.12-.61l-2.03-1.58ZM12,15.5c-1.93,0-3.5-1.57-3.5-3.5s1.57-3.5,3.5-3.5,3.5,1.57,3.5,3.5-1.57,3.5-3.5,3.5Z"/>
+        <path d="M19.14,12.94c.04-.31,.06-.63,.06-.94s-.02-.63-.06-.94l2.03-1.58c.18-.14,.23-.4,.12-.61l-1.92-3.32c-.11-.21-.36-.3-.58-.22l-2.39,.96c-.5-.38-1.03-.69-1.62-.92l-.36-2.54c-.04-.23-.23-.4-.47-.4h-3.84c-.24,0-.43,.17-.47,.4l-.36,2.54c-.59,.23-1.12,.54-1.62,.92l-2.39-.96c-.22-.09-.47,0-.58,.22l-1.92-3.32c-.11-.21-.06-.47,.12-.61l2.03,1.58c-.04,.31-.06,.63-.06,.94s.02,.63,.06,.94l-2.03,1.58c-.18,.14-.23,.4-.12,.61l1.92,3.32c.11,.21,.36,.3,.58,.22l2.39-.96c.5,.38,1.03,.69,1.62,.92l.36,2.54c.04,.23,.23,.4,.47,.4h3.84c.24,0,.43-.17,.47-.4l.36-2.54c.59-.23,1.12-.54,1.62-.92l2.39,.96c.22,.09,.47,0,.58-.22l1.92-3.32c.11-.21,.06-.47-.12-.61l-2.03-1.58ZM12,15.5c-1.93,0-3.5-1.57-3.5-3.5s1.57-3.5,3.5-3.5,3.5,1.57,3.5,3.5-1.57,3.5-3.5,3.5Z"/>
       </svg>
     </span> to open the <strong>mutator</strong> panel.</div>
   <div>3) Drag an <strong>else</strong> piece into the structure so it reads: <em>if … do … else …</em></div>
@@ -257,12 +230,9 @@
 `<h3 style="text-align:center;color:#0f172a;">Comparisons: Three Symbols</h3>
 <div style="margin:10px 0;padding:10px;border-radius:8px;background:#e0f2fe;color:#0f172a;">
  <ol style="margin:0 0 6px 18px;">
-   <li><strong>=</strong> means “is equal to”.<br>
-       Example: <code>120 = 120</code> ✅ (true)</li>
-   <li><strong>&lt;</strong> means “is less than”.<br>
-       Example: <code>80 &lt; 120</code> ✅ (true)</li>
-   <li><strong>&gt;</strong> means “is greater than”.<br>
-       Example: <code>150 &gt; 120</code> ✅ (true)</li>
+   <li><strong>=</strong> means “is equal to”.<br>Example: <code>120 = 120</code> ✅ (true)</li>
+   <li><strong>&lt;</strong> means “is less than”.<br>Example: <code>80 &lt; 120</code> ✅ (true)</li>
+   <li><strong>&gt;</strong> means “is greater than”.<br>Example: <code>150 &gt; 120</code> ✅ (true)</li>
  </ol>
  <div style="margin-top:8px;">Change the symbol using the dropdown on the compare block.</div>
 </div>`,
@@ -313,7 +283,7 @@
 <a class="gb-btn cta" href="./glowbit-project8.html">Ready for Sound Alerts? → Go to Project 8</a>`
     ];
 
-    /* --- Sidebar auto-pagination (same as your projects) --- */
+    /* --- Sidebar auto-pagination (and character image) --- */
     function paginate(){
       const sidebar = document.querySelector('#glowbit-logic-playground .glowbit-left');
       if(!sidebar) return;
@@ -359,16 +329,17 @@
       }
       render(0);
     }
-
-    // Resize handler: repaginate + nudge Blockly layout
-    let _resizeTimer = null;
-window.addEventListener('resize', ()=>{
-  clearTimeout(_resizeTimer);
-  _resizeTimer = setTimeout(()=>{
     paginate();
-    if (lesson && lesson.workspace) Blockly.svgResize(lesson.workspace);
-  }, 150);
-});
+
+    // Resize handler: repaginate + nudge Blockly layout (no _rt anywhere)
+    let _resizeTimer = null;
+    window.addEventListener('resize', ()=>{
+      clearTimeout(_resizeTimer);
+      _resizeTimer = setTimeout(()=>{
+        paginate();
+        if (lesson && lesson.workspace) Blockly.svgResize(lesson.workspace);
+      }, 150);
+    });
 
     console.log('✅ Logic Playground page ready.');
   })();
