@@ -717,7 +717,16 @@ sndSlider.addEventListener("input", (e) => {
         // 8×8 multi-line entry (# or .), 8 lines of 8 cells each
         { "type":"show_leds","message0":"show leds 8×8 %1","args0":[{"type":"field_multilinetext","name":"MATRIX","text":"# . . . . . . #\n. # . . . . # .\n. . # . . # . .\n. . . # # . . .\n. . . # # . . .\n. . # . . # . .\n. # . . . . # .\n# . . . . . . #"}],"previousStatement":null,"nextStatement":null,"colour":20 },
 
-        { "type":"set_brightness","message0":"set brightness %1","args0":[{"type":"field_number","name":"VAL","value":255,"min":0,"max":255}],"previousStatement":null,"nextStatement":null,"colour":230 },
+       {
+  "type": "set_brightness",
+  "message0": "set brightness %1",
+  "args0": [
+    { "type": "input_value", "name": "VALUE", "check": "Number" }
+  ],
+  "previousStatement": null,
+  "nextStatement": null,
+  "colour": 230
+},
         { "type":"change_color","message0":"set color %1","args0":[{"type":"field_colour","name":"COL","colour":"#00FF00"}],"previousStatement":null,"nextStatement":null,"colour":230 },
         { "type":"pause_block","message0":"pause (ms) %1","args0":[{"type":"field_number","name":"MS","value":300,"min":0}],"previousStatement":null,"nextStatement":null,"colour":120 },
         { "type":"clear_screen","message0":"clear screen","previousStatement":null,"nextStatement":null,"colour":0 },
@@ -801,7 +810,13 @@ sndSlider.addEventListener("input", (e) => {
         }
         return js;
       });
-      reg("set_brightness", (b) => { const v=Number(b.getFieldValue("VAL")||255); return `Glowbit._state.brightness=${v};\n`; });
+      reg("set_brightness", (b) => {
+  // Prefer a wired value input named VALUE (e.g., a math_number),
+  // but fall back to old field 'VAL' or default 255 for backward compatibility.
+  const raw = Blockly.JavaScript.valueToCode(b, "VALUE", Blockly.JavaScript.ORDER_NONE);
+  const val = Number(raw || b.getFieldValue("VAL") || 255);
+  return `Glowbit._state.brightness=${isFinite(val) ? val : 255};\n`;
+});
       reg("change_color", (b) => { const c=b.getFieldValue("COL")||"#00ff00"; return `Glowbit._state.defaultColor=${JSON.stringify(c)};\n`; });
       reg("pause_block", (b) => { const ms=Number(b.getFieldValue("MS")||300); return `Glowbit.pause(${ms});\n`; });
       reg("clear_screen", () => `Glowbit.clear();\n`);
