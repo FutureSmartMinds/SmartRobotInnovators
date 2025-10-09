@@ -56,7 +56,7 @@
   (function boot(){
     if(!(window.Glowbit && window.Blockly)) return setTimeout(boot,120);
 
-    /* Create standard two-column UI (same as Project 8). Keep defaultJson non-null. */
+    /* Create standard two-column UI (keep defaultJson non-null so toolbox shows) */
     const lesson = Glowbit.createLessonUI('glowbit-project9', {
       title: '',
       instructions: '',
@@ -65,61 +65,61 @@
     });
     if (lesson && lesson.workspace) lesson.workspace.clear();
 
-    /* ---------- Step cards (sidebar) ---------- */
+    /* ---------- Sidebar slides (reworded for Icon → N/S/E/W) ---------- */
     const stepCards = [
 
 `<h3 style="text-align:center;color:#3730a3;">Step 1 — Show an Up Arrow</h3>
 <div class="callout">
-  1) 🧰 Go to <strong>Basic</strong> and drag a <strong>show text</strong> block.<br>
-  2) ✍️ Click its text and type the up arrow: <strong>↑</strong> (you can also type "UP").<br>
-  3) 🚀 Drag an <strong>on start</strong> block and place <em>show text ↑</em> inside it.<br>
-  4) ▶️ Click <strong>Run</strong> to see the arrow scroll. Liam: “GlowBit’s pointing up!”
+  1) 🧰 Go to the <strong>Icon</strong> tab and drag a <strong>show icon</strong> block.<br>
+  2) 🔽 Click the dropdown and choose <strong>N</strong> (north/up).<br>
+  3) 🚀 Drag an <strong>on start</strong> block and place <em>show icon → N</em> inside it.<br>
+  4) ▶️ Click <strong>Run</strong> to see the up arrow on the LED grid. Liam says, “GlowBit’s pointing up!”
 </div>
-<div class="callout"><span class="tip">Cleanup</span> Remove <em>show text ↑</em> from <em>on start</em> after testing.</div>`,
+<div class="callout"><span class="tip">Cleanup</span> Remove the test block from <em>on start</em> after you try it.</div>`,
 
-`<h3 style="text-align:center;color:#3730a3;">Step 2 — Add Other Directions</h3>
+`<h3 style="text-align:center;color:#3730a3;">Step 2 — Add Other Arrow Directions</h3>
 <div class="callout">
-  1) Drag three more <strong>show text</strong> blocks and set them to: <strong>↓</strong> (down), <strong>←</strong> (left), <strong>→</strong> (right).<br>
+  1) Drag three more <strong>show icon</strong> blocks. Set them to <strong>S</strong> (down), <strong>W</strong> (left), and <strong>E</strong> (right).<br>
   2) Test each by putting it in <em>on start</em> (one at a time) and hitting <strong>Run</strong>.<br>
-  3) Liam: “GlowBit can point all ways!”<br>
+  3) Liam: “GlowBit can point all ways!”
 </div>
-<div class="callout"><span class="tip">Cleanup</span> Remove extra test blocks from <em>on start</em> after testing.</div>`,
+<div class="callout"><span class="tip">Cleanup</span> Remove the extra test blocks from <em>on start</em> after testing.</div>`,
 
-`<h3 style="text-align:center;color:#0e7490;">Step 3 — Commands for Each Arrow</h3>
+`<h3 style="text-align:center;color:#0e7490;">Step 3 — Map 4 Commands to 4 Arrows</h3>
 <div class="callout">
-  We’ll map 4 commands to 4 arrows:<br>
-  • 🅰️ <strong>Button A</strong> → <strong>↑</strong><br>
-  • 🅱️ <strong>Button B</strong> → <strong>↓</strong><br>
-  • 📳 <strong>Shake</strong> → <strong>←</strong><br>
-  • 🟢 <strong>On Start</strong> → <strong>→</strong> (so we have all 4 directions)
+  We’ll trigger arrows with four different commands:<br>
+  • 🟢 <strong>On Start</strong> → <strong>E</strong> (right)<br>
+  • 🅰️ <strong>Button A</strong> → <strong>N</strong> (up)<br>
+  • 🅱️ <strong>Button B</strong> → <strong>S</strong> (down)<br>
+  • 📳 <strong>Shake</strong> → <strong>W</strong> (left)
 </div>
 <div>
-  1) From <strong>Input</strong> drag <strong>on button A pressed</strong> and drop a <em>show text ↑</em> inside.<br>
-  2) Add <strong>on button B pressed</strong> → <em>show text ↓</em>.<br>
-  3) Add <strong>on shake</strong> → <em>show text ←</em>.<br>
-  4) Add <strong>on start</strong> → <em>show text →</em>.<br>
-  Optional: after each arrow, add <em>pause (ms) 500</em> then <em>clear screen</em> for a blink effect.
+  1) From <strong>Input</strong> drag <strong>on button A pressed</strong>, then place <em>show icon → N</em> inside.<br>
+  2) Add <strong>on button B pressed</strong> → <em>show icon → S</em>.<br>
+  3) Add <strong>on shake</strong> → <em>show icon → W</em>.<br>
+  4) Add <strong>on start</strong> → <em>show icon → E</em>.<br>
+  <em>Optional:</em> after each arrow add <strong>pause (ms) 500</strong> then <strong>clear screen</strong> for a blink effect.
 </div>`,
 
-`<h3 style="text-align:center;color:#0e7490;">Step 4 — (Optional) Conditions</h3>
+`<h3 style="text-align:center;color:#0e7490;">Step 4 — (Optional) Extra Conditions</h3>
 <div class="callout">
-  Want arrows to blink until you interact again? Use a <strong>forever</strong> loop with conditional blocks:<br>
-  • Example: If you want a status arrow when <em>sound level &gt; 120</em>, <em>show text →</em> else <em>←</em>.<br>
-  Keep it simple for now—your command arrows above already do the job.
+  Want more logic? Combine with <strong>Logic → if</strong> and <strong>Input → sound level</strong>.<br>
+  Example: If <em>sound level &gt; 120</em> then show <em>icon → E</em> else show <em>icon → W</em>.<br>
+  Keep it simple first—your command arrows already work great!
 </div>`,
 
 `<h3 style="text-align:center;color:#00A1D6;">Did You Know?</h3>
 <div class="callout">
-  • 🧭 Phones and drones show arrows based on orientation—just like our GlowBit compass idea!<br>
-  • 🚗 GPS dashboards use arrows to guide turns. We’re mimicking that with button commands.<br>
-  • 🧠 Interfaces often offer <em>multiple inputs</em> for one action: buttons, shake, or automatic checks.
+  • 🧭 Phones and drones use sensors to decide which arrow to show—our buttons/shake simulate that idea.<br>
+  • 🚗 GPS dashboards draw arrows to guide turns. We’re building the same behavior with kid-friendly inputs.<br>
+  • 🧠 Interfaces often offer multiple inputs for the same action: buttons, shake, or automatic checks.
 </div>
 <div class="callout">
-  <span class="tip">Try this</span> Change the arrows to words ("UP", "DOWN", "LEFT", "RIGHT"), or add <em>set brightness</em> before each arrow for emphasis.
+  <span class="tip">Try this</span> Add <em>set brightness</em> before each arrow to make it brighter/dimmer depending on direction.
 </div>`
     ];
 
-    /* ---------- Auto-pagination (same as Project 8) ---------- */
+    /* ---------- Pagination (same mechanism as Project 8) ---------- */
     function paginate(){
       const sidebar = document.querySelector('#glowbit-project9 .glowbit-left');
       if(!sidebar) return;
@@ -161,53 +161,50 @@
     }
     paginate();
 
-    /* ---------- Correct Setup (solution) ---------- 
-       Uses only blocks you already have:
-       - on_start, on_button_pressed (BTN A/B), on_shake
-       - show_text, pause_block (MS), clear_screen
-    ----------------------------------------------- */
-    function seqShow(str){
+    /* ---------- Helper to build "show icon (dir) → pause → clear" ---------- */
+    function seqArrow(dir /* "N" | "S" | "E" | "W" */){
       return {
-        type:"show_text", fields:{ TEXT:str },
+        type:"show_icon", fields:{ ICON:dir },
         next:{ block:{ type:"pause_block", fields:{ MS:500 },
           next:{ block:{ type:"clear_screen" } } } }
       };
     }
 
+    /* ---------- Correct Setup (solution) ---------- */
     const solutionJson = {
       blocks:{ languageVersion:0, blocks:[
-        { /* Show RIGHT at start so we have the 4th direction */
+        { // On start → EAST (right) so we have all four directions represented
           type:"on_start", x:18, y:18,
-          inputs:{ DO:{ block: seqShow("→") } }
+          inputs:{ DO:{ block: seqArrow("E") } }
         },
-        {
+        { // Button A → NORTH (up)
           type:"on_button_pressed", x:18, y:160, fields:{ BTN:"A" },
-          inputs:{ DO:{ block: seqShow("↑") } }
+          inputs:{ DO:{ block: seqArrow("N") } }
         },
-        {
+        { // Button B → SOUTH (down)
           type:"on_button_pressed", x:18, y:300, fields:{ BTN:"B" },
-          inputs:{ DO:{ block: seqShow("↓") } }
+          inputs:{ DO:{ block: seqArrow("S") } }
         },
-        {
+        { // Shake → WEST (left)
           type:"on_shake", x:18, y:440,
-          inputs:{ DO:{ block: seqShow("←") } }
+          inputs:{ DO:{ block: seqArrow("W") } }
         }
       ]}
     };
 
-    /* Load the solution into the modal + preload a helpful starter on the workspace */
+    /* Preload a helpful starter on the workspace: Button A → N (kids add B/Shake/Start) */
     if (lesson && lesson.workspace) {
-      // Starter on the workspace (optional): just Button A (↑) so kids can add the rest
       const starter = {
         blocks:{ languageVersion:0, blocks:[
           { type:"on_button_pressed", x:20, y:20, fields:{ BTN:"A" },
-            inputs:{ DO:{ block: seqShow("↑") } } }
+            inputs:{ DO:{ block: seqArrow("N") } } }
         ]}
       };
       Blockly.serialization.workspaces.load(starter, lesson.workspace);
       setTimeout(()=>Blockly.svgResize(lesson.workspace),0);
     }
-    // Expose solutionJson for your global “Check Your Setup” modal
+
+    /* Expose solution for your “Check Your Setup” modal */
     window.solutionJson = solutionJson;
 
     // Simple resize handler
