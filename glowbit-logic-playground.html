@@ -33,8 +33,10 @@
 /* Optional: keep columns from getting too wide on huge screens */
 .glowbit-left, .glowbit-right { box-sizing: border-box; }
 
-/* Cap the right editor width so it doesn’t “eat” the page */
+/* Cap width AND give Blockly a real height so it can render */
 #glowbit-logic-playground-editor {
+  height: 560px;       /* ← required for Blockly to show up */
+  min-height: 560px;
   max-width: 720px;
   margin: 0 auto;
 }
@@ -45,7 +47,7 @@
   border-radius:24px;                /* rounded cloud pill */
   padding:14px 16px;
 }
-.gb-header .title{font-size:22px;line-height:1.2;}
+.gb-header .title{text-align:center;font-size:22px;line-height:1.2;}
 .gb-header .subtitle{font-size:18px;font-weight:700;color:#4c1d95;margin-top:4px;}
     .gb-intro{text-align:center;font-size:18px;line-height:1.6;margin:0 0 10px;color:#374151;
               background:#e0f2fe;border-radius:8px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
@@ -155,7 +157,17 @@
     if (lesson && lesson.workspace) {
       lesson.workspace.clear();
       Blockly.serialization.workspaces.load(starterJson, lesson.workspace);
+      // Force a layout pass now that the container has a real size
+  setTimeout(() => Blockly.svgResize(lesson.workspace), 0);
     }
+    let _rt=null;
+window.addEventListener('resize', ()=>{
+  clearTimeout(_rt);
+  _rt = setTimeout(()=>{
+    paginate();
+    if (lesson && lesson.workspace) Blockly.svgResize(lesson.workspace);
+  }, 150);
+});
 
     // Sidebar content with inline SVG hints (gear + compare)
    const stepCards = [
