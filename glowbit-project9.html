@@ -23,7 +23,6 @@
       text-align:center;background:#ecfeff;color:#0e7490;font-size:16px;font-weight:800;
       padding:8px 12px;border-radius:10px;margin:0 0 10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);
     }
-
     .callout{background:#f1f5f9;border-left:6px solid #64748b;padding:8px 10px;border-radius:8px;color:#0f172a;margin:8px 0;}
     .tip{display:inline-block;background:#fde68a;color:#92400e;border:1px solid #f59e0b;border-radius:6px;padding:2px 6px;font-size:12px;font-weight:800;}
 
@@ -41,23 +40,6 @@
 
     /* Ensure the editor is visible */
     #glowbit-project9-editor{height:560px;min-height:560px;background:#fff;}
-
-    /* Modal for "Check Your Setup" */
-    .modal-backdrop{
-      position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;z-index:1000;
-      align-items:center;justify-content:center;padding:16px;
-    }
-    .modal{
-      background:#fff;border-radius:12px;max-width:900px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.25);
-      display:flex;flex-direction:column;overflow:hidden;
-    }
-    .modal-header{
-      padding:10px 14px;background:#eef2ff;color:#3730a3;font-weight:800;display:flex;justify-content:space-between;align-items:center;
-    }
-    .modal-body{padding:10px;}
-    .modal-footer{padding:10px;display:flex;justify-content:flex-end;gap:8px;}
-    .close-btn{background:#6B7280;color:#fff;border:none;border-radius:6px;padding:8px 12px;font-weight:700;cursor:pointer;}
-    #solution-editor{height:480px;min-height:480px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;}
   </style>
 </head>
 
@@ -70,37 +52,21 @@
     <div id="glowbit-project9"></div>
   </div>
 
-  <!-- Check Your Setup modal -->
-  <div id="solution-backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="solution-title">
-    <div class="modal">
-      <div class="modal-header">
-        <div id="solution-title">✅ Correct Setup (Read-only)</div>
-        <button class="close-btn" id="solution-close">Close</button>
-      </div>
-      <div class="modal-body">
-        <div id="solution-editor"></div>
-      </div>
-      <div class="modal-footer">
-        <button class="close-btn" id="solution-close-2">Close</button>
-      </div>
-    </div>
-  </div>
-
   <script>
   (function boot(){
     if(!(window.Glowbit && window.Blockly)) return setTimeout(boot,120);
 
-    /* Create standard two-column UI (keep defaultJson non-null so toolbox shows) */
+    /* Create standard two-column UI */
     const lesson = Glowbit.createLessonUI('glowbit-project9', {
       title: '',
       instructions: '',
       pixelSize: 28,
-      defaultJson: { blocks:{ languageVersion:0, blocks:[] } }
+      defaultJson: { blocks:{ languageVersion:0, blocks:[] } } // keep non-null so toolbox shows
     });
     if (lesson && lesson.workspace) lesson.workspace.clear();
 
-    /* ---------- Helper: Pause → Show Arrow(dir) → Clear ---------- */
-    function seqPauseShowClear(dir /* "arrow_up" | "arrow_down" | "arrow_left" | "arrow_right" */){
+    /* Helper: Pause 500 → Show Arrow(dir) → Clear */
+    function seqPauseShowClear(dir /* "arrow_up"|"arrow_down"|"arrow_left"|"arrow_right" */){
       return {
         type:"pause_block", fields:{ MS:500 },
         next:{ block:{ type:"show_arrow", fields:{ ARROW:dir },
@@ -108,10 +74,10 @@
       };
     }
 
-    /* ---------- Correct Setup (exact order you requested) ---------- */
+    /* Correct Setup (exactly as requested) */
     const solutionJson = {
       blocks:{ languageVersion:0, blocks:[
-        { // On start → Pause → E → Clear
+        { // On Start → Pause → E → Clear
           type:"on_start", x:18, y:18,
           inputs:{ DO:{ block: seqPauseShowClear("arrow_right") } }
         },
@@ -129,8 +95,10 @@
         }
       ]}
     };
+    /* Expose for the built-in compact modal in global.js */
+    window.solutionJson = solutionJson;
 
-    /* ---------- Starter on the workspace (kids add the rest) ---------- */
+    /* Starter on the workspace (kids add the rest) */
     if (lesson && lesson.workspace) {
       const starter = {
         blocks:{ languageVersion:0, blocks:[
@@ -142,7 +110,7 @@
       setTimeout(()=>Blockly.svgResize(lesson.workspace),0);
     }
 
-    /* ---------- Sidebar slides ---------- */
+    /* Sidebar slides (include the Check button; global.js handles the modal) */
     const stepCards = [
 
 `<h3 style="text-align:center;color:#3730a3;">Step 1 — Show an Up Arrow</h3>
@@ -192,7 +160,7 @@
 </div>`
     ];
 
-    /* ---------- Pagination (like Project 8) ---------- */
+    /* Pagination (same as your other pages) */
     function paginate(){
       const sidebar = document.querySelector('#glowbit-project9 .glowbit-left');
       if(!sidebar) return;
@@ -229,57 +197,18 @@
 
         const frame=document.createElement('div');frame.className='character-frame';
         frame.innerHTML='<img src="images/GlowBit3.png" alt="GlowBit buddy">';sidebar.appendChild(frame);
-
-        // Wire “Check Your Setup” button if present on this page
-        const btn = sidebar.querySelector('#open-solution');
-        if(btn){
-          btn.addEventListener('click', openSolutionModal);
-        }
       }
       render(0);
     }
     paginate();
 
-    /* ---------- Our lightweight modal for the solution ---------- */
-    let solutionWorkspace = null;
-    function openSolutionModal(){
-      const backdrop = document.getElementById('solution-backdrop');
-      backdrop.style.display = 'flex';
-
-      // Lazy-initialize a read-only Blockly workspace in the modal
-      if(!solutionWorkspace){
-        const editorDiv = document.getElementById('solution-editor');
-        solutionWorkspace = Blockly.inject(editorDiv, {
-          readOnly: true,
-          scrollbars: true,
-          sounds: false,
-          toolbox: null,
-        });
-      } else {
-        solutionWorkspace.clear();
-      }
-
-      // Load the solution blocks
-      Blockly.serialization.workspaces.load(solutionJson, solutionWorkspace);
-      setTimeout(()=>Blockly.svgResize(solutionWorkspace), 0);
-    }
-    function closeSolutionModal(){
-      const backdrop = document.getElementById('solution-backdrop');
-      backdrop.style.display = 'none';
-    }
-    document.getElementById('solution-close').addEventListener('click', closeSolutionModal);
-    document.getElementById('solution-close-2').addEventListener('click', closeSolutionModal);
-    // Also expose the JSON globally in case your global.js uses it too
-    window.solutionJson = solutionJson;
-
-    // Simple resize handler
+    // Resize handler
     window.addEventListener('resize', ()=>{
       paginate();
       if (lesson && lesson.workspace) Blockly.svgResize(lesson.workspace);
-      if (solutionWorkspace) Blockly.svgResize(solutionWorkspace);
     });
 
-    console.log('✅ Project 9 – Tilt Navigator ready (with Check Your Setup).');
+    console.log('✅ Project 9 – Tilt Navigator ready (built-in compact modal).');
   })();
   </script>
 </body>
