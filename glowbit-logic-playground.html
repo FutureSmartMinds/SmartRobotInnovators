@@ -15,9 +15,18 @@
 
   <style>
     .gb-wrapper{max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
-    .gb-header{text-align:center;background:#e6f9ff;color:#00A1D6;font-size:22px;font-weight:800;
-                padding:8px 12px;border-radius:10px;margin:10px 0;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
-    .gb-header .highlight{color:#7B2CBF;}
+    .gb-header{
+  text-align:center;font-weight:800;margin:10px 0;box-shadow:0 1px 4px rgba(0,0,0,0.08);
+}
+.gb-header.cloud{
+  background:#f3e8ff;               /* soft lilac cloud */
+  color:#6b21a8;                     /* deep purple */
+  border:2px dashed #c084fc;
+  border-radius:24px;                /* rounded cloud pill */
+  padding:14px 16px;
+}
+.gb-header .title{font-size:22px;line-height:1.2;}
+.gb-header .subtitle{font-size:15px;font-weight:700;color:#4c1d95;margin-top:4px;}
     .gb-intro{text-align:center;font-size:16px;line-height:1.6;margin:0 0 10px;color:#374151;
               background:#e0f2fe;border-radius:8px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
     .didyouknow{margin-top:18px;background:#fef9c3;border:2px solid #facc15;padding:10px 12px;
@@ -43,11 +52,10 @@
 </head>
 
 <body>
-  <div class="gb-wrapper">
-    <div class="gb-header">
-      🧠 <span class="highlight">Logic Playground — If, Then, Else (and Comparisons!)</span> —
-      <span class="highlight">Teach GlowBit to make decisions like a tiny robot brain</span>
-    </div>
+  <div class="gb-header cloud">
+  <div class="title">✨ Expand Your Knowledge — Logical Conditions & Comparisons</div>
+  <div class="subtitle">Teach GlowBit to make decisions like a tiny robot brain</div>
+</div>
 
     <p class="gb-intro">
       This is a fun pit-stop between Projects 7 and 8. You’ll learn <strong>If–Then–Else</strong>
@@ -129,92 +137,107 @@
     }
 
     // Sidebar content with inline SVG hints (gear + compare)
-    const stepCards = [
+   const stepCards = [
+
+/* 1) Welcome (intro copy adjusted) */
 `<div style="display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:4px;">
-   <!-- HERO ILLUSTRATION placeholder -->
-   <!-- Upload: images/logic-hero-mia-glowbit.png  (content: Mia high-fiving GlowBit; BG: soft gradient; size: ~1200×500, transparent or light bg) -->
+   <!-- Optional hero: images/logic-hero-mia-glowbit.png -->
 </div>
-<h3 style="text-align:center;color:#00A1D6;">Welcome to the Logic Playground!</h3>
-<div class="callout">
- Teach GlowBit to make choices. You’ll learn <strong>If–Then–Else</strong> and <strong>Comparisons</strong> to prepare for Project 8 (Sound Alert).
+<h3 style="text-align:center;color:#6b21a8;">Welcome to the Logic Playground!</h3>
+<div class="callout" style="border-left-color:#a78bfa;">
+ Teach GlowBit to make choices. You’ll learn <strong>If–Then–Else</strong> and <strong>Comparisons</strong>
+ to prepare for <strong>your next projects</strong>.
 </div>
 <div>
- <strong>Try this real-life logic:</strong><br>
+ <strong>Real-life logic:</strong><br>
  • 🌧️ If it’s raining → Then take umbrella → Else wear a cap.<br>
  • 🎮 If battery &gt; 50 → Then keep playing → Else charge it.<br>
  • 🚦 If light is green → Then go → Else wait.
-</div>
-<button class="gb-btn cta" onclick="window.location.hash='#logic-steps'">Let’s Practice!</button>`,
+</div>`,
 
-`<h3 id="logic-steps" style="text-align:center;color:#00A1D6;">If–Then–Else (Build it with the Gear)</h3>
-<div style="margin:10px 0;padding:10px;border-radius:8px;background:#10B981;color:#0f5132;">
+/* 2) If–Then–Else (gear mutator) — unchanged steps, no challenge here */
+`<h3 id="logic-steps" style="text-align:center;color:#0f5132;">If–Then–Else (Build it with the Gear)</h3>
+<div style="margin:10px 0;padding:10px;border-radius:8px;background:#d1fae5;color:#0f5132;">
   <div>1) From <strong>Logic</strong>, drag an <strong>if</strong> block into your Workspace.</div>
   <div>2) Click the tiny gear 
     <span aria-hidden="true" style="display:inline-block;vertical-align:-2px;">
-      <!-- tiny gear SVG -->
       <svg width="14" height="14" viewBox="0 0 24 24" fill="#0f5132">
         <path d="M19.14,12.94c.04-.31,.06-.63,.06-.94s-.02-.63-.06-.94l2.03-1.58c.18-.14,.23-.4,.12-.61l-1.92-3.32c-.11-.21-.36-.3-.58-.22l-2.39,.96c-.5-.38-1.03-.69-1.62-.92l-.36-2.54c-.04-.23-.23-.4-.47-.4h-3.84c-.24,0-.43,.17-.47,.4l-.36,2.54c-.59,.23-1.12,.54-1.62,.92l-2.39-.96c-.22-.09-.47,0-.58,.22l-1.92,3.32c-.11,.21-.06,.47,.12,.61l2.03,1.58c-.04,.31-.06,.63-.06,.94s.02,.63,.06,.94l-2.03,1.58c-.18,.14-.23,.4-.12,.61l1.92,3.32c.11,.21,.36,.3,.58,.22l2.39-.96c.5,.38,1.03,.69,1.62,.92l.36,2.54c.04,.23,.23,.4,.47,.4h3.84c.24,0,.43-.17,.47-.4l.36-2.54c.59-.23,1.12-.54,1.62-.92l2.39,.96c.22,.09,.47,0,.58-.22l1.92-3.32c.11-.21,.06-.47-.12-.61l-2.03-1.58ZM12,15.5c-1.93,0-3.5-1.57-3.5-3.5s1.57-3.5,3.5-3.5,3.5,1.57,3.5,3.5-1.57,3.5-3.5,3.5Z"/>
       </svg>
     </span> to open the <strong>mutator</strong> panel.</div>
   <div>3) Drag an <strong>else</strong> piece into the structure so it reads: <em>if … do … else …</em></div>
   <div>4) Close the panel — you now have a full <strong>If–Then–Else</strong> block!</div>
-  <div class="mini-badge">Tip</div> Put blocks in the <em>then</em> and <em>else</em> parts to see different results.</div>
-<div class="callout">
-  <strong>Micro-challenge:</strong> If Button A is pressed, then show <em>heart</em>, else show <em>smile</em>.
+  <div class="mini-badge">Tip</div> Put blocks in the <em>then</em> and <em>else</em> parts to see different results.
 </div>`,
 
-`<h3 style="text-align:center;color:#00A1D6;">Comparisons (>, <, =)</h3>
+/* 3) Comparisons — operators explained one-by-one */
+`<h3 style="text-align:center;color:#0f172a;">Comparisons: Three Symbols</h3>
 <div style="margin:10px 0;padding:10px;border-radius:8px;background:#e0f2fe;color:#0f172a;">
-  <div class="pill-row">
-    <span class="pill">&gt;</span>
-    <span class="pill">&lt;</span>
-    <span class="pill">=</span>
-  </div>
-  <div><strong>Meaning:</strong> 150 &gt; 120 ✅ / 80 &lt; 120 ✅ / 120 = 120 ✅</div>
-  <div style="margin-top:8px;">
-    <strong>With sound level (0–255):</strong><br>
-    If <em>sound level &gt; 120</em> → “LOUD!” else “sssh”
-  </div>
-  <div style="margin-top:8px;">
-    <strong>With numbers:</strong><br>
-    If <em>number &lt; 3</em> → show “LOW” else “OK”
-  </div>
-  <!-- NUMBER LINE ILLUSTRATION placeholder
-       Upload: images/logic-numberline-0-255.png (content: horizontal line 0…255 with a marker at 120; BG: transparent or very light; size: ~900×220) -->
+ <ol style="margin:0 0 6px 18px;">
+   <li><strong>=</strong> means “is equal to”.<br>
+       Example: <code>120 = 120</code> ✅ (true)</li>
+   <li><strong>&lt;</strong> means “is less than”.<br>
+       Example: <code>80 &lt; 120</code> ✅ (true)</li>
+   <li><strong>&gt;</strong> means “is greater than”.<br>
+       Example: <code>150 &gt; 120</code> ✅ (true)</li>
+ </ol>
+ <div style="margin-top:8px;">You change the symbol using the dropdown on the compare block.</div>
+ <!-- Optional number line image:
+      images/logic-numberline-0-255.png (0…255 with a marker at 100 or 120) -->
 </div>`,
 
+/* 4) Comparisons — X on the left, Y on the right */
+`<h3 style="text-align:center;color:#0f172a;">What are we comparing?</h3>
+<div style="margin:10px 0;padding:10px;border-radius:8px;background:#f1f5f9;color:#0f172a;">
+  Think of a comparison as <strong>X ? Y</strong> where <strong>?</strong> is one of <strong>=</strong>, <strong>&lt;</strong>, <strong>&gt;</strong>.<br><br>
+  <ul style="margin:0 0 6px 18px;">
+    <li><strong>X</strong> (left side) can be a <em>changing sensor value</em> like <strong>sound level</strong>.</li>
+    <li><strong>Y</strong> (right side) is often a <em>fixed number</em> (a threshold), like <strong>100</strong> or <strong>120</strong>.</li>
+  </ul>
+  Examples:<br>
+  • <code>sound level &gt; 120</code> → loud<br>
+  • <code>sound level &lt; 100</code> → quiet
+</div>`,
+
+/* 5) Your simple Button-A challenge with clear steps */
+`<h3 style="text-align:center;color:#065f46;">Challenge: Button A + If–Then–Else</h3>
+<div style="margin:10px 0;padding:10px;border-radius:8px;background:#d1fae5;color:#065f46;">
+  <strong>Goal:</strong> When you press <strong>Button A</strong>, check the sound. If it’s quiet, show a heart; otherwise, show a smile.<br><br>
+  <ol style="margin:0 0 6px 18px;">
+    <li>From <strong>Input</strong>, drag <strong>on button A pressed</strong> to the Workspace.</li>
+    <li>From <strong>Logic</strong>, drag an <strong>if</strong> block inside it. Click the <strong>gear</strong> and add <strong>else</strong>.</li>
+    <li>From <strong>Logic</strong>, drag a <strong>compare</strong> block (A ? B) into the if’s slot. Change <code>?</code> to <strong>&lt;</strong>.</li>
+    <li>From <strong>Input</strong>, place <strong>sound level</strong> in the left side (A). From <strong>Math</strong>, place a <strong>number</strong> <code>100</code> on the right side (B).</li>
+    <li>In the <strong>then</strong> part: add <strong>show icon → heart</strong> (optional: then a <strong>pause 400 ms</strong> and <strong>clear screen</strong>).</li>
+    <li>In the <strong>else</strong> part: add <strong>show icon → smile</strong> (optional pause + clear).</li>
+    <li>Click <strong>Run</strong>, then press <strong>A</strong>. Try talking quietly vs loudly—does it switch?</li>
+  </ol>
+</div>`,
+
+/* 6) Practice Zone — simplified */
 `<h3 style="text-align:center;color:#00A1D6;">Practice Zone</h3>
-<div style="margin:10px 0;padding:10px;border-radius:8px;background:#10B981;color:#0f5132;">
-  <div><strong>Challenge 1 — “High vs. Low”</strong> <span class="mini-badge">Beginner</span><br>
-  Goal: If <em>sound level &gt; 120</em> → show <strong>“LOUD”</strong>; else show <strong>“sssh”</strong>.<br>
-  Hint: Use <em>if–then–else</em> + <em>compare &gt;</em> + <em>sound level</em>.</div>
-  <hr style="border:none;border-top:1px dashed #0f5132;margin:10px 0;">
-  <div><strong>Challenge 2 — “Bright vs. Dim”</strong> <span class="mini-badge">Next</span><br>
-  Goal: If <em>number &gt; 5</em> → <em>brightness 255</em>; else <em>50</em>.<br>
-  Hint: <em>Math → number</em> + <em>LED → set brightness</em>.</div>
-</div>
+<div style="margin:10px 0;padding:10px;border-radius:8px;background:#e0f2fe;color:#0f172a;">
+  <div><strong>Practice 1 — “Shhh or Loud”</strong><br>
+  If <em>sound level &gt; 120</em> → show <strong>“LOUD”</strong>; else show <strong>“sssh”</strong>.</div>
+  <hr style="border:none;border-top:1px dashed #94a3b8;margin:10px 0;">
+  <div><strong>Practice 2 — “Bright vs Dim”</strong><br>
+  If <em>sound level &lt; 100</em> → set brightness <strong>50</strong>; else <strong>200</strong>.</div>
+</div>`,
+
+/* 7) Did You Know — unchanged from your version */
+`<h3 style="text-align:center;color:#00A1D6;">Did You Know?</h3>
 <div class="didyouknow">
-  💡 <strong>Did you know?</strong>
+  💡 <strong>Real-world logic is everywhere:</strong>
   <p>🚶 Crosswalks: If the button is pressed → then walk signal; else wait.</p>
   <p>🌡️ Thermostats: If temperature &lt; target → then heat; else stop.</p>
   <p>🗣️ Smart speakers: If wake word heard → then listen; else sleep.</p>
   <p>🏭 Factory lights: If a machine is too loud/hot → then alert.</p>
-</div>`,
-
-`<h3 style="text-align:center;color:#00A1D6;">Quick Quiz</h3>
-<div style="margin:10px 0;padding:10px;border-radius:8px;background:#e0f2fe;color:#0f172a;">
-  <ol style="margin:0 0 6px 18px;">
-    <li>Which symbol means “greater than”? — <strong>&gt;</strong></li>
-    <li>If sound level is 140, which branch runs? — <strong>Then (loud)</strong></li>
-    <li>True/False: If–Then–Else helps GlowBit choose between two actions. — <strong>True</strong></li>
-  </ol>
-  <div class="callout">You’ve got the logic superpower! Ready to build a real <strong>Sound Alert</strong>?</div>
-  <a class="gb-btn cta" href="./glowbit-project8.html">Go to Project 8</a>
 </div>
+<a class="gb-btn cta" href="./glowbit-project8.html">Ready for Sound Alerts? → Go to Project 8</a>`
 
 <div class="character-frame">
   <!-- CHARACTER IMAGE -->
-  <!-- Upload: images/Mia3.png (content: Mia smiling / thumbs-up; PNG 400×400, transparent bg; displayed at max 260px) -->
+  <!-- Upload: images/Glowbit3.png (content: Mia smiling / thumbs-up; PNG 400×400, transparent bg; displayed at max 260px) -->
   <img src="images/Mia3.png" alt="Mia the Maker">
 </div>`
     ];
