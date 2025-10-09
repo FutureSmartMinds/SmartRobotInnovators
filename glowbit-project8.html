@@ -98,48 +98,44 @@
         x: 20, y: 20,
         inputs: {
           DO: {
-            block: {
-              type: "controls_if",
-              inputs: {
-                IF0: {
-                  block: {
-                    type: "logic_compare",
-                    fields: { OP: "GT" },
-                    inputs: {
-                      A: { block: { type: "sound_level" } },
-                      B: { block: { type: "math_number", fields: { NUM: 120 } } }
-                    }
-                  }
-                },
-                DO0: {
-                  block: {
-                    type: "set_brightness",
-                    inputs: {
-                      VALUE: { shadow: { type: "math_number", fields: { NUM: 255 } } }
-                    },
-                    next: {
-                      block: { type: "show_icon", fields: { ICON: "square" } }
-                    }
-                  }
-                },
-                ELSE: {
-                  block: {
-                    type: "set_brightness",
-                    inputs: {
-                      VALUE: { shadow: { type: "math_number", fields: { NUM: 50 } } }
-                    },
-                    next: {
-                      block: {
-                        type: "show_icon",
-                        fields: { ICON: "square" },
-                        next: { block: { type: "clear_screen" } }
-                      }
-                    }
-                  }
-                }
-              },
-              next: { block: { type: "pause_block", fields: { MS: 500 } } }
-            }
+            block: {type: "controls_if",
+  // 👇 This line is the important bit
+  extraState: { elseIfCount: 0, hasElse: true },
+  inputs: {
+    IF0: {
+      block: {
+        type: "logic_compare",
+        fields: { OP: "GT" },
+        inputs: {
+          A: { block: { type: "sound_level" } },
+          B: { block: { type: "math_number", fields: { NUM: 120 } } }
+        }
+      }
+    },
+    DO0: {
+      block: {
+        type: "set_brightness",
+        inputs: { VALUE: { shadow: { type: "math_number", fields: { NUM: 255 } } } },
+        next: { block: { type: "show_icon", fields: { ICON: "square" } } }
+      }
+    },
+    // 👇 Make sure this exact key is present and wired
+    ELSE: {
+      block: {
+        type: "set_brightness",
+        inputs: { VALUE: { shadow: { type: "math_number", fields: { NUM: 50 } } } },
+        next: {
+          block: {
+            type: "show_icon",
+            fields: { ICON: "square" },
+            next: { block: { type: "clear_screen" } }
+          }
+        }
+      }
+    }
+  },
+  next: { block: { type: "pause_block", fields: { MS: 500 } } }
+}
           }
         }
       }
