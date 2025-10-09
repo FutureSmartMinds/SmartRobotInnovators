@@ -5,7 +5,7 @@
   <title>GlowBit Logic Playground — If, Then, Else (and Comparisons!)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Match project pages: core libs (RELATIVE to site root /SmartRobotInnovators/) -->
+  <!-- Core libs (same paths as your working project pages) -->
   <script src="lib/blockly_compressed.js"></script>
   <script src="lib/blocks_compressed.js"></script>
   <script src="lib/javascript_compressed.js"></script>
@@ -14,95 +14,153 @@
   <script src="lib/blockly_xml_patch.js"></script>
 
   <style>
-    /* Wrapper: center the whole page like your projects */
-.gb-wrapper {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 12px;
-  font-family: "Segoe UI", Roboto, Arial, sans-serif;
-}
+    /* Page wrapper: center like your projects */
+    .gb-wrapper {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 12px;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    }
 
-/* Keep the Glowbit two-column shell centered & not full-bleed */
-.glowbit-root {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 12px;
-  display: block;
-}
+    /* Header (cloud look) — centered title + subtitle */
+    .gb-header {
+      text-align: center;
+      font-weight: 800;
+      margin: 10px 0;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .gb-header.cloud {
+      background: #f3e8ff;    /* soft lilac cloud */
+      color: #6b21a8;         /* deep purple */
+      border: 2px dashed #c084fc;
+      border-radius: 24px;    /* rounded cloud pill */
+      padding: 14px 16px;
+    }
+    .gb-header .title {
+      font-size: 22px;
+      line-height: 1.2;
+      text-align: center;
+      display: block;
+    }
+    .gb-header .subtitle {
+      font-size: 15px;
+      font-weight: 700;
+      color: #4c1d95;
+      margin-top: 4px;
+      text-align: center;
+      display: block;
+    }
 
-/* Optional: keep columns from getting too wide on huge screens */
-.glowbit-left, .glowbit-right { box-sizing: border-box; }
+    /* Intro bubble */
+    .gb-intro {
+      text-align: center;
+      font-size: 16px;
+      line-height: 1.6;
+      margin: 0 0 10px;
+      color: #374151;
+      background: #e0f2fe;
+      border-radius: 8px;
+      padding: 10px 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
 
-/* Cap width AND give Blockly a real height so it can render */
-#glowbit-logic-playground-editor {
-  height: 560px;       /* ← required for Blockly to show up */
-  min-height: 560px;
-  max-width: 720px;
-  margin: 0 auto;
-}
-.gb-header.cloud{
-  background:#f3e8ff;               /* soft lilac cloud */
-  color:#6b21a8;                     /* deep purple */
-  border:2px dashed #c084fc;
-  border-radius:24px;                /* rounded cloud pill */
-  padding:14px 16px;
-}
-.gb-header .title{text-align:center;font-size:22px;line-height:1.2;}
-.gb-header .subtitle{font-size:18px;font-weight:700;color:#4c1d95;margin-top:4px;}
-    .gb-intro{text-align:center;font-size:18px;line-height:1.6;margin:0 0 10px;color:#374151;
-              background:#e0f2fe;border-radius:8px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
-    .didyouknow{margin-top:18px;background:#fef9c3;border:2px solid #facc15;padding:10px 12px;
-                border-radius:12px;color:#713f12;font-size:15px;font-weight:600;position:relative;
-                box-shadow:0 2px 5px rgba(0,0,0,0.06);}
-    .didyouknow::before{content:"";position:absolute;top:-10px;left:20px;border-width:0 10px 10px 10px;
-                         border-style:solid;border-color:transparent transparent #fef9c3 transparent;}
-    .didyouknow p{text-align:justify;margin:6px 0;}
-    .nav-btns{display:flex;justify-content:space-between;gap:8px;margin-top:10px;flex-wrap:wrap;}
-    .gb-btn{padding:8px 14px;border:none;border-radius:8px;font-weight:800;cursor:pointer;flex:1;text-align:center;}
-    .gb-btn.next{background:#00A1D6;color:#fff;}
-    .gb-btn.back{background:#6B7280;color:#fff;}
-    .gb-btn.cta{background:#10B981;color:#fff;display:block;margin:12px auto 0;}
-    .character-frame{text-align:center;margin-top:18px;}
-    .character-frame img{width:85%;max-width:260px;height:auto;border-radius:12px;
-                         box-shadow:0 4px 12px rgba(0,0,0,0.25);object-fit:cover;}
-    .pill-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
-    .pill{background:#e2e8f0;color:#0f172a;border:1px solid #94a3b8;border-radius:999px;padding:6px 12px;font-weight:700;}
-    .callout{background:#ecfeff;border-left:6px solid #06b6d4;padding:8px 10px;border-radius:8px;color:#0f172a;margin:8px 0;}
-    .mini-badge{display:inline-block;background:#fde68a;color:#92400e;border:1px solid #f59e0b;
-                border-radius:6px;padding:2px 6px;font-size:12px;font-weight:800;margin-left:6px;}
+    /* Keep the Glowbit two-column shell centered & not full-bleed */
+    .glowbit-root {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 12px;
+      display: block;
+    }
+
+    /* Ensure Blockly gets real height — otherwise it won’t render */
+    #glowbit-logic-playground-editor {
+      height: 560px;      /* REQUIRED so the workspace is visible */
+      min-height: 560px;
+      max-width: 720px;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    /* Optional: keep columns from getting too wide */
+    .glowbit-left, .glowbit-right { box-sizing: border-box; }
+
+    .didyouknow {
+      margin-top: 18px;
+      background: #fef9c3;
+      border: 2px solid #facc15;
+      padding: 10px 12px;
+      border-radius: 12px;
+      color: #713f12;
+      font-size: 15px;
+      font-weight: 600;
+      position: relative;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+    }
+    .didyouknow::before {
+      content:"";
+      position:absolute; top:-10px; left:20px;
+      border-width:0 10px 10px 10px;
+      border-style:solid;
+      border-color:transparent transparent #fef9c3 transparent;
+    }
+    .didyouknow p { text-align: justify; margin: 6px 0; }
+
+    .nav-btns {
+      display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; flex-wrap: wrap;
+    }
+    .gb-btn {
+      padding: 8px 14px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; flex: 1; text-align: center;
+    }
+    .gb-btn.next { background: #00A1D6; color: #fff; }
+    .gb-btn.back { background: #6B7280; color: #fff; }
+    .gb-btn.cta  { background: #10B981; color: #fff; display: block; margin: 12px auto 0; }
+
+    .character-frame { text-align: center; margin-top: 18px; }
+    .character-frame img {
+      width: 85%; max-width: 260px; height: auto; border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.25); object-fit: cover;
+    }
+
+    .pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 }
+    .pill { background:#e2e8f0; color:#0f172a; border:1px solid #94a3b8; border-radius:999px; padding:6px 12px; font-weight:700; }
+    .callout { background:#ecfeff; border-left:6px solid #06b6d4; padding:8px 10px; border-radius:8px; color:#0f172a; margin:8px 0; }
+    .mini-badge { display:inline-block; background:#fde68a; color:#92400e; border:1px solid #f59e0b;
+                  border-radius:6px; padding:2px 6px; font-size:12px; font-weight:800; margin-left:6px; }
   </style>
 </head>
 
 <body>
-   <div class="gb-wrapper">
-  <div class="gb-header cloud">
-  <div class="title">✨ Expand Your Knowledge — Logical Conditions & Comparisons</div>
-  <div class="subtitle">Teach GlowBit to make decisions like a tiny robot brain</div>
-</div>
+  <div class="gb-wrapper">
+    <div class="gb-header cloud">
+      <span class="title">✨ Expand Your Knowledge — Logical Conditions & Comparisons</span>
+      <span class="subtitle">Teach GlowBit to make decisions like a tiny robot brain</span>
+    </div>
 
     <p class="gb-intro">
       This is a fun pit-stop between Projects 7 and 8. You’ll learn <strong>If–Then–Else</strong>
       and <strong>Comparisons</strong> (<span class="pill">&gt;</span> <span class="pill">&lt;</span> <span class="pill">=</span>)
-      so Project 8 feels easy. Let’s practice!
+      so your next projects feel easy. Let’s practice!
     </p>
 
-    <!-- Use standard lesson shell so the page looks like other projects -->
+    <!-- Standard lesson shell; right pane hosts the Blockly editor -->
     <div id="glowbit-logic-playground"></div>
   </div>
 
-<script>
+  <script>
   (function init(){
     if(!(window.Glowbit && window.Blockly)) return setTimeout(init,120);
 
-    // ✅ Starter program (works whether field is "BUTTON" or "BTN")
-    //    Also shows the *correct* structure: Event → If–Then–Else inside
+    /* Starter program:
+       On Button A pressed → IF (TRUE placeholder) THEN heart ELSE smile
+       (Kids will replace TRUE with a real comparison later)
+       We set both BUTTON/BTN so it works whatever your field name is.
+    */
     const starterJson = {
       blocks: {
         languageVersion: 0,
         blocks: [
           {
             type: "on_button_pressed",
-            // set both; Blockly will ignore the unknown one and use the right one
             fields: { BUTTON: "A", BTN: "A" },
             x: 20, y: 20,
             inputs: {
@@ -111,15 +169,13 @@
                   type: "controls_if",
                   extraState: { elseIfCount: 0, hasElse: true },
                   inputs: {
-                    // Placeholder condition so kids can see it work immediately.
-                    // They can replace this with (sound level > 120), etc.
                     IF0: { block: { type: "logic_boolean", fields: { BOOL: "TRUE" } } },
                     DO0: {
                       block: {
                         type: "show_icon",
                         fields: { ICON: "heart" },
                         next: {
-                          block: { type: "pause_block", fields: { MS: 500 },
+                          block: { type: "pause_block", fields: { MS: 400 },
                             next: { block: { type: "clear_screen" } }
                           }
                         }
@@ -130,7 +186,7 @@
                         type: "show_icon",
                         fields: { ICON: "smile" },
                         next: {
-                          block: { type: "pause_block", fields: { MS: 500 },
+                          block: { type: "pause_block", fields: { MS: 400 },
                             next: { block: { type: "clear_screen" } }
                           }
                         }
@@ -145,7 +201,7 @@
       }
     };
 
-    // Build the standard UI shell (no defaultJson here)
+    // Build the standard two-column UI
     const lesson = Glowbit.createLessonUI('glowbit-logic-playground', {
       title: '',
       instructions: '',
@@ -153,26 +209,22 @@
       defaultJson: null
     });
 
-    // Clear once, then load our starter program
+    // Ensure the editor container exists and has height (CSS) before load
+    const editorEl = document.getElementById('glowbit-logic-playground-editor');
+    if (editorEl && !editorEl.style.height) {
+      editorEl.style.height = '560px'; // safety net (CSS also sets this)
+    }
+
+    // Clear once, then load starter blocks, then force a layout pass
     if (lesson && lesson.workspace) {
       lesson.workspace.clear();
       Blockly.serialization.workspaces.load(starterJson, lesson.workspace);
-      // Force a layout pass now that the container has a real size
-  setTimeout(() => Blockly.svgResize(lesson.workspace), 0);
+      // Nudge Blockly after the DOM paints
+      setTimeout(() => Blockly.svgResize(lesson.workspace), 0);
     }
-    let _rt=null;
-window.addEventListener('resize', ()=>{
-  clearTimeout(_rt);
-  _rt = setTimeout(()=>{
-    paginate();
-    if (lesson && lesson.workspace) Blockly.svgResize(lesson.workspace);
-  }, 150);
-});
 
-    // Sidebar content with inline SVG hints (gear + compare)
-   const stepCards = [
-
-/* 1) Welcome (intro copy adjusted) */
+    /* --- Sidebar content (updated as per your requests) --- */
+    const stepCards = [
 `<div style="display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:4px;">
    <!-- Optional hero: images/logic-hero-mia-glowbit.png -->
 </div>
@@ -188,7 +240,6 @@ window.addEventListener('resize', ()=>{
  • 🚦 If light is green → Then go → Else wait.
 </div>`,
 
-/* 2) If–Then–Else (gear mutator) — unchanged steps, no challenge here */
 `<h3 id="logic-steps" style="text-align:center;color:#0f5132;">If–Then–Else (Build it with the Gear)</h3>
 <div style="margin:10px 0;padding:10px;border-radius:8px;background:#d1fae5;color:#0f5132;">
   <div>1) From <strong>Logic</strong>, drag an <strong>if</strong> block into your Workspace.</div>
@@ -203,7 +254,6 @@ window.addEventListener('resize', ()=>{
   <div class="mini-badge">Tip</div> Put blocks in the <em>then</em> and <em>else</em> parts to see different results.
 </div>`,
 
-/* 3) Comparisons — operators explained one-by-one */
 `<h3 style="text-align:center;color:#0f172a;">Comparisons: Three Symbols</h3>
 <div style="margin:10px 0;padding:10px;border-radius:8px;background:#e0f2fe;color:#0f172a;">
  <ol style="margin:0 0 6px 18px;">
@@ -214,12 +264,9 @@ window.addEventListener('resize', ()=>{
    <li><strong>&gt;</strong> means “is greater than”.<br>
        Example: <code>150 &gt; 120</code> ✅ (true)</li>
  </ol>
- <div style="margin-top:8px;">You change the symbol using the dropdown on the compare block.</div>
- <!-- Optional number line image:
-      images/logic-numberline-0-255.png (0…255 with a marker at 100 or 120) -->
+ <div style="margin-top:8px;">Change the symbol using the dropdown on the compare block.</div>
 </div>`,
 
-/* 4) Comparisons — X on the left, Y on the right */
 `<h3 style="text-align:center;color:#0f172a;">What are we comparing?</h3>
 <div style="margin:10px 0;padding:10px;border-radius:8px;background:#f1f5f9;color:#0f172a;">
   Think of a comparison as <strong>X ? Y</strong> where <strong>?</strong> is one of <strong>=</strong>, <strong>&lt;</strong>, <strong>&gt;</strong>.<br><br>
@@ -232,7 +279,6 @@ window.addEventListener('resize', ()=>{
   • <code>sound level &lt; 100</code> → quiet
 </div>`,
 
-/* 5) Your simple Button-A challenge with clear steps */
 `<h3 style="text-align:center;color:#065f46;">Challenge: Button A + If–Then–Else</h3>
 <div style="margin:10px 0;padding:10px;border-radius:8px;background:#d1fae5;color:#065f46;">
   <strong>Goal:</strong> When you press <strong>Button A</strong>, check the sound. If it’s quiet, show a heart; otherwise, show a smile.<br><br>
@@ -247,7 +293,6 @@ window.addEventListener('resize', ()=>{
   </ol>
 </div>`,
 
-/* 6) Practice Zone — simplified */
 `<h3 style="text-align:center;color:#00A1D6;">Practice Zone</h3>
 <div style="margin:10px 0;padding:10px;border-radius:8px;background:#e0f2fe;color:#0f172a;">
   <div><strong>Practice 1 — “Shhh or Loud”</strong><br>
@@ -257,7 +302,6 @@ window.addEventListener('resize', ()=>{
   If <em>sound level &lt; 100</em> → set brightness <strong>50</strong>; else <strong>200</strong>.</div>
 </div>`,
 
-/* 7) Did You Know — unchanged from your version */
 `<h3 style="text-align:center;color:#00A1D6;">Did You Know?</h3>
 <div class="didyouknow">
   💡 <strong>Real-world logic is everywhere:</strong>
@@ -269,65 +313,63 @@ window.addEventListener('resize', ()=>{
 <a class="gb-btn cta" href="./glowbit-project8.html">Ready for Sound Alerts? → Go to Project 8</a>`
     ];
 
-    // Sidebar auto-pagination (same pattern as projects)
+    /* --- Sidebar auto-pagination (same as your projects) --- */
     function paginate(){
       const sidebar = document.querySelector('#glowbit-logic-playground .glowbit-left');
       if(!sidebar) return;
       const editor = document.getElementById('glowbit-logic-playground-editor');
-      const targetH = (editor && editor.offsetHeight) ? editor.offsetHeight : 520;
+      const targetH = (editor && editor.offsetHeight) ? editor.offsetHeight : 560;
 
       const meas = document.createElement('div');
-      meas.style.visibility='hidden';meas.style.position='absolute';meas.style.left='-9999px';meas.style.top='-9999px';
-      meas.style.width=(sidebar.clientWidth||320)+'px';
+      meas.style.visibility='hidden'; meas.style.position='absolute'; meas.style.left='-9999px'; meas.style.top='-9999px';
+      meas.style.width = (sidebar.clientWidth || 320) + 'px';
       document.body.appendChild(meas);
 
-      const pages=[]; let current=[]; const reserve=56;
+      const pages = []; let current = []; const reserve = 56;
       stepCards.forEach(html=>{
-        const c=document.createElement('div'); c.innerHTML=html; meas.appendChild(c);
+        const c = document.createElement('div'); c.innerHTML = html; meas.appendChild(c);
         const tooTall = meas.scrollHeight > (targetH - reserve);
         if(tooTall){
           if(current.length===0){ pages.push([html]); meas.innerHTML=''; }
-          else{
+          else {
             pages.push([...current]); current=[html]; meas.innerHTML='';
             current.forEach(h=>{ const d=document.createElement('div'); d.innerHTML=h; meas.appendChild(d); });
           }
-        }else current.push(html);
+        } else {
+          current.push(html);
+        }
       });
       if(current.length) pages.push(current);
       document.body.removeChild(meas);
 
       function render(i){
-  sidebar.innerHTML = pages[i].join('');
+        sidebar.innerHTML = pages[i].join('');
 
-  const nav = document.createElement('div');
-  nav.className = 'nav-btns';
-  if(i>0){ const b=document.createElement('button'); b.textContent='⬅ Back'; b.className='gb-btn back'; b.onclick=()=>render(i-1); nav.appendChild(b); }
-  if(i<pages.length-1){ const n=document.createElement('button'); n.textContent='Next ➜'; n.className='gb-btn next'; n.onclick=()=>render(i+1); nav.appendChild(n); }
-  if(nav.children.length) sidebar.appendChild(nav);
+        const nav = document.createElement('div');
+        nav.className = 'nav-btns';
+        if(i>0){ const b=document.createElement('button'); b.textContent='⬅ Back'; b.className='gb-btn back'; b.onclick=()=>render(i-1); nav.appendChild(b); }
+        if(i<pages.length-1){ const n=document.createElement('button'); n.textContent='Next ➜'; n.className='gb-btn next'; n.onclick=()=>render(i+1); nav.appendChild(n); }
+        if(nav.children.length) sidebar.appendChild(nav);
 
-  // 👇 Add character image under the sidebar (persists across slides)
-  const frame = document.createElement('div');
-  frame.className = 'character-frame';
-  frame.innerHTML = `
-    <img src="images/GlowBit3.png" alt="GlowBit buddy">
-  `;
-  sidebar.appendChild(frame);
-}
+        // Character image under the sidebar (every slide)
+        const frame = document.createElement('div');
+        frame.className = 'character-frame';
+        frame.innerHTML = `<img src="images/GlowBit3.png" alt="GlowBit buddy">`;
+        sidebar.appendChild(frame);
+      }
       render(0);
     }
     paginate();
-    let _rt=null; window.addEventListener('resize',()=>{ clearTimeout(_rt); _rt=setTimeout(paginate,150); });
 
-    // Optional: show a hero image on the right instead of an empty workspace.
-    // Upload images/logic-hero-mia-glowbit.png then uncomment below:
-    // (function swapRightPane(){
-    //   const right = document.querySelector('#glowbit-logic-playground .glowbit-right');
-    //   if(!right) return;
-    //   const hero = document.createElement('div');
-    //   hero.style.cssText='text-align:center;margin-top:10px;';
-    //   hero.innerHTML = '<img src="images/logic-hero-mia-glowbit.png" alt="Logic hero" style="max-width:96%;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.15)">';
-    //   right.innerHTML = ''; right.appendChild(hero);
-    // })();
+    // Resize handler: repaginate + nudge Blockly layout
+    let _rt = null;
+    window.addEventListener('resize', ()=>{
+      clearTimeout(_rt);
+      _rt = setTimeout(()=>{
+        paginate();
+        if (lesson && lesson.workspace) Blockly.svgResize(lesson.workspace);
+      }, 150);
+    });
 
     console.log('✅ Logic Playground page ready.');
   })();
