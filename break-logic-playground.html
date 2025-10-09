@@ -151,12 +151,25 @@
 
     // Build the standard two-column UI
     const lesson = Glowbit.createLessonUI('break-logic-playground', {
-      title: '',
-      instructions: '',
-      pixelSize: 28,
-      defaultJson: null
-    });
+  title: '',
+  instructions: '',
+  pixelSize: 28,
+  defaultJson: null
+});
 
+// 👇 ADD THIS BLOCK to ensure the toolbox is attached
+if (lesson && lesson.workspace) {
+  const toolbox =
+    (window.Glowbit && (Glowbit.toolboxXml || Glowbit.toolbox || Glowbit.TOOLBOX_XML))
+    || null;
+
+  if (toolbox) {
+    // Accepts either an XML string or a DOM element
+    lesson.workspace.updateToolbox(toolbox);
+  } else {
+    console.warn('No Glowbit toolbox found. Check assets/global.js for toolbox export.');
+  }
+}
     // Ensure editor has height before loading blocks
     const editorEl = document.getElementById('break-logic-playground-editor');
     if (editorEl && !editorEl.style.height) editorEl.style.height = '560px';
