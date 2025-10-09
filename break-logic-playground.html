@@ -42,9 +42,11 @@
     .glowbit-root { max-width: 1100px; margin: 0 auto; padding: 0 12px; display: block; }
 
     /* Ensure Blockly gets real height — otherwise it won’t render */
-    #glowbit-logic-playground-editor {
-      height: 560px; min-height: 560px; max-width: 720px; margin: 0 auto; box-sizing: border-box;
-    }
+    #break-logic-playground-editor {
+  height: 560px; min-height: 560px; max-width: 720px; margin: 0 auto; box-sizing: border-box;
+}
+/* (Optional) visual debugging while you test */
+.glowbit-editor { background:#fff; }
 
     .glowbit-left, .glowbit-right { box-sizing: border-box; }
 
@@ -93,7 +95,7 @@
     </p>
 
     <!-- Standard lesson shell; right pane hosts the Blockly editor -->
-    <div id="glowbit-logic-playground"></div>
+    <div id="break-logic-playground"></div>
   </div>
 
   <script>
@@ -107,7 +109,7 @@
         blocks: [
           {
             type: "on_button_pressed",
-            fields: { BUTTON: "A", BTN: "A" },
+            fields: { BTN: "A" },
             x: 20, y: 20,
             inputs: {
               DO: {
@@ -148,7 +150,7 @@
     };
 
     // Build the standard two-column UI
-    const lesson = Glowbit.createLessonUI('glowbit-logic-playground', {
+    const lesson = Glowbit.createLessonUI('break-logic-playground', {
       title: '',
       instructions: '',
       pixelSize: 28,
@@ -156,8 +158,9 @@
     });
 
     // Ensure editor has height before loading blocks
-    const editorEl = document.getElementById('glowbit-logic-playground-editor');
+    const editorEl = document.getElementById('break-logic-playground-editor');
     if (editorEl && !editorEl.style.height) editorEl.style.height = '560px';
+    console.log('Editor div?', !!editorEl, editorEl && editorEl.id, editorEl && editorEl.style.height);
 
     // Load starter blocks, then force layout
     if (lesson && lesson.workspace) {
@@ -255,9 +258,9 @@
 
     /* --- Sidebar auto-pagination (and character image) --- */
     function paginate(){
-      const sidebar = document.querySelector('#glowbit-logic-playground .glowbit-left');
+      const sidebar = document.querySelector('#break-logic-playground .glowbit-left');
       if(!sidebar) return;
-      const editor = document.getElementById('glowbit-logic-playground-editor');
+      const editor  = document.getElementById('break-logic-playground-editor');
       const targetH = (editor && editor.offsetHeight) ? editor.offsetHeight : 560;
 
       const meas = document.createElement('div');
