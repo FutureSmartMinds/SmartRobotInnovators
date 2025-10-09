@@ -5,21 +5,15 @@
   <title>GlowBit Logic Playground — If, Then, Else (and Comparisons!)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Match project pages: core libs -->
-  <script src="SmartRobotInnovators/lib/blockly_compressed.js"></script>
-<script src="SmartRobotInnovators/lib/blocks_compressed.js"></script>
-<script src="SmartRobotInnovators/lib/javascript_compressed.js"></script>
-<script src="SmartRobotInnovators/lib/msg/en.js"></script>
-<script src="SmartRobotInnovators/assets/global.js"></script>
-<script src="SmartRobotInnovators/lib/blockly_xml_patch.js"></script><script src="SmartRobotInnovators/lib/blockly_compressed.js"></script>
-<script src="SmartRobotInnovators/lib/blocks_compressed.js"></script>
-<script src="SmartRobotInnovators/lib/javascript_compressed.js"></script>
-<script src="SmartRobotInnovators/lib/msg/en.js"></script>
-<script src="SmartRobotInnovators/assets/global.js"></script>
-<script src="SmartRobotInnovators/lib/blockly_xml_patch.js"></script>
+  <!-- Match project pages: core libs (RELATIVE to site root /SmartRobotInnovators/) -->
+  <script src="lib/blockly_compressed.js"></script>
+  <script src="lib/blocks_compressed.js"></script>
+  <script src="lib/javascript_compressed.js"></script>
+  <script src="lib/msg/en.js"></script>
+  <script src="assets/global.js"></script>
+  <script src="lib/blockly_xml_patch.js"></script>
 
   <style>
-    /* Same overall feel as projects */
     .gb-wrapper{max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
     .gb-header{text-align:center;background:#e6f9ff;color:#00A1D6;font-size:22px;font-weight:800;
                 padding:8px 12px;border-radius:10px;margin:10px 0;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
@@ -61,7 +55,7 @@
       so Project 8 feels easy. Let’s practice!
     </p>
 
-    <!-- Use standard lesson shell so the layout matches projects -->
+    <!-- Use standard lesson shell so the page looks like other projects -->
     <div id="glowbit-logic-playground"></div>
   </div>
 
@@ -69,18 +63,17 @@
   (function init(){
     if(!(window.Glowbit && window.Blockly)) return setTimeout(init,120);
 
-    /* Create the standard two-column UI so the page looks like other projects.
-       We'll leave the workspace empty; the right side still gives kids the familiar canvas/controls. */
+    // Create the standard two-column UI; workspace stays empty (right pane remains familiar)
     const lesson = Glowbit.createLessonUI('glowbit-logic-playground', {
       title: '', instructions: '', pixelSize: 28, defaultJson: { blocks:{ languageVersion:0, blocks:[] } }
     });
     if (lesson && lesson.workspace) lesson.workspace.clear();
 
-    /* --- Sidebar content with inline SVG hints (gear + compare) --- */
+    // Sidebar content with inline SVG hints (gear + compare)
     const stepCards = [
 `<div style="display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:4px;">
    <!-- HERO ILLUSTRATION placeholder -->
-   <!-- Upload: /images/logic-hero-mia-glowbit.png  (content: Mia high-fiving GlowBit; BG: soft gradient; size: ~1200×500, transparent or light bg) -->
+   <!-- Upload: images/logic-hero-mia-glowbit.png  (content: Mia high-fiving GlowBit; BG: soft gradient; size: ~1200×500, transparent or light bg) -->
 </div>
 <h3 style="text-align:center;color:#00A1D6;">Welcome to the Logic Playground!</h3>
 <div class="callout">
@@ -128,7 +121,7 @@
     If <em>number &lt; 3</em> → show “LOW” else “OK”
   </div>
   <!-- NUMBER LINE ILLUSTRATION placeholder
-       Upload: /images/logic-numberline-0-255.png (content: horizontal line 0…255 with a marker at 120; BG: transparent or very light; size: ~900×220) -->
+       Upload: images/logic-numberline-0-255.png (content: horizontal line 0…255 with a marker at 120; BG: transparent or very light; size: ~900×220) -->
 </div>`,
 
 `<h3 style="text-align:center;color:#00A1D6;">Practice Zone</h3>
@@ -162,12 +155,12 @@
 
 <div class="character-frame">
   <!-- CHARACTER IMAGE -->
-  <!-- Upload: /images/Mia3.png (content: Mia smiling / thumbs-up; PNG 400×400, transparent bg; we’ll display at max-width 260px) -->
-  <img src="SmartRobotInnovators/images/Mia3.png" alt="Mia the Maker">
+  <!-- Upload: images/Mia3.png (content: Mia smiling / thumbs-up; PNG 400×400, transparent bg; displayed at max 260px) -->
+  <img src="images/Mia3.png" alt="Mia the Maker">
 </div>`
     ];
 
-    /* --- Sidebar auto-pagination (same pattern as projects) --- */
+    // Sidebar auto-pagination (same pattern as projects)
     function paginate(){
       const sidebar = document.querySelector('#glowbit-logic-playground .glowbit-left');
       if(!sidebar) return;
@@ -206,14 +199,14 @@
     paginate();
     let _rt=null; window.addEventListener('resize',()=>{ clearTimeout(_rt); _rt=setTimeout(paginate,150); });
 
-    /* Optional: you can show a hero image on the right instead of an empty workspace.
-       If you upload /images/logic-hero-mia-glowbit.png, uncomment the lines below to display it. */
+    // Optional: show a hero image on the right instead of an empty workspace.
+    // Upload images/logic-hero-mia-glowbit.png then uncomment below:
     // (function swapRightPane(){
     //   const right = document.querySelector('#glowbit-logic-playground .glowbit-right');
     //   if(!right) return;
     //   const hero = document.createElement('div');
     //   hero.style.cssText='text-align:center;margin-top:10px;';
-    //   hero.innerHTML = '<img src="SmartRobotInnovators/images/logic-hero-mia-glowbit.png" alt="Logic hero" style="max-width:96%;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.15)">';
+    //   hero.innerHTML = '<img src="images/logic-hero-mia-glowbit.png" alt="Logic hero" style="max-width:96%;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.15)">';
     //   right.innerHTML = ''; right.appendChild(hero);
     // })();
 
