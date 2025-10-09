@@ -6,13 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Cache-Control" content="no-store" />
 
-  <!-- Core libs (same paths as your working project pages) -->
-  <script src="lib/blockly_compressed.js"></script>
-  <script src="lib/blocks_compressed.js"></script>
-  <script src="lib/javascript_compressed.js"></script>
-  <script src="lib/msg/en.js"></script>
-  <script src="assets/global.js"></script>
-  <script src="lib/blockly_xml_patch.js"></script>
+  <!-- Core libs (cache-busted) -->
+  <script src="lib/blockly_compressed.js?v=lp3"></script>
+  <script src="lib/blocks_compressed.js?v=lp3"></script>
+  <script src="lib/javascript_compressed.js?v=lp3"></script>
+  <script src="lib/msg/en.js?v=lp3"></script>
+  <script src="assets/global.js?v=lp3"></script>
+  <script src="lib/blockly_xml_patch.js?v=lp3"></script>
 
   <style>
     /* Page wrapper: center like your projects */
@@ -24,50 +24,26 @@
     }
 
     /* Header (cloud look) — centered title + subtitle */
-    .gb-header {
-      text-align: center;
-      font-weight: 800;
-      margin: 10px 0;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-    }
+    .gb-header { text-align: center; font-weight: 800; margin: 10px 0; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
     .gb-header.cloud {
-      background: #f3e8ff;
-      color: #6b21a8;
-      border: 2px dashed #c084fc;
-      border-radius: 24px;
-      padding: 14px 16px;
+      background: #f3e8ff; color: #6b21a8; border: 2px dashed #c084fc;
+      border-radius: 24px; padding: 14px 16px;
     }
     .gb-header .title { font-size: 22px; line-height: 1.2; display:block; }
     .gb-header .subtitle { font-size: 15px; font-weight: 700; color: #4c1d95; margin-top: 4px; display:block; }
 
     /* Intro bubble */
     .gb-intro {
-      text-align: center;
-      font-size: 16px;
-      line-height: 1.6;
-      margin: 0 0 10px;
-      color: #374151;
-      background: #e0f2fe;
-      border-radius: 8px;
-      padding: 10px 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      text-align: center; font-size: 16px; line-height: 1.6; margin: 0 0 10px; color: #374151;
+      background: #e0f2fe; border-radius: 8px; padding: 10px 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
 
     /* Keep the Glowbit two-column shell centered & not full-bleed */
-    .glowbit-root {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 12px;
-      display: block;
-    }
+    .glowbit-root { max-width: 1100px; margin: 0 auto; padding: 0 12px; display: block; }
 
     /* Ensure Blockly gets real height — otherwise it won’t render */
     #glowbit-logic-playground-editor {
-      height: 560px;      /* REQUIRED so the workspace is visible */
-      min-height: 560px;
-      max-width: 720px;
-      margin: 0 auto;
-      box-sizing: border-box;
+      height: 560px; min-height: 560px; max-width: 720px; margin: 0 auto; box-sizing: border-box;
     }
 
     .glowbit-left, .glowbit-right { box-sizing: border-box; }
@@ -124,11 +100,7 @@
   (function init(){
     if(!(window.Glowbit && window.Blockly)) return setTimeout(init,120);
 
-    /* Starter program:
-       On Button A pressed → IF (TRUE placeholder) THEN heart ELSE smile
-       (Kids will replace TRUE with a real comparison later)
-       We set both BUTTON/BTN so it works whatever your field name is.
-    */
+    /* Starter program (Button A → IF TRUE THEN heart ELSE smile) */
     const starterJson = {
       blocks: {
         languageVersion: 0,
@@ -183,13 +155,11 @@
       defaultJson: null
     });
 
-    // Safety: ensure the editor has height before loading blocks
+    // Ensure editor has height before loading blocks
     const editorEl = document.getElementById('glowbit-logic-playground-editor');
-    if (editorEl && !editorEl.style.height) {
-      editorEl.style.height = '560px';
-    }
+    if (editorEl && !editorEl.style.height) editorEl.style.height = '560px';
 
-    // Load starter blocks, then force a layout pass
+    // Load starter blocks, then force layout
     if (lesson && lesson.workspace) {
       lesson.workspace.clear();
       Blockly.serialization.workspaces.load(starterJson, lesson.workspace);
@@ -331,14 +301,10 @@
     }
     paginate();
 
-    // Resize handler: repaginate + nudge Blockly layout (no _rt anywhere)
-    let _resizeTimer = null;
+    // Simple resize handler: no timers/variables at all
     window.addEventListener('resize', ()=>{
-      clearTimeout(_resizeTimer);
-      _resizeTimer = setTimeout(()=>{
-        paginate();
-        if (lesson && lesson.workspace) Blockly.svgResize(lesson.workspace);
-      }, 150);
+      paginate();
+      if (lesson && lesson.workspace) Blockly.svgResize(lesson.workspace);
     });
 
     console.log('✅ Logic Playground page ready.');
