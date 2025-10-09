@@ -362,14 +362,14 @@
     paginate();
 
     // Resize handler: repaginate + nudge Blockly layout
-    let _rt = null;
-    window.addEventListener('resize', ()=>{
-      clearTimeout(_rt);
-      _rt = setTimeout(()=>{
-        paginate();
-        if (lesson && lesson.workspace) Blockly.svgResize(lesson.workspace);
-      }, 150);
-    });
+    let _resizeTimer = null;
+window.addEventListener('resize', ()=>{
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(()=>{
+    paginate();
+    if (lesson && lesson.workspace) Blockly.svgResize(lesson.workspace);
+  }, 150);
+});
 
     console.log('✅ Logic Playground page ready.');
   })();
