@@ -89,7 +89,7 @@
            clear_screen
          pause 500
     */
-    const solutionJson = {
+   const solutionJson = {
   blocks: {
     languageVersion: 0,
     blocks: [
@@ -104,34 +104,24 @@
                 IF0: {
                   block: {
                     type: "logic_compare",
-                    fields: { OP: "GT" },
+                    fields: { OP: "GT" },          // >
                     inputs: {
                       A: { block: { type: "sound_level" } },
                       B: { block: { type: "math_number", fields: { NUM: 120 } } }
                     }
                   }
                 },
-                DO0: {
+                DO0: {                            // loud: bright on
                   block: {
                     type: "set_brightness",
-                    inputs: {
-                      VALUE: {
-                        shadow: { type: "math_number", fields: { NUM: 255 } }
-                      }
-                    },
-                    next: {
-                      block: { type: "show_icon", fields: { ICON: "square" } }
-                    }
+                    fields: { VAL: 255 },
+                    next: { block: { type: "show_icon", fields: { ICON: "square" } } }
                   }
                 },
-                ELSE: {
+                ELSE: {                           // quiet: dim on then clear
                   block: {
                     type: "set_brightness",
-                    inputs: {
-                      VALUE: {
-                        shadow: { type: "math_number", fields: { NUM: 50 } }
-                      }
-                    },
+                    fields: { VAL: 50 },
                     next: {
                       block: {
                         type: "show_icon",
