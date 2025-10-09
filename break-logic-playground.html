@@ -99,94 +99,105 @@
   </div>
 
   <script>
-  (function init(){
-    if(!(window.Glowbit && window.Blockly)) return setTimeout(init,120);
+(function init(){
+  // Wait until both Glowbit + Blockly are available
+  if(!(window.Glowbit && window.Blockly)) return setTimeout(init,120);
 
-    /* Starter program (Button A → IF TRUE THEN heart ELSE smile) */
-    const starterJson = {
-      blocks: {
-        languageVersion: 0,
-        blocks: [
-          {
-            type: "on_button_pressed",
-            fields: { BTN: "A" },
-            x: 20, y: 20,
-            inputs: {
-              DO: {
-                block: {
-                  type: "controls_if",
-                  extraState: { elseIfCount: 0, hasElse: true },
-                  inputs: {
-                    IF0: { block: { type: "logic_boolean", fields: { BOOL: "TRUE" } } },
-                    DO0: {
-                      block: {
-                        type: "show_icon",
-                        fields: { ICON: "heart" },
-                        next: {
-                          block: { type: "pause_block", fields: { MS: 400 },
-                            next: { block: { type: "clear_screen" } }
-                          }
-                        }
-                      }
-                    },
-                    ELSE: {
-                      block: {
-                        type: "show_icon",
-                        fields: { ICON: "smile" },
-                        next: {
-                          block: { type: "pause_block", fields: { MS: 400 },
-                            next: { block: { type: "clear_screen" } }
-                          }
-                        }
-                      }
-                    }
-                  }
+  // --- Starter program: Button A → IF TRUE then heart else smile ---
+  const starterJson = {
+    blocks:{
+      languageVersion:0,
+      blocks:[
+        {
+          type:"on_button_pressed",
+          fields:{ BTN:"A" },             // use BTN (your global.js field name)
+          x:20, y:20,
+          inputs:{
+            DO:{
+              block:{
+                type:"controls_if",
+                extraState:{ elseIfCount:0, hasElse:true },
+                inputs:{
+                  IF0:{ block:{ type:"logic_boolean", fields:{ BOOL:"TRUE" } } },
+                  DO0:{ block:{
+                    type:"show_icon", fields:{ ICON:"heart" },
+                    next:{ block:{ type:"pause_block", fields:{ MS:400 },
+                      next:{ block:{ type:"clear_screen" } } }
+                  }},
+                  ELSE:{ block:{
+                    type:"show_icon", fields:{ ICON:"smile" },
+                    next:{ block:{ type:"pause_block", fields:{ MS:400 },
+                      next:{ block:{ type:"clear_screen" } } }
+                  }}
                 }
               }
             }
           }
-        ]
-      }
-    };
-
-    // Build the standard two-column UI
-    const lesson = Glowbit.createLessonUI('break-logic-playground', {
-  title: '',
-  instructions: '',
-  pixelSize: 28,
-  defaultJson: { blocks: { languageVersion: 0, blocks: [] } }
-});
-
-// 👇 ADD THIS BLOCK to ensure the toolbox is attached
-if (lesson && lesson.workspace) {
-  const toolbox =
-    (window.Glowbit && (Glowbit.toolboxXml || Glowbit.toolbox || Glowbit.TOOLBOX_XML))
-    || null;
-
-  if (toolbox) {
-    // Accepts either an XML string or a DOM element
-    lesson.workspace.updateToolbox(toolbox);
-  } else {
-    console.warn('No Glowbit toolbox found. Check assets/global.js for toolbox export.');
-  }
-}
-    // Ensure editor has height before loading blocks
-    const editorEl = document.getElementById('break-logic-playground-editor');
-    if (editorEl && !editorEl.style.height) editorEl.style.height = '560px';
-    console.log('Editor div?', !!editorEl, editorEl && editorEl.id, editorEl && editorEl.style.height);
-
-    // Load starter blocks, then force layout
-    if (lesson && lesson.workspace) {
-      lesson.workspace.clear();
-      Blockly.serialization.workspaces.load(starterJson, lesson.workspace);
-      setTimeout(() => Blockly.svgResize(lesson.workspace), 0);
+        }
+      ]
     }
+  };
 
-    /* --- Sidebar content --- */
-    const stepCards = [
-`<div style="display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:4px;">
-   <!-- Optional hero: images/logic-hero-mia-glowbit.png -->
-</div>
+  // --- Build the two-column shell exactly like projects ---
+  const lesson = Glowbit.createLessonUI('break-logic-playground', {
+    title: '',
+    instructions: '',
+    pixelSize: 28,
+    // IMPORTANT: non-null defaultJson so Blockly injects with toolbox
+    defaultJson: { blocks:{ languageVersion:0, blocks:[] } }
+  });
+
+  // Ensure the editor div has height before load (required for visibility)
+  const editorEl = document.getElementById('break-logic-playground-editor');
+  if (editorEl && !editorEl.style.height) editorEl.style.height = '560px';
+
+  // Optional safety: if your toolbox isn’t auto-attached, attach it
+  if (lesson && lesson.workspace) {
+    const tb = (Glowbit.toolboxXml || Glowbit.toolbox || Glowbit.TOOLBOX_XML || null);
+    if (tb) {
+      try { lesson.workspace.updateToolbox(tb); } catch(e) { console.warn('Toolbox update skipped', e); }
+    }
+  }
+
+  // Load the starter blocks, nudge layout
+  if (lesson && lesson.workspace) {
+    lesson.workspace.clear();
+    Blockly.serialization.workspaces.load(starterJson, lesson.workspace);
+    setTimeout(()=>Blockly.svgResize(lesson.workspace), 0);
+  }
+
+  // --- AUTO-RUN once so event handlers (Button A) are registered upfront ---
+  function autoRunOnce(){
+    try {
+      // 1) If createLessonUI exposed a run method
+      if (lesson && typeof lesson.runProgram === 'function') { lesson.runProgram(); return; }
+
+      // 2) If global handler exists (common in your global.js)
+      if (typeof window.runProgram === 'function') {
+        // call it with a fake button context if needed
+        window.runProgram.call(document.querySelector('#break-logic-playground button') || window);
+        return;
+      }
+
+      // 3) Fallback: click a Run/Play button if your UI exposes one
+      const runBtn = document.querySelector(
+        '#break-logic-playground .gb-run, ' +
+        '#break-logic-playground [data-role="run"], ' +
+        'button.gb-run, button[data-role="run"]'
+      );
+      if (runBtn) { runBtn.click(); return; }
+
+      console.warn('Auto-run: no run handler/button found; press Run once manually.');
+    } catch(e) {
+      console.warn('Auto-run error:', e);
+    }
+  }
+  // Give the DOM a tick to finish, then run
+  setTimeout(autoRunOnce, 50);
+
+  // --- Sidebar content (unchanged from your last working version) ---
+  const stepCards = [
+`<div style="display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:4px;"></div>
 <h3 style="text-align:center;color:#6b21a8;">Welcome to the Logic Playground!</h3>
 <div class="callout" style="border-left-color:#a78bfa;">
  Teach GlowBit to make choices. You’ll learn <strong>If–Then–Else</strong> and <strong>Comparisons</strong>
@@ -202,12 +213,7 @@ if (lesson && lesson.workspace) {
 `<h3 id="logic-steps" style="text-align:center;color:#0f5132;">If–Then–Else (Build it with the Gear)</h3>
 <div style="margin:10px 0;padding:10px;border-radius:8px;background:#d1fae5;color:#0f5132;">
   <div>1) From <strong>Logic</strong>, drag an <strong>if</strong> block into your Workspace.</div>
-  <div>2) Click the tiny gear 
-    <span aria-hidden="true" style="display:inline-block;vertical-align:-2px;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="#0f5132">
-        <path d="M19.14,12.94c.04-.31,.06-.63,.06-.94s-.02-.63-.06-.94l2.03-1.58c.18-.14,.23-.4,.12-.61l-1.92-3.32c-.11-.21-.36-.3-.58-.22l-2.39,.96c-.5-.38-1.03-.69-1.62-.92l-.36-2.54c-.04-.23-.23-.4-.47-.4h-3.84c-.24,0-.43,.17-.47,.4l-.36,2.54c-.59,.23-1.12,.54-1.62,.92l-2.39-.96c-.22-.09-.47,0-.58,.22l-1.92-3.32c-.11-.21-.06-.47,.12-.61l2.03,1.58c-.04,.31-.06,.63-.06,.94s.02,.63,.06,.94l-2.03,1.58c-.18,.14-.23,.4-.12,.61l1.92,3.32c.11,.21,.36,.3,.58,.22l2.39-.96c.5,.38,1.03,.69,1.62,.92l.36,2.54c.04,.23,.23,.4,.47,.4h3.84c.24,0,.43-.17,.47-.4l.36-2.54c.59-.23,1.12-.54,1.62-.92l2.39,.96c.22,.09,.47,0,.58-.22l1.92-3.32c.11-.21,.06-.47-.12-.61l-2.03-1.58ZM12,15.5c-1.93,0-3.5-1.57-3.5-3.5s1.57-3.5,3.5-3.5,3.5,1.57,3.5,3.5-1.57,3.5-3.5,3.5Z"/>
-      </svg>
-    </span> to open the <strong>mutator</strong> panel.</div>
+  <div>2) Click the tiny gear to open the <strong>mutator</strong> panel.</div>
   <div>3) Drag an <strong>else</strong> piece into the structure so it reads: <em>if … do … else …</em></div>
   <div>4) Close the panel — you now have a full <strong>If–Then–Else</strong> block!</div>
   <div class="mini-badge">Tip</div> Put blocks in the <em>then</em> and <em>else</em> parts to see different results.
@@ -216,9 +222,9 @@ if (lesson && lesson.workspace) {
 `<h3 style="text-align:center;color:#0f172a;">Comparisons: Three Symbols</h3>
 <div style="margin:10px 0;padding:10px;border-radius:8px;background:#e0f2fe;color:#0f172a;">
  <ol style="margin:0 0 6px 18px;">
-   <li><strong>=</strong> means “is equal to”.<br>Example: <code>120 = 120</code> ✅ (true)</li>
-   <li><strong>&lt;</strong> means “is less than”.<br>Example: <code>80 &lt; 120</code> ✅ (true)</li>
-   <li><strong>&gt;</strong> means “is greater than”.<br>Example: <code>150 &gt; 120</code> ✅ (true)</li>
+   <li><strong>=</strong> means “is equal to”. Example: <code>120 = 120</code> ✅</li>
+   <li><strong>&lt;</strong> means “is less than”. Example: <code>80 &lt; 120</code> ✅</li>
+   <li><strong>&gt;</strong> means “is greater than”. Example: <code>150 &gt; 120</code> ✅</li>
  </ol>
  <div style="margin-top:8px;">Change the symbol using the dropdown on the compare block.</div>
 </div>`,
@@ -245,7 +251,7 @@ if (lesson && lesson.workspace) {
     <li>From <strong>Input</strong>, place <strong>sound level</strong> in the left side (A). From <strong>Math</strong>, place a <strong>number</strong> <code>100</code> on the right side (B).</li>
     <li>In the <strong>then</strong> part: add <strong>show icon → heart</strong> (optional: then a <strong>pause 400 ms</strong> and <strong>clear screen</strong>).</li>
     <li>In the <strong>else</strong> part: add <strong>show icon → smile</strong> (optional pause + clear).</li>
-    <li>Click <strong>Run</strong>, then press <strong>A</strong>. Try talking quietly vs loudly—does it switch?</li>
+    <li>Click <strong>Run</strong> (already done for you), then press <strong>A</strong>. Try speaking softly vs loudly—does it switch?</li>
   </ol>
 </div>`,
 
@@ -267,65 +273,65 @@ if (lesson && lesson.workspace) {
   <p>🏭 Factory lights: If a machine is too loud/hot → then alert.</p>
 </div>
 <a class="gb-btn cta" href="./glowbit-project8.html">Ready for Sound Alerts? → Go to Project 8</a>`
-    ];
+  ];
 
-    /* --- Sidebar auto-pagination (and character image) --- */
-    function paginate(){
-      const sidebar = document.querySelector('#break-logic-playground .glowbit-left');
-      if(!sidebar) return;
-      const editor  = document.getElementById('break-logic-playground-editor');
-      const targetH = (editor && editor.offsetHeight) ? editor.offsetHeight : 560;
+  // --- Sidebar pagination + character image (unchanged) ---
+  function paginate(){
+    const sidebar = document.querySelector('#break-logic-playground .glowbit-left');
+    if(!sidebar) return;
+    const editor = document.getElementById('break-logic-playground-editor');
+    const targetH = (editor && editor.offsetHeight) ? editor.offsetHeight : 560;
 
-      const meas = document.createElement('div');
-      meas.style.visibility='hidden'; meas.style.position='absolute'; meas.style.left='-9999px'; meas.style.top='-9999px';
-      meas.style.width = (sidebar.clientWidth || 320) + 'px';
-      document.body.appendChild(meas);
+    const meas = document.createElement('div');
+    meas.style.visibility='hidden'; meas.style.position='absolute';
+    meas.style.left='-9999px'; meas.style.top='-9999px';
+    meas.style.width = (sidebar.clientWidth || 320) + 'px';
+    document.body.appendChild(meas);
 
-      const pages = []; let current = []; const reserve = 56;
-      stepCards.forEach(html=>{
-        const c = document.createElement('div'); c.innerHTML = html; meas.appendChild(c);
-        const tooTall = meas.scrollHeight > (targetH - reserve);
-        if(tooTall){
-          if(current.length===0){ pages.push([html]); meas.innerHTML=''; }
-          else {
-            pages.push([...current]); current=[html]; meas.innerHTML='';
-            current.forEach(h=>{ const d=document.createElement('div'); d.innerHTML=h; meas.appendChild(d); });
-          }
-        } else {
-          current.push(html);
+    const pages = []; let current = []; const reserve = 56;
+    stepCards.forEach(html=>{
+      const c = document.createElement('div'); c.innerHTML = html; meas.appendChild(c);
+      const tooTall = meas.scrollHeight > (targetH - reserve);
+      if(tooTall){
+        if(current.length===0){ pages.push([html]); meas.innerHTML=''; }
+        else {
+          pages.push([...current]); current=[html]; meas.innerHTML='';
+          current.forEach(h=>{ const d=document.createElement('div'); d.innerHTML=h; meas.appendChild(d); });
         }
-      });
-      if(current.length) pages.push(current);
-      document.body.removeChild(meas);
-
-      function render(i){
-        sidebar.innerHTML = pages[i].join('');
-
-        const nav = document.createElement('div');
-        nav.className = 'nav-btns';
-        if(i>0){ const b=document.createElement('button'); b.textContent='⬅ Back'; b.className='gb-btn back'; b.onclick=()=>render(i-1); nav.appendChild(b); }
-        if(i<pages.length-1){ const n=document.createElement('button'); n.textContent='Next ➜'; n.className='gb-btn next'; n.onclick=()=>render(i+1); nav.appendChild(n); }
-        if(nav.children.length) sidebar.appendChild(nav);
-
-        // Character image under the sidebar (every slide)
-        const frame = document.createElement('div');
-        frame.className = 'character-frame';
-        frame.innerHTML = `<img src="images/GlowBit4.png" alt="GlowBit buddy">`;
-        sidebar.appendChild(frame);
+      } else {
+        current.push(html);
       }
-      render(0);
-    }
-    paginate();
-
-    // Simple resize handler: no timers/variables at all
-    window.addEventListener('resize', ()=>{
-      paginate();
-      if (lesson && lesson.workspace) Blockly.svgResize(lesson.workspace);
     });
+    if(current.length) pages.push(current);
+    document.body.removeChild(meas);
 
-    console.log('✅ Logic Playground page ready.');
-  })();
-  </script>
+    function render(i){
+      sidebar.innerHTML = pages[i].join('');
+
+      const nav = document.createElement('div');
+      nav.className = 'nav-btns';
+      if(i>0){ const b=document.createElement('button'); b.textContent='⬅ Back'; b.className='gb-btn back'; b.onclick=()=>render(i-1); nav.appendChild(b); }
+      if(i<pages.length-1){ const n=document.createElement('button'); n.textContent='Next ➜'; n.className='gb-btn next'; n.onclick=()=>render(i+1); nav.appendChild(n); }
+      if(nav.children.length) sidebar.appendChild(nav);
+
+      const frame = document.createElement('div');
+      frame.className = 'character-frame';
+      frame.innerHTML = `<img src="images/GlowBit3.png" alt="GlowBit buddy">`;
+      sidebar.appendChild(frame);
+    }
+    render(0);
+  }
+  paginate();
+
+  // Simple resize handler
+  window.addEventListener('resize', ()=>{
+    paginate();
+    if (lesson && lesson.workspace) Blockly.svgResize(lesson.workspace);
+  });
+
+  console.log('✅ Logic Playground page ready.');
+})();
+</script>
 </body>
 </html>
 
