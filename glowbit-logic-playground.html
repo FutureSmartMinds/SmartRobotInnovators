@@ -14,17 +14,29 @@
   <script src="lib/blockly_xml_patch.js"></script>
 
   <style>
-    .gb-wrapper{max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
-    .gb-wrapper { max-width: 1100px; margin: 0 auto; padding: 0 12px; }
-.glowbit-root { max-width: 1100px; margin: 0 auto; }
+    /* Wrapper: center the whole page like your projects */
+.gb-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 12px;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* Keep the Glowbit two-column shell centered & not full-bleed */
+.glowbit-root {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 12px;
+  display: block;
+}
 
 /* Optional: keep columns from getting too wide on huge screens */
 .glowbit-left, .glowbit-right { box-sizing: border-box; }
 
-/* If the right editor grows too wide, set a reasonable cap */
-#glowbit-logic-playground-editor { max-width: 720px; margin: 0 auto; }
-    .gb-header{
-  text-align:center;font-weight:800;margin:10px 0;box-shadow:0 1px 4px rgba(0,0,0,0.08);
+/* Cap the right editor width so it doesn’t “eat” the page */
+#glowbit-logic-playground-editor {
+  max-width: 720px;
+  margin: 0 auto;
 }
 .gb-header.cloud{
   background:#f3e8ff;               /* soft lilac cloud */
@@ -60,6 +72,7 @@
 </head>
 
 <body>
+   <div class="gb-wrapper">
   <div class="gb-header cloud">
   <div class="title">✨ Expand Your Knowledge — Logical Conditions & Comparisons</div>
   <div class="subtitle">Teach GlowBit to make decisions like a tiny robot brain</div>
