@@ -15,6 +15,14 @@
 
   <style>
     .gb-wrapper{max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
+    .gb-wrapper { max-width: 1100px; margin: 0 auto; padding: 0 12px; }
+.glowbit-root { max-width: 1100px; margin: 0 auto; }
+
+/* Optional: keep columns from getting too wide on huge screens */
+.glowbit-left, .glowbit-right { box-sizing: border-box; }
+
+/* If the right editor grows too wide, set a reasonable cap */
+#glowbit-logic-playground-editor { max-width: 720px; margin: 0 auto; }
     .gb-header{
   text-align:center;font-weight:800;margin:10px 0;box-shadow:0 1px 4px rgba(0,0,0,0.08);
 }
@@ -264,12 +272,22 @@
       document.body.removeChild(meas);
 
       function render(i){
-        sidebar.innerHTML = pages[i].join('');
-        const nav=document.createElement('div'); nav.className='nav-btns';
-        if(i>0){ const b=document.createElement('button'); b.textContent='⬅ Back'; b.className='gb-btn back'; b.onclick=()=>render(i-1); nav.appendChild(b); }
-        if(i<pages.length-1){ const n=document.createElement('button'); n.textContent='Next ➜'; n.className='gb-btn next'; n.onclick=()=>render(i+1); nav.appendChild(n); }
-        if(nav.children.length) sidebar.appendChild(nav);
-      }
+  sidebar.innerHTML = pages[i].join('');
+
+  const nav = document.createElement('div');
+  nav.className = 'nav-btns';
+  if(i>0){ const b=document.createElement('button'); b.textContent='⬅ Back'; b.className='gb-btn back'; b.onclick=()=>render(i-1); nav.appendChild(b); }
+  if(i<pages.length-1){ const n=document.createElement('button'); n.textContent='Next ➜'; n.className='gb-btn next'; n.onclick=()=>render(i+1); nav.appendChild(n); }
+  if(nav.children.length) sidebar.appendChild(nav);
+
+  // 👇 Add character image under the sidebar (persists across slides)
+  const frame = document.createElement('div');
+  frame.className = 'character-frame';
+  frame.innerHTML = `
+    <img src="images/GlowBit3.png" alt="GlowBit buddy">
+  `;
+  sidebar.appendChild(frame);
+}
       render(0);
     }
     paginate();
