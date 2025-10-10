@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>(10) Mia’s GlowBit ChatBot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Same required script order -->
+  <script src="lib/blockly_compressed.js"></script>
+  <script src="lib/blocks_compressed.js"></script>
+  <script src="lib/javascript_compressed.js"></script>
+  <script src="lib/msg/en.js"></script>
+  <script src="assets/global.js"></script>
+  <script src="lib/blockly_xml_patch.js"></script>
+
+  <style>
+    .gb-wrapper{max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
+    .gb-header{text-align:center;background:#fef2f2;color:#be123c;font-size:22px;font-weight:800;
+               padding:10px 12px;border-radius:12px;margin:8px 0 6px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+    .gb-subhead{text-align:center;background:#fff7ed;color:#c2410c;font-size:16px;font-weight:700;
+                padding:8px 12px;border-radius:10px;margin:0 0 10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+    .callout{background:#f1f5f9;border-left:6px solid #64748b;padding:10px 12px;border-radius:10px;color:#0f172a;margin:8px 0;}
+    .tip{display:inline-block;background:#fde68a;color:#92400e;border:1px solid #f59e0b;border-radius:6px;padding:2px 6px;font-size:12px;font-weight:800;}
+    .nav-btns{display:flex;justify-content:space-between;gap:8px;margin-top:10px;flex-wrap:wrap;}
+    .gb-btn{padding:8px 14px;border:none;border-radius:8px;font-weight:700;cursor:pointer;flex:1;text-align:center;}
+    .gb-btn.next{background:#00A1D6;color:#fff;}
+    .gb-btn.back{background:#6B7280;color:#fff;}
+    .gb-btn.cta{background:#16a34a;color:#fff;margin-top:8px;}
+    .character-frame{text-align:center;margin-top:18px;}
+    .character-frame img{width:85%;max-width:260px;height:auto;border-radius:12px;
+                         box-shadow:0 4px 12px rgba(0,0,0,0.25);object-fit:cover;}
+    #glowbit-project10-editor{height:560px;min-height:560px;background:#fff;}
+
+    /* Compact Check-Your-Setup modal */
+    #solutionModalP10{display:none;position:fixed;top:60px;right:20px;width:640px;max-width:42%;
+      background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.28);
+      z-index:12000;overflow:hidden;user-select:none;}
+    #solutionHeaderP10{cursor:move;padding:10px 12px;background:#be123c;color:#fff;font-weight:700;
+      text-align:left;border-radius:10px 10px 0 0;display:flex;justify-content:space-between;align-items:center;}
+    #solutionWorkspaceP10{height:360px;width:100%;border-top:1px solid #eee;background:#fafafa;}
+    #solutionFooterP10{text-align:center;padding:12px;background:#fff;}
+    #solutionFooterP10 button{background:#be123c;color:#fff;border:none;border-radius:8px;
+      padding:8px 18px;cursor:pointer;font-weight:700;}
+    @media(max-width:900px){
+      #solutionModalP10{left:10px;right:10px;width:auto;max-width:calc(100% - 20px);top:40px;}
+      #solutionWorkspaceP10{height:260px;}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="gb-wrapper">
+    <div class="gb-header">(10) Mia’s GlowBit ChatBot</div>
+    <div class="gb-subhead">
+      Let’s make GlowBit welcome you! You’ll code GlowBit to display a welcome message, count from 1 to 10, and play a name tune — like a smart chatbot.
+    </div>
+
+    <div id="glowbit-project10"></div>
+  </div>
+
+  <!-- ✅ Compact Solution Modal -->
+  <div id="solutionModalP10" aria-hidden="true" role="dialog">
+    <div id="solutionHeaderP10">
+      <div>✅ Correct Setup — ChatBot</div>
+      <button id="solutionCloseP10" title="Close">✕</button>
+    </div>
+    <div id="solutionWorkspaceP10" aria-label="Correct solution workspace"></div>
+    <div id="solutionFooterP10"><button id="solutionCloseBtnP10">Close</button></div>
+  </div>
+
+  <script>
+  (function boot(){
+    if(!(window.Glowbit && window.Blockly)) return setTimeout(boot,120);
+
+    /* Create standard two-column UI */
+    const lesson = Glowbit.createLessonUI('glowbit-project10', {
+      title:'',instructions:'',pixelSize:28,
+      defaultJson:{blocks:{languageVersion:0,blocks:[]}}
+    });
+    if(lesson && lesson.workspace) lesson.workspace.clear();
+
+    /* Helper for pause-show-clear */
+    function seqPauseShowClear(ms=500,text){
+      return {
+        type:"pause_block",fields:{MS:ms},
+        next:{block:{type:"show_text",fields:{TEXT:text||"Hello"},
+        next:{block:{type:"clear_screen"}}}}
+      };
+    }
+
+    /* ✅ Correct Setup JSON */
+    const solutionJson = {
+      blocks:{languageVersion:0,blocks:[
+        {type:"on_start",x:20,y:20,
+          inputs:{DO:{block:{type:"show_text",fields:{TEXT:"Welcome!"},next:{
+            block:{type:"show_number",inputs:{NUM:{shadow:{type:"math_number",fields:{NUM:1}}}},
+            next:{block:{type:"clear_screen"}}}}}}}},
+        {type:"on_button_pressed",fields:{BTN:"A"},x:20,y:160,
+          inputs:{DO:{block:{type:"show_number",
+          inputs:{NUM:{shadow:{type:"math_number",fields:{NUM:1}}}}}}}},
+        {type:"on_button_pressed",fields:{BTN:"B"},x:20,y:300,
+          inputs:{DO:{block:{type:"play_tone_note",
+          fields:{NOTE:"C4",BEATS:"0.5"}}}}}
+      ]}
+    };
+    window.solutionJson = solutionJson;
+
+    /* Sidebar steps — same style as Projects 8 & 9 */
+    const stepCards = [
+
+`<h3 style="text-align:center;color:#be123c;">Step 1 — Show a Welcome Message</h3>
+<div class="callout">
+  1️⃣ 🧰 Go to the <strong>Basic</strong> tab and drag a <strong>show string</strong> block to the Workspace. Type <em>Welcome!</em> in the text field.<br>
+  2️⃣ 🚀 Drag an <strong>on start</strong> block and place <em>show string Welcome!</em> inside it.<br>
+  3️⃣ ▶️ Click the green <strong>Play</strong> button to see the message on the LED grid.<br>
+  💬 Mia: “GlowBit says hi!”<br><br>
+  4️⃣ 🧹 Remove the block from <em>on start</em> after testing.
+</div>`,
+
+`<h3 style="text-align:center;color:#be123c;">Step 2 — Show a Number</h3>
+<div class="callout">
+  1️⃣ 🧰 From the <strong>Basic</strong> tab, drag a <strong>show number</strong> block to the Workspace and set it to <code>1</code>.<br>
+  2️⃣ 🚀 Place it inside an <strong>on start</strong> block.<br>
+  3️⃣ ▶️ Press <strong>Play</strong> — GlowBit shows “1.”<br>
+  💬 Mia: “GlowBit’s counting!”<br><br>
+  4️⃣ 🧹 Remove it from <em>on start</em> after testing.
+</div>`,
+
+`<h3 style="text-align:center;color:#be123c;">Step 3 — Add Button Inputs</h3>
+<div class="callout">
+  1️⃣ 🔘 From <strong>Input</strong>, drag <strong>on button A pressed</strong> and place the <em>show number 1</em> block inside it.<br>
+  2️⃣ 🔘 From <strong>Input</strong>, drag <strong>on button B pressed</strong>.<br>
+  3️⃣ 🎵 From <strong>Music</strong>, drag <strong>play tone</strong> → choose <em>Middle C</em> for <em>½ beat</em>.<br>
+  💬 Mia: “GlowBit will play a tune!”<br><br>
+  ▶️ Click <strong>Play</strong>, press A to see the number, B to hear the tone.
+</div>`,
+
+`<h3 style="text-align:center;color:#be123c;">Step 4 — Add Counting on Button A</h3>
+<div class="callout">
+  1️⃣ 🔢 From <strong>Variables</strong>, click <strong>Make a Variable</strong> → name it <em>Count</em>.<br>
+  2️⃣ 🚀 From <strong>Basic</strong>, drag <strong>on start</strong> → add <strong>set Count to 1</strong>.<br>
+  3️⃣ 🔘 Add <strong>on button A pressed</strong> and inside it place an <strong>if then else</strong> block from <strong>Logic</strong>.<br>
+  4️⃣ ⚙️ Set the condition to <code>Count &lt; 10</code> (drag Count + “&lt;” from Logic + math number 10).<br>
+  5️⃣ ➕ In <em>then</em> area: add <strong>change Count by 1</strong> and <strong>show number Count</strong>.<br>
+  6️⃣ 🔁 In <em>else</em>: add <strong>set Count to 1</strong> and <strong>show number 1</strong>.<br>
+  ▶️ Click <strong>Play</strong>, press A repeatedly to count 1-10, then cycle back to 1.<br>
+  💬 Mia: “GlowBit counts with me!”
+</div>`,
+
+`<div class="callout" style="text-align:center;">
+  <button class="gb-btn cta" id="open-solution">✅ Check Your Setup</button>
+</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Did You Know?</h3>
+<div class="callout">
+  • 🤖 Chatbots like Alexa and Siri respond with voices and animations — our GlowBit ChatBot shows text and numbers the same way!<br>
+  • 🔢 Smart devices use counters to track steps or messages; our variable “Count” acts the same way.<br>
+  • 🎵 Music and text combine in robot greetings to make interactions fun and friendly — just like GlowBit does here.
+</div>
+<div class="callout">
+  <span class="tip">Try this</span> Change the tone for Button B and add a second note to make a short “name tune.”
+</div>`
+    ];
+
+    /* Pagination (same as P8/P9) */
+    function paginate(){
+      const sidebar=document.querySelector('#glowbit-project10 .glowbit-left');
+      if(!sidebar)return;
+      const editor=document.getElementById('glowbit-project10-editor');
+      const targetH=(editor&&editor.offsetHeight)?editor.offsetHeight:520;
+
+      const meas=document.createElement('div');
+      meas.style.visibility='hidden';meas.style.position='absolute';meas.style.left='-9999px';
+      meas.style.width=(sidebar.clientWidth||320)+'px';document.body.appendChild(meas);
+
+      const pages=[];let current=[];const reserve=56;
+      stepCards.forEach(html=>{
+        const c=document.createElement('div');c.innerHTML=html;meas.appendChild(c);
+        const tooTall=meas.scrollHeight>(targetH-reserve);
+        if(tooTall){
+          if(current.length===0){pages.push([html]);meas.innerHTML='';}
+          else{pages.push([...current]);current=[html];meas.innerHTML='';
+            current.forEach(h=>{const d=document.createElement('div');d.innerHTML=h;meas.appendChild(d);});}
+        }else current.push(html);
+      });
+      if(current.length)pages.push(current);
+      document.body.removeChild(meas);
+
+      function render(i){
+        sidebar.innerHTML=pages[i].join('');
+        const nav=document.createElement('div');nav.className='nav-btns';
+        if(i>0){const b=document.createElement('button');b.textContent='⬅ Back';b.className='gb-btn back';b.onclick=()=>render(i-1);nav.appendChild(b);}
+        if(i<pages.length-1){const n=document.createElement('button');n.textContent='Next ➜';n.className='gb-btn next';n.onclick=()=>render(i+1);nav.appendChild(n);}
+        sidebar.appendChild(nav);
+        const frame=document.createElement('div');frame.className='character-frame';
+        frame.innerHTML='<img src="images/GlowBit3.png" alt="GlowBit buddy">';sidebar.appendChild(frame);
+        const openBtn=document.getElementById('open-solution');
+        if(openBtn)openBtn.addEventListener('click',()=>showSolutionModal());
+      }
+      render(0);
+    }
+    paginate();
+    window.addEventListener('resize',()=>{paginate();if(lesson&&lesson.workspace)Blockly.svgResize(lesson.workspace);});
+
+    /* Modal behavior */
+    const modal=document.getElementById('solutionModalP10');
+    const wsDiv=document.getElementById('solutionWorkspaceP10');
+    const closeBtns=[document.getElementById('solutionCloseP10'),document.getElementById('solutionCloseBtnP10')];
+    function showSolutionModal(){
+      modal.style.display='block';wsDiv.innerHTML='';
+      const ws=Blockly.inject(wsDiv,{readOnly:true,scrollbars:true});
+      Blockly.serialization.workspaces.load(window.solutionJson,ws);
+    }
+    closeBtns.forEach(b=>b.addEventListener('click',()=>modal.style.display='none'));
+
+    console.log('✅ Project 10 – ChatBot ready: sidebar, pagination, compact modal.');
+  })();
+  </script>
+</body>
+</html>
