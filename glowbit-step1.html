@@ -28,16 +28,18 @@
     }
     .gb-header .highlight { color:#991b1b; }
     .gb-intro {
-      text-align:center;
-      font-size:14px;
-      line-height:1.4;
-      margin:0 0 10px;
-      color:#374151;
-      background:#e0f2fe;
-      border-radius:6px;
-      padding:8px 10px;
-      box-shadow:0 1px 3px rgba(0,0,0,0.06);
-    }
+  text-align:center;
+  font-size:18px;
+  line-height:1.5;
+  margin:0 0 12px;
+  color:#1e3a8a;
+  background:#e0f2fe;
+  border:3px solid #7dd3fc;
+  border-radius:10px;
+  padding:10px 14px;
+  font-weight:600;
+  box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
     #glowbit-step1 .glowbit-playground {
       max-height:500px;
       overflow-y:auto !important;
@@ -145,7 +147,10 @@
         '<div style="' + stepCardStyle + '">✍️ <strong>Click the text field</strong> (it says "Hello!" by default). Type <strong>Smart Robot</strong>.</div>' +
         '<div style="' + stepCardStyle + '">📦 <strong>Find the "on start"</strong> block in Basic. Drag your Show Text block inside it.</div>' +
         '<div style="' + stepCardStyle + '">▶️ <strong>Click Run Program</strong>. Watch GlowBit scroll <strong>Smart Robot</strong> across its face!</div>' +
-        '<div class="didyouknow">💡 <strong>Did you know?</strong> Robots in real life often use screens or lights to share messages, and now you’ll get to try it too.</div>';
+        '<div class="didyouknow">💡 <strong>Did you know?</strong> Robots in real life often use screens or lights to share messages, and now you’ll get to try it too.</div>' + 
+        '<div style="text-align:center;margin-top:15px;">' +
+    '<img src="images/GlowBit1.png" alt="GlowBit waving hello" style="width:85%;max-width:260px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.25);" />' +
+  '</div>';;
     }
 
     overrideSidebar();
@@ -163,3 +168,4 @@
   </script>
 </body>
 </html>
+
