@@ -255,6 +255,40 @@
        4) Check-Your-Setup modal
     --------------------------------------------*/
     const modal=document.getElementById('solutionModalP1');
+    /* --- Make the modal draggable --- */
+function makeDraggable(modalId, headerId){
+  const modalEl = document.getElementById(modalId);
+  const headerEl = document.getElementById(headerId);
+  if(!modalEl || !headerEl) return;
+
+  let isDown = false, startX = 0, startY = 0;
+
+  headerEl.style.cursor = 'move';
+  headerEl.addEventListener('mousedown', (e)=>{
+    isDown = true;
+    startX = e.clientX - modalEl.offsetLeft;
+    startY = e.clientY - modalEl.offsetTop;
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', stop);
+  });
+
+  function move(e){
+    if(!isDown) return;
+    modalEl.style.left = (e.clientX - startX) + 'px';
+    modalEl.style.top = (e.clientY - startY) + 'px';
+    modalEl.style.right = 'auto';
+  }
+
+  function stop(){
+    isDown = false;
+    document.removeEventListener('mousemove', move);
+    document.removeEventListener('mouseup', stop);
+  }
+}
+
+/* ✅ Enable drag on Project 1 modal */
+makeDraggable('solutionModalP1','solutionModalP1');
+
     document.addEventListener('click',function(e){
       if(e.target && e.target.id==='check-setup-btnP1'){
         modal.style.display='block';
