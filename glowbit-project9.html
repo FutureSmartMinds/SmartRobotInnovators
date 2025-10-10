@@ -243,6 +243,41 @@ const stepCards = [
     }
     [closeBtn, closeBtn2].forEach(b=>b.addEventListener('click',()=>modal.style.display='none'));
 
+    /* --- Make the modal draggable --- */
+function makeDraggable(modalId, headerId){
+  const modalEl = document.getElementById(modalId);
+  const headerEl = document.getElementById(headerId);
+  if(!modalEl || !headerEl) return;
+
+  let isDown = false, startX = 0, startY = 0;
+
+  headerEl.style.cursor = 'move';
+  headerEl.addEventListener('mousedown', (e)=>{
+    isDown = true;
+    startX = e.clientX - modalEl.offsetLeft;
+    startY = e.clientY - modalEl.offsetTop;
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', stop);
+  });
+
+  function move(e){
+    if(!isDown) return;
+    modalEl.style.left = (e.clientX - startX) + 'px';
+    modalEl.style.top = (e.clientY - startY) + 'px';
+    modalEl.style.right = 'auto';
+  }
+
+  function stop(){
+    isDown = false;
+    document.removeEventListener('mousemove', move);
+    document.removeEventListener('mouseup', stop);
+  }
+}
+
+/* ✅ Enable drag on Project 9 modal */
+makeDraggable('solutionModalP9','solutionModalP9');
+
+
     console.log('✅ Project 9 – Tilt Navigator ready: sliding sidebar, emojis, Did You Know, GlowBit image, compact Check modal.');
   })();
   </script>
