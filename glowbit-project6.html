@@ -218,6 +218,21 @@
 
     /* --- Modal logic --- */
     const modal=document.getElementById('solutionModalP6');
+    function makeDraggable(el){
+      const h=document.getElementById('solutionHeader');if(!h)return;
+      let drag=false,sx=0,sy=0,ol=0,ot=0;
+      h.addEventListener('mousedown',e=>{
+        e.preventDefault();drag=true;
+        if(el.style.right&&el.style.right!=='auto'){el.style.left=el.getBoundingClientRect().left+'px';el.style.right='auto';}
+        ol=parseInt(el.style.left||el.getBoundingClientRect().left,10);
+        ot=parseInt(el.style.top||el.getBoundingClientRect().top,10);
+        sx=e.clientX;sy=e.clientY;
+        document.addEventListener('mousemove',move);
+        document.addEventListener('mouseup',stop);
+      });
+      function move(e){if(!drag)return;el.style.left=(ol+(e.clientX-sx))+'px';el.style.top=(ot+(e.clientY-sy))+'px';}
+      function stop(){drag=false;document.removeEventListener('mousemove',move);document.removeEventListener('mouseup',stop);}
+    }
     document.addEventListener('click',function(e){
       if(e.target&&e.target.id==='check-setup-btnP6'){
         modal.style.display='block';
