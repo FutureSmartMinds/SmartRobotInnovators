@@ -2,133 +2,207 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>GlowBit – Step 4</title>
+  <title>GlowBit Step 4 – Pause & Clear</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Blockly + Global -->
+  <!-- Blockly core + global Glowbit engine -->
   <script src="lib/blockly_compressed.js"></script>
   <script src="lib/blocks_compressed.js"></script>
   <script src="lib/javascript_compressed.js"></script>
   <script src="lib/msg/en.js"></script>
   <script src="assets/global.js"></script>
-  <script src="lib/blockly_xml_patch.js"></script>
 
+  <!-- Styling (same theme as previous steps) -->
   <style>
-    /* ---------- Shared layout ---------- */
-    body {
-      margin:0;
-      background:#f9fafb;
-      font-family:"Segoe UI",Roboto,Arial,sans-serif;
+   body {
+  margin:0;
+  background:#f9fafb;
+  font-family:"Segoe UI",Roboto,Arial,sans-serif;
+}
+.gb-wrapper {
+  max-width:1100px;
+  margin:0 auto;
+  padding:8px 12px;
+}
+.gb-header {
+  text-align:center;
+  background:#e0f2fe;
+  color:#1e3a8a;
+  font-size:22px;
+  font-weight:800;
+  padding:10px 12px;
+  border-radius:12px;
+  margin:8px 0 6px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.08);
+}
+.gb-intro {
+  text-align:center;
+  font-size:18px;
+  line-height:1.5;
+  margin:0 0 12px;
+  color:#1e3a8a;
+  background:#e0f2fe;
+  border:3px solid #7dd3fc;
+  border-radius:10px;
+  padding:10px 14px;
+  font-weight:600;
+  box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+    .didyouknow::before {
+      content:""; position:absolute; top:-10px; left:20px;
+      border-width:0 10px 10px 10px; border-style:solid;
+      border-color:transparent transparent #fef9c3 transparent;
     }
-    .gb-wrapper {
-      max-width:1100px;
-      margin:0 auto;
-      padding:8px 12px;
+    /* Check Setup button */
+    .check-setup-btn {
+      display:inline-block; background:#0284C7; color:white;
+      border:none; border-radius:8px; padding:10px 16px;
+      font-weight:700; margin:10px auto; cursor:pointer;
+      box-shadow:0 2px 5px rgba(0,0,0,0.15);
     }
-
-    /* ---------- Header + subtitle (same as Step 1) ---------- */
-    .gb-header {
-      text-align:center;
-      background:#e0f2fe;
-      color:#1e3a8a;
-      font-size:22px;
-      font-weight:800;
-      padding:10px 12px;
-      border-radius:12px;
-      margin:8px 0 6px;
-      box-shadow:0 1px 4px rgba(0,0,0,0.08);
-    }
-    .gb-intro {
-      text-align:center;
-      font-size:18px;
-      line-height:1.5;
-      margin:0 0 12px;
-      color:#1e3a8a;
-      background:#e0f2fe;
-      border:3px solid #7dd3fc;
-      border-radius:10px;
-      padding:10px 14px;
-      font-weight:600;
-      box-shadow:0 2px 6px rgba(0,0,0,0.08);
-    }
-
-    /* ---------- Sidebar & Did-You-Know ---------- */
-    .glowbit-left {
-      width:320px;
-      padding:12px;
-      box-sizing:border-box;
-      background:#f0f9ff;
-      border-radius:10px;
-    }
-    .didyouknow {
-      background:#fef9c3;
-      border-left:6px solid #facc15;
-      border-radius:10px;
-      padding:10px 12px;
-      color:#78350f;
-      font-weight:500;
-      margin-top:10px;
-      box-shadow:0 2px 5px rgba(0,0,0,0.05);
-    }
-    .character-frame {
-      text-align:center;
-      margin-top:18px;
-    }
-    .character-frame img {
-      width:85%;
-      max-width:260px;
-      border-radius:12px;
-      box-shadow:0 4px 12px rgba(0,0,0,0.25);
-    }
-
-    /* ---------- Blockly editor area ---------- */
-    #glowbit-step4-editor {
-      height:560px;
-      min-height:560px;
-      background:#fff;
-      border-radius:10px;
-    }
+    .check-setup-btn:hover { background:#0369A1; }
   </style>
 </head>
 
 <body>
   <div class="gb-wrapper">
-    <div class="gb-header">GlowBit – Step 4 : More LED Magic!</div>
-    <div class="gb-intro">
-      Ready to learn how to blink and flash colors with style? <br>
-      Let’s make GlowBit dance with light patterns!
+    <div class="gb-header">
+      🌟 <span class="highlight">Step 4</span>: Pause & Clear — Give <span class="highlight">GlowBit</span> a Breather
     </div>
 
+    <p class="gb-intro">
+      GlowBit can pause between messages and then clear the screen so new messages are easy to read.
+      In this step, you'll show a message, pause briefly, and clear the LED grid.
+    </p>
+
     <div id="glowbit-step4"></div>
+
+    <!-- Optional “Check Your Setup” button -->
+    <div style="text-align:center;">
+      <button id="checkSetupBtn" class="check-setup-btn">✅ Check Your Setup</button>
+    </div>
   </div>
 
+  <!-- Step 4 Script -->
   <script>
-  (function boot(){
-    if(!(window.Glowbit && window.Blockly)) return setTimeout(boot,100);
+  /* ===============================================================
+     Glowbit Step 4 — Pause & Clear (GitHub Pages Adapted)
+     Includes “Check Your Setup” preview button
+     =============================================================== */
+  function initStep4() {
+    if (!window.Glowbit || !window.Blockly) {
+      console.log("⌛ Waiting for Glowbit or Blockly...");
+      return setTimeout(initStep4,150);
+    }
 
-    const lesson = Glowbit.createLessonUI('glowbit-step4',{
+    const container=document.getElementById('glowbit-step4');
+    if(!container){
+      console.log("⌛ Waiting for #glowbit-step4 container...");
+      return setTimeout(initStep4,100);
+    }
+
+    console.log("✅ Glowbit, Blockly, and container ready. Initializing Step 4.");
+
+    // --- Default example program for setup check ---
+    const defaultJson={
+      "blocks":{
+        "languageVersion":0,
+        "blocks":[
+          {
+            "type":"on_start",
+            "x":20,"y":20,
+            "inputs":{
+              "DO":{
+                "block":{
+                  "type":"show_text",
+                  "fields":{"TEXT":"Hello!"},
+                  "next":{
+                    "block":{
+                      "type":"pause",
+                      "fields":{"MS":300},
+                      "next":{
+                        "block":{"type":"clear_screen"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    };
+
+    // --- Create main editable workspace (EMPTY at start) ---
+    const lesson=Glowbit.createLessonUI('glowbit-step4',{
       title:'',
       instructions:'',
       pixelSize:28,
-      defaultJson:{blocks:{languageVersion:0,blocks:[]}}
+      defaultJson:null // students start with empty workspace
     });
-    if(lesson && lesson.workspace) lesson.workspace.clear();
+    window._lesson_step4=lesson;
 
-    /* --- Sidebar override (adds image) --- */
-    const sidebar = document.querySelector('#glowbit-step4 .glowbit-left');
-    if(sidebar){
-      sidebar.innerHTML = `
-        <h3 style="text-align:center;color:#1e3a8a;">Step 4 — Your Next Move</h3>
-        <div class="didyouknow">
-          💡 <strong>Did you know?</strong><br>
-          Traffic lights and signs use patterns and colors to communicate—GlowBit’s LEDs work the same way!
-        </div>
-        <div class="character-frame">
-          <img src="images/GlowBit1.png" alt="GlowBit waving hello">
-        </div>
-      `;
+    // --- “Check Your Setup” button handler ---
+    const checkBtn=document.getElementById('checkSetupBtn');
+    if(checkBtn){
+      checkBtn.addEventListener('click',()=>{
+        if(!window.Blockly){
+          alert("Blockly not ready yet!");
+          return;
+        }
+        // Confirm before overwriting workspace
+        if(confirm("This will show the correct example setup. Continue?")){
+          Blockly.serialization.workspaces.load(defaultJson,lesson.workspace);
+          alert("✅ Correct setup loaded — compare your work!");
+        }
+      });
     }
-  })();
+
+    // --- Sidebar customization ---
+    function overrideSidebar(){
+      const sidebar=Array.from(container.querySelectorAll('*')).find(el =>
+        el.innerText && (
+          el.innerText.includes("GlowBit Lesson") ||
+          el.innerText.includes("Follow the steps on the right")
+        )
+      );
+      if(!sidebar)return;
+
+      sidebar.style.background='#e6f9ff';
+      sidebar.style.borderRadius='10px';
+      sidebar.style.padding='12px';
+      sidebar.style.color='#00A1D6';
+      sidebar.style.fontSize='14px';
+      sidebar.style.fontWeight='500';
+      sidebar.style.boxShadow='0 0 8px rgba(0,0,0,0.08)';
+
+      const stepCard='margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;font-weight:600;';
+
+      sidebar.innerHTML=
+        '<h3 style="color:#00A1D6;font-weight:800;font-size:16px;margin-bottom:10px;text-align:center;">🌟 Follow These Steps 🌟</h3>'+
+        '<div style="'+stepCard+'">🧩 From <strong>Basic</strong>, drag a <strong>Show Text</strong> block and type a short message.</div>'+
+        '<div style="'+stepCard+'">⏸️ Add a <strong>Pause (ms)</strong> block right after. Set it to <strong>300</strong>.</div>'+
+        '<div style="'+stepCard+'">🧹 Add a <strong>Clear Screen</strong> block next — this wipes the LEDs clean.</div>'+
+        '<div style="'+stepCard+'">📦 Wrap all three blocks inside <strong>on start</strong>.</div>'+
+        '<div style="'+stepCard+'">▶️ Run your program — your GlowBit says hello, waits, and clears!</div>'+
+        '<div class="didyouknow">💡 <strong>Did you know?</strong> Robots often pause and reset displays to manage memory and readability.</div>' +
+'<div style="text-align:center;margin-top:15px;">' +
+  '<img src="images/GlowBit1.png" alt="GlowBit waving hello" ' +
+  'style="width:85%;max-width:260px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.25);" />' +
+'</div>';
+
+    overrideSidebar();
+    const sid=setInterval(overrideSidebar,500);
+    setTimeout(()=>clearInterval(sid),10000);
+
+    if(typeof Glowbit.showIcon==='function') Glowbit.showIcon('pause');
+    console.log("✅ Step 4 fully initialized.");
+  }
+
+  window.addEventListener('DOMContentLoaded',()=>{
+    console.log("🔥 Step 4 script loaded; DOMContentLoaded fired.");
+    setTimeout(initStep4,300);
+  });
   </script>
 </body>
 </html>
