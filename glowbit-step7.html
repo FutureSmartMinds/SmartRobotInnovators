@@ -160,6 +160,40 @@
 
     /* 🧩 Modal logic */
     const modal=document.getElementById('solutionModal7');
+    /* --- Universal draggable modal handler --- */
+function makeAllSolutionModalsDraggable(){
+  const modals = document.querySelectorAll('[id^="solutionModal"]');
+
+  modals.forEach(modal => {
+    const modalId = modal.id;
+    const header = modal.querySelector('[id^="solutionHeader"]');
+    if (!header) return;
+
+    let isDown = false, startX = 0, startY = 0;
+
+    header.style.cursor = 'move';
+    header.addEventListener('mousedown', (e)=>{
+      isDown = true;
+      startX = e.clientX - modal.offsetLeft;
+      startY = e.clientY - modal.offsetTop;
+      document.addEventListener('mousemove', move);
+      document.addEventListener('mouseup', stop);
+    });
+
+    function move(e){
+      if (!isDown) return;
+      modal.style.left = (e.clientX - startX) + 'px';
+      modal.style.top  = (e.clientY - startY) + 'px';
+      modal.style.right = 'auto';
+    }
+
+    function stop(){
+      isDown = false;
+      document.removeEventListener('mousemove', move);
+      document.removeEventListener('mouseup', stop);
+    }
+  });
+}
     document.addEventListener('click',e=>{
       if(e.target.id==='check-setup-btn7'){
         modal.style.display='block'; modal.setAttribute('aria-hidden','false');
