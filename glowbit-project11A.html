@@ -5,7 +5,7 @@
   <title>(11A) Liam’s GlowBit Visual Guessing Challenge</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Load Blockly and Global scripts -->
+  <!-- Blockly + Global -->
   <script src="lib/blockly_compressed.js"></script>
   <script src="lib/blocks_compressed.js"></script>
   <script src="lib/javascript_compressed.js"></script>
@@ -30,11 +30,10 @@
     .gb-btn.cta{background:#16a34a;color:#fff;margin-top:8px;}
     .character-frame{text-align:center;margin-top:18px;}
     .character-frame img{width:85%;max-width:260px;height:auto;border-radius:12px;
-      box-shadow:0 4px 12px rgba(0,0,0,0.25);object-fit:cover;}
+      box-shadow:0 4px 12px rgba(0,0,0,0.25);}
     #glowbit-project11A-editor{height:560px;min-height:560px;background:#fff;}
     #solutionModalP11A{display:none;position:fixed;top:60px;right:20px;width:640px;max-width:42%;
-      background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.28);
-      z-index:12000;overflow:hidden;user-select:none;}
+      background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.28);z-index:12000;overflow:hidden;}
     #solutionHeaderP11A{cursor:move;padding:10px 12px;background:#1e3a8a;color:#fff;font-weight:700;
       text-align:left;border-radius:10px 10px 0 0;display:flex;justify-content:space-between;align-items:center;}
     #solutionWorkspaceP11A{height:360px;width:100%;border-top:1px solid #eee;background:#fafafa;}
@@ -80,7 +79,7 @@
     });
     if(lesson && lesson.workspace) lesson.workspace.clear();
 
-    /* ---------- Correct Setup JSON (flattened) ---------- */
+    /* ---------- Correct Setup JSON ---------- */
     const VAR_SECRET="VAR_SECRET_ID";
     const VAR_GUESS="VAR_GUESS_ID";
     const numShadow=(n)=>({shadow:{type:"math_number",fields:{NUM:n}}});
@@ -99,20 +98,28 @@
             inputs:{
               DO:{
                 block:{
-                  type:"show_text",fields:{TEXT:"Hello!"},
+                  type:"show_text",fields:{TEXT:"Hello"},
                   next:{
                     block:{
                       type:"pause_block",fields:{MS:2000},
                       next:{
                         block:{
-                          type:"variables_set",fields:{VAR:{id:VAR_SECRET,name:"SecretNumber"}},
-                          inputs:{
-                            VALUE:{block:{type:"math_random_int",fields:{FROM:1,TO:5}}}
-                          },
+                          type:"variables_set",fields:{VAR:{id:VAR_GUESS,name:"Guess"}},
+                          inputs:{VALUE:numShadow(0)},
                           next:{
                             block:{
-                              type:"variables_set",fields:{VAR:{id:VAR_GUESS,name:"Guess"}},
-                              inputs:{VALUE:numShadow(0)}
+                              type:"variables_set",fields:{VAR:{id:VAR_SECRET,name:"SecretNumber"}},
+                              inputs:{
+                                VALUE:{
+                                  block:{
+                                    type:"math_random_int",
+                                    inputs:{
+                                      FROM:numShadow(1),
+                                      TO:numShadow(5)
+                                    }
+                                  }
+                                }
+                              }
                             }
                           }
                         }
@@ -128,8 +135,14 @@
             inputs:{
               DO:{
                 block:{
-                  type:"variables_change",fields:{VAR:{id:VAR_GUESS,name:"Guess"},DELTA:1},
-                  next:{block:{type:"show_number",inputs:{NUM:{block:{type:"variables_get",fields:{VAR:{id:VAR_GUESS,name:"Guess"}}}}}}}
+                  type:"variables_change",
+                  fields:{VAR:{id:VAR_GUESS,name:"Guess"},DELTA:1},
+                  next:{
+                    block:{
+                      type:"show_number",
+                      inputs:{NUM:{block:{type:"variables_get",fields:{VAR:{id:VAR_GUESS,name:"Guess"}}}}}
+                    }
+                  }
                 }
               }
             }
@@ -139,8 +152,14 @@
             inputs:{
               DO:{
                 block:{
-                  type:"variables_change",fields:{VAR:{id:VAR_GUESS,name:"Guess"},DELTA:-1},
-                  next:{block:{type:"show_number",inputs:{NUM:{block:{type:"variables_get",fields:{VAR:{id:VAR_GUESS,name:"Guess"}}}}}}}
+                  type:"variables_change",
+                  fields:{VAR:{id:VAR_GUESS,name:"Guess"},DELTA:-1},
+                  next:{
+                    block:{
+                      type:"show_number",
+                      inputs:{NUM:{block:{type:"variables_get",fields:{VAR:{id:VAR_GUESS,name:"Guess"}}}}}
+                    }
+                  }
                 }
               }
             }
@@ -164,18 +183,27 @@
                     },
                     DO0:{
                       block:{
-                        type:"show_text",fields:{TEXT:"Yes!"},
-                        next:{block:{type:"show_icon",fields:{ICON:"heart"}}}
+                        type:"show_text",fields:{TEXT:"yes"},
+                        next:{
+                          block:{
+                            type:"pause_block",fields:{MS:1000},
+                            next:{block:{type:"show_icon",fields:{ICON:"heart"}}}
+                          }
+                        }
                       }
                     },
                     ELSE:{
                       block:{
-                        type:"show_text",fields:{TEXT:"Try again!"},
-                        next:{block:{type:"show_icon",fields:{ICON:"cross"}}}
+                        type:"show_text",fields:{TEXT:"Try Again"},
+                        next:{
+                          block:{
+                            type:"show_icon",fields:{ICON:"square_border"},
+                            next:{block:{type:"pause_block",fields:{MS:1000}}}
+                          }
+                        }
                       }
                     }
-                  },
-                  next:{block:{type:"pause_block",fields:{MS:1000}}}
+                  }
                 }
               }
             }
@@ -191,18 +219,19 @@
 `<h3 style="text-align:center;color:#1e3a8a;">Step 1 — Generate a Random Secret Number</h3>
 <div class="callout">
   🎲 From the <strong>Math</strong> tab, drag <strong>pick random 1 to 5</strong>.<br>
+  🔢 From <strong>Math</strong>, drag two <strong>number</strong> blocks and snap them into the <em>pick random</em> block to set <code>1</code> and <code>5</code>.<br>
   🧩 From <strong>Variables</strong>, click <strong>Make a Variable</strong> and name it <em>SecretNumber</em>.<br>
   🚀 From <strong>Basic</strong>, drag <strong>on start</strong> to the Workspace.<br>
-  💬 Add <strong>show text "Hello!"</strong> and <strong>pause (ms) 2000</strong> at the top.<br>
-  🔢 From <strong>Variables</strong>, drag <strong>set SecretNumber to</strong> and snap the <em>pick random 1 to 5</em> block inside.<br>
+  💬 Inside it, add <strong>show text "Hello"</strong> and <strong>pause (ms) 2000</strong>.<br>
+  🧩 From <strong>Variables</strong>, drag <strong>set SecretNumber to</strong> and snap the <em>pick random 1 to 5</em> block inside.<br>
   ▶️ Click <strong>Run</strong> to see the message and set the number.<br>
   💬 Liam: “My secret visual code is ready!”
 </div>`,
 
 `<h3 style="text-align:center;color:#1e3a8a;">Step 2 — Set Up a Guess Variable</h3>
 <div class="callout">
-  🧩 From the <strong>Variables</strong> tab, click <strong>Make a Variable</strong> and name it <em>Guess</em>.<br>
-  🔢 In the same <em>on start</em>, add <strong>set Guess to 0</strong>.<br>
+  🧩 From <strong>Variables</strong>, click <strong>Make a Variable</strong> and name it <em>Guess</em>.<br>
+  🔢 Inside the same <em>on start</em>, add <strong>set Guess to 0</strong> (from Variables + Math).<br>
   ▶️ Click <strong>Run</strong> to test.<br>
   💬 Liam: “Let’s track your guess!”
 </div>`,
@@ -210,10 +239,10 @@
 `<h3 style="text-align:center;color:#1e3a8a;">Step 3 — Add Button Inputs for Guessing</h3>
 <div class="callout">
   🔘 From <strong>Input</strong>, drag <strong>on button A pressed</strong>.<br>
-  ➕ Inside it, add <strong>change Guess by 1</strong> from <strong>Variables</strong>.<br>
-  🔢 Add <strong>show number Guess</strong> (from <strong>Basic</strong> + <strong>Variables</strong>).<br>
+  ➕ Inside it, add <strong>change Guess by 1</strong> (from Variables).<br>
+  🔢 Add <strong>show number Guess</strong> (from Basic + Variables).<br><br>
   🔘 From <strong>Input</strong>, drag <strong>on button B pressed</strong>.<br>
-  ➖ Inside it, add <strong>change Guess by -1</strong> and <strong>show number Guess</strong>.<br>
+  ➖ Inside it, add <strong>change Guess by -1</strong> (from Variables) and <strong>show number Guess</strong>.<br>
   ▶️ Click <strong>Run</strong>, press A/B to adjust Guess.<br>
   💬 Liam: “Press A to go up, B to go down!”
 </div>`,
@@ -221,11 +250,10 @@
 `<h3 style="text-align:center;color:#1e3a8a;">Step 4 — Check the Guess and Give Visual Feedback</h3>
 <div class="callout">
   📳 From <strong>Input</strong>, drag <strong>on shake</strong>.<br>
-  ⚙️ Inside it, add <strong>if then else</strong> from <strong>Logic</strong>.<br>
-  💭 Condition: <em>Guess = SecretNumber</em> (<strong>Variables</strong> + <strong>Logic</strong>).<br>
-  ✅ In “then”: add <strong>show text "Yes!"</strong> + <strong>show icon Heart</strong>.<br>
-  ❌ In “else”: add <strong>show text "Try again!"</strong> + <strong>show icon Cross</strong>.<br>
-  ⏸ Add <strong>pause (ms) 1000</strong> to briefly show feedback.<br>
+  ⚙️ Inside it, add <strong>if then else</strong> (from Logic).<br>
+  💭 Condition: <em>Guess = SecretNumber</em> (Variables + Logic).<br>
+  ✅ In “then”: add <strong>show text "yes"</strong> → <strong>pause (ms) 1000</strong> → <strong>show icon heart</strong>.<br>
+  ❌ In “else”: add <strong>show text "Try Again"</strong> → <strong>show icon square (border)</strong> → <strong>pause (ms) 1000</strong>.<br>
   ▶️ Click <strong>Run</strong>, adjust Guess, shake to submit.<br>
   💬 Liam: “Guess my code and shake to see the lights!”
 </div>`,
@@ -236,12 +264,12 @@
 
 `<h3 style="text-align:center;color:#00A1D6;">Did You Know?</h3>
 <div class="callout">
-  💡 Video games use light cues for feedback — just like your GlowBit!<br>
-  🚦 Traffic lights, elevators, and dashboards all rely on color patterns to guide humans.<br>
-  🤖 Robots often flash LEDs to signal success or errors — you’re coding the same logic!
+  💡 Video games use light signals to reward players — GlowBit does the same!<br>
+  🚦 Traffic lights and elevators flash colors to guide people safely.<br>
+  🤖 Robots use LED patterns to communicate status — you’re learning that concept now!
 </div>
 <div class="callout">
-  <span class="tip">Try this</span> Change the range to <strong>1–10</strong> or use different <em>icons</em> for each hint level!
+  <span class="tip">Try this</span> Change the range to <code>1–10</code> or use different icons to show hint levels.
 </div>`
     ];
 
@@ -283,7 +311,7 @@
     paginate();
     window.addEventListener('resize',()=>{paginate();if(lesson&&lesson.workspace)Blockly.svgResize(lesson.workspace);});
 
-    /* ---------- Modal Behavior ---------- */
+    /* ---------- Modal ---------- */
     const modal=document.getElementById('solutionModalP11A');
     const wsDiv=document.getElementById('solutionWorkspaceP11A');
     const closeBtns=[document.getElementById('solutionCloseP11A'),document.getElementById('solutionCloseBtnP11A')];
@@ -294,7 +322,7 @@
     }
     closeBtns.forEach(b=>b.addEventListener('click',()=>modal.style.display='none'));
 
-    console.log('✅ Project 11A – Liam’s Visual Guessing Challenge ready (GitHub-safe, with enlarged subtitle).');
+    console.log('✅ Project 11A – Liam’s Visual Guessing Challenge (corrected with square border + explicit tab instructions).');
   })();
   </script>
 </body>
