@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>(11B) Mia’s GlowBit Sound Guessing Challenge</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Blockly + Global -->
+  <script src="lib/blockly_compressed.js"></script>
+  <script src="lib/blocks_compressed.js"></script>
+  <script src="lib/javascript_compressed.js"></script>
+  <script src="lib/msg/en.js"></script>
+  <script src="assets/global.js"></script>
+  <script src="lib/blockly_xml_patch.js"></script>
+
+  <style>
+    .gb-wrapper{max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
+    .gb-header{
+      text-align:center;background:#fce7f3;color:#9d174d;font-size:22px;font-weight:800;
+      padding:10px 12px;border-radius:12px;margin:8px 0 6px;box-shadow:0 1px 4px rgba(0,0,0,0.08);
+    }
+    .gb-subhead{
+      text-align:center;background:#fdf2f8;color:#be185d;font-size:20px;font-weight:700;
+      padding:10px 16px;border-radius:10px;margin:0 0 10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);
+    }
+    .callout{background:#fdf2f8;border-left:6px solid #ec4899;padding:10px 12px;border-radius:10px;
+      color:#831843;margin:8px 0;}
+    .tip{display:inline-block;background:#fce7f3;color:#9d174d;border:1px solid #f472b6;border-radius:6px;
+      padding:2px 6px;font-size:12px;font-weight:800;}
+    .nav-btns{display:flex;justify-content:space-between;gap:8px;margin-top:10px;flex-wrap:wrap;}
+    .gb-btn{padding:8px 14px;border:none;border-radius:8px;font-weight:700;cursor:pointer;flex:1;text-align:center;}
+    .gb-btn.next{background:#ec4899;color:#fff;}
+    .gb-btn.back{background:#9d174d;color:#fff;}
+    .gb-btn.cta{background:#10b981;color:#fff;margin-top:8px;}
+    .character-frame{text-align:center;margin-top:18px;}
+    .character-frame img{width:85%;max-width:260px;height:auto;border-radius:12px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.25);}
+    #glowbit-project11B-editor{height:560px;min-height:560px;background:#fff;}
+
+    /* Modal */
+    #solutionModalP11B{display:none;position:fixed;top:60px;right:20px;width:640px;max-width:42%;
+      background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.28);z-index:12000;overflow:hidden;}
+    #solutionHeaderP11B{cursor:move;padding:10px 12px;background:#be185d;color:#fff;font-weight:700;
+      text-align:left;border-radius:10px 10px 0 0;display:flex;justify-content:space-between;align-items:center;}
+    #solutionWorkspaceP11B{height:360px;width:100%;border-top:1px solid #eee;background:#fafafa;}
+    #solutionFooterP11B{text-align:center;padding:12px;background:#fff;}
+    #solutionFooterP11B button{background:#be185d;color:#fff;border:none;border-radius:8px;padding:8px 18px;cursor:pointer;font-weight:700;}
+    @media(max-width:900px){
+      #solutionModalP11B{left:10px;right:10px;width:auto;max-width:calc(100% - 20px);top:40px;}
+      #solutionWorkspaceP11B{height:260px;}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="gb-wrapper">
+    <div class="gb-header">(11B) Mia’s GlowBit Sound Guessing Challenge</div>
+    <div class="gb-subhead">
+      Mia loves creating games that sing! 🎵<br>
+      “My version plays tunes to guide you through guessing a number.<br>
+      Think you can follow my audio adventure? Let’s create some sound magic together!”
+    </div>
+
+    <div id="glowbit-project11B"></div>
+  </div>
+
+  <!-- ✅ Compact Solution Modal -->
+  <div id="solutionModalP11B" aria-hidden="true" role="dialog">
+    <div id="solutionHeaderP11B">
+      <div>✅ Correct Setup — Mia’s Sound Challenge</div>
+      <button id="solutionCloseP11B" title="Close">✕</button>
+    </div>
+    <div id="solutionWorkspaceP11B" aria-label="Correct solution workspace"></div>
+    <div id="solutionFooterP11B"><button id="solutionCloseBtnP11B">Close</button></div>
+  </div>
+
+  <script>
+  (function boot(){
+    if(!(window.Glowbit && window.Blockly)) return setTimeout(boot,120);
+
+    const lesson = Glowbit.createLessonUI('glowbit-project11B', {
+      title:'', instructions:'', pixelSize:28,
+      defaultJson:{ blocks:{ languageVersion:0, blocks:[] } }
+    });
+    if (lesson && lesson.workspace) lesson.workspace.clear();
+
+    /* ---------- Correct Setup JSON (sound-based version) ---------- */
+    const VAR_SECRET = "VAR_SECRET_ID";
+    const VAR_GUESS  = "VAR_GUESS_ID";
+    const numShadow  = (n)=>({ shadow:{ type:"math_number", fields:{ NUM:n } } });
+
+    const solutionJson = {
+      variables: [
+        { name:"SecretNumber", id:VAR_SECRET },
+        { name:"Guess",        id:VAR_GUESS  }
+      ],
+      blocks: {
+        languageVersion: 0,
+        blocks: [
+          {
+            type:"on_start", x:20, y:20,
+            inputs:{ DO:{ block:{
+              type:"show_text", fields:{ TEXT:"Hello" },
+              next:{ block:{
+                type:"pause_block", fields:{ MS:2000 },
+                next:{ block:{
+                  type:"variables_set", fields:{ VAR:{ id:VAR_GUESS, name:"Guess" } },
+                  inputs:{ VALUE:numShadow(0) },
+                  next:{ block:{
+                    type:"variables_set", fields:{ VAR:{ id:VAR_SECRET, name:"SecretNumber" } },
+                    inputs:{ VALUE:{ block:{
+                      type:"pick_random",
+                      inputs:{ FROM:numShadow(1), TO:numShadow(5) }
+                    }}}
+                  }}
+                }}
+              }}
+            }}}
+          },
+
+          /* Button A: increment */
+          {
+            type:"on_button_pressed", fields:{ BTN:"A" }, x:20, y:260,
+            inputs:{ DO:{ block:{
+              type:"variables_set", fields:{ VAR:{ id:VAR_GUESS, name:"Guess" } },
+              inputs:{ VALUE:{ block:{
+                type:"math_arithmetic", fields:{ OP:"ADD" },
+                inputs:{
+                  A:{ block:{ type:"variables_get", fields:{ VAR:{ id:VAR_GUESS, name:"Guess" } } } },
+                  B:{ block:{ type:"math_number", fields:{ NUM:1 } } }
+                }
+              }}},
+              next:{ block:{
+                type:"show_number",
+                inputs:{ NUM:{ block:{ type:"variables_get", fields:{ VAR:{ id:VAR_GUESS, name:"Guess" } } } } }
+              }}
+            }}}
+          },
+
+          /* Button B: decrement */
+          {
+            type:"on_button_pressed", fields:{ BTN:"B" }, x:20, y:380,
+            inputs:{ DO:{ block:{
+              type:"variables_set", fields:{ VAR:{ id:VAR_GUESS, name:"Guess" } },
+              inputs:{ VALUE:{ block:{
+                type:"math_arithmetic", fields:{ OP:"MINUS" },
+                inputs:{
+                  A:{ block:{ type:"variables_get", fields:{ VAR:{ id:VAR_GUESS, name:"Guess" } } } },
+                  B:{ block:{ type:"math_number", fields:{ NUM:1 } } }
+                }
+              }}},
+              next:{ block:{
+                type:"show_number",
+                inputs:{ NUM:{ block:{ type:"variables_get", fields:{ VAR:{ id:VAR_GUESS, name:"Guess" } } } } }
+              }}
+            }}}
+          },
+
+          /* On shake: play tone for feedback */
+          {
+            type:"on_shake", x:20, y:520,
+            inputs:{ DO:{ block:{
+              type:"controls_if", extraState:{ elseIfCount:0, hasElse:true },
+              inputs:{
+                IF0:{ block:{
+                  type:"logic_compare", fields:{ OP:"EQ" },
+                  inputs:{
+                    A:{ block:{ type:"variables_get", fields:{ VAR:{ id:VAR_GUESS,  name:"Guess" } } } },
+                    B:{ block:{ type:"variables_get", fields:{ VAR:{ id:VAR_SECRET, name:"SecretNumber" } } } }
+                  }
+                }},
+                DO0:{ block:{
+                  type:"show_text", fields:{ TEXT:"Correct!" },
+                  next:{ block:{
+                    type:"play_tone_note",
+                    fields:{ NOTE:"C5", DURATION:"beat", WAIT:"TRUE" },
+                    next:{ block:{ type:"pause_block", fields:{ MS:1000 } } }
+                  }}
+                }},
+                ELSE:{ block:{
+                  type:"show_text", fields:{ TEXT:"Try Again" },
+                  next:{ block:{
+                    type:"play_tone_note",
+                    fields:{ NOTE:"A3", DURATION:"beat", WAIT:"TRUE" },
+                    next:{ block:{ type:"pause_block", fields:{ MS:1000 } } }
+                  }}
+                }}
+              }
+            }}}
+          }
+        ]
+      }
+    };
+    window.solutionJson = solutionJson;
+
+    /* ---------- Sidebar Slides ---------- */
+    const stepCards = [
+
+`<h3 style="text-align:center;color:#9d174d;">Step 1 — Generate a Random Secret Number</h3>
+<div class="callout">
+  🎲 From the <strong>Math</strong> tab, drag <strong>pick random</strong>.<br>
+  🔢 From <strong>Math</strong>, drag two <strong>number</strong> blocks — set them to <code>1</code> and <code>5</code> — then snap them into <em>pick random</em>.<br>
+  🧩 From <strong>Variables</strong>, click <strong>Make a Variable</strong> and name it <em>SecretNumber</em>.<br>
+  🚀 From <strong>Basic</strong>, drag <strong>on start</strong> to the Workspace.<br>
+  💬 Inside it, add <strong>show text "Hello"</strong> and <strong>pause (ms) 2000</strong>.<br>
+  🧩 From <strong>Variables</strong>, drag <strong>set SecretNumber to</strong> and snap in the <em>pick random 1–5</em> block.<br>
+  ▶️ Click <strong>Run</strong> to see the message and set the number.<br>
+  💬 Mia: “My secret sound code is ready!”
+</div>`,
+
+`<h3 style="text-align:center;color:#9d174d;">Step 2 — Set Up a Guess Variable</h3>
+<div class="callout">
+  🧩 From <strong>Variables</strong>, click <strong>Make a Variable</strong> and name it <em>Guess</em>.<br>
+  🔢 In the same <em>on start</em>, add <strong>set Guess to</strong> and snap in a <strong>number</strong> (from <strong>Math</strong>) set to <code>0</code>.<br>
+  ▶️ Click <strong>Run</strong> to test.<br>
+  💬 Mia: “We’ll keep track of your guess!”
+</div>`,
+
+`<h3 style="text-align:center;color:#9d174d;">Step 3 — Add Button Inputs for Guessing</h3>
+<div class="callout">
+  🔘 From <strong>Input</strong>, drag <strong>on button A pressed</strong>.<br>
+  ➕ Inside it, build <em>Guess = Guess + 1</em> using <strong>Variables → set Guess to</strong> + <strong>Math → arithmetic (+)</strong> with <strong>Variables → Guess</strong> and <strong>Math → number 1</strong>.<br>
+  🔢 Add <strong>Basic → show number</strong> and snap in <strong>Variables → Guess</strong>.<br><br>
+  🔘 From <strong>Input</strong>, drag <strong>on button B pressed</strong>.<br>
+  ➖ Inside it, build <em>Guess = Guess − 1</em> the same way but with arithmetic <strong>(−)</strong>.<br>
+  🔢 Add <strong>show number Guess</strong> again.<br>
+  ▶️ Click <strong>Run</strong>, press A/B to adjust Guess.<br>
+  💬 Mia: “Press A to go higher, B to go lower!”
+</div>`,
+
+`<h3 style="text-align:center;color:#9d174d;">Step 4 — Add Sound Feedback</h3>
+<div class="callout">
+  📳 From <strong>Input</strong>, drag <strong>on shake</strong>.<br>
+  ⚙️ Inside it, add <strong>Logic → if then else</strong>.<br>
+  💭 Condition: build <em>Guess = SecretNumber</em> (Variables + Logic).<br>
+  🎵 In “then”: add <strong>show text "Correct!"</strong> → <strong>Music → play tone C5 (1 beat)</strong> → <strong>pause (ms) 1000</strong>.<br>
+  🎶 In “else”: add <strong>show text "Try Again"</strong> → <strong>Music → play tone A3 (1 beat)</strong> → <strong>pause (ms) 1000</strong>.<br>
+  ▶️ Click <strong>Run</strong>, guess, and shake!<br>
+  💬 Mia: “Listen carefully — can you hear the clue?”
+</div>`,
+
+`<div class="callout" style="text-align:center;">
+  <button class="gb-btn cta" id="open-solution">✅ Check Your Setup</button>
+</div>`,
+
+`<h3 style="text-align:center;color:#be185d;">Did You Know?</h3>
+<div class="callout">
+  🎧 Sound feedback helps people and robots react — from elevator chimes to phone alerts!<br>
+  🎮 Games often use sound to hint success or failure — your GlowBit now does the same.<br>
+  🧠 Combining hearing and logic strengthens coding creativity!
+</div>
+<div class="callout">
+  <span class="tip">Try this</span> Change tones for each number guessed — turn it into a musical game!
+</div>`
+    ];
+
+    /* ---------- Pagination ---------- */
+    function paginate(){
+      const sidebar=document.querySelector('#glowbit-project11B .glowbit-left');
+      if(!sidebar)return;
+      const editor=document.getElementById('glowbit-project11B-editor');
+      const targetH=(editor&&editor.offsetHeight)?editor.offsetHeight:520;
+      const meas=document.createElement('div');
+      meas.style.visibility='hidden';meas.style.position='absolute';meas.style.left='-9999px';
+      meas.style.width=(sidebar.clientWidth||320)+'px';
+      document.body.appendChild(meas);
+      const pages=[];let current=[];const reserve=56;
+      stepCards.forEach(html=>{
+        const c=document.createElement('div');c.innerHTML=html;meas.appendChild(c);
+        const tooTall=meas.scrollHeight>(targetH-reserve);
+        if(tooTall){
+          if(current.length===0){pages.push([html]);meas.innerHTML='';}
+          else{pages.push([...current]);current=[html];meas.innerHTML='';
+            current.forEach(h=>{const d=document.createElement('div');d.innerHTML=h;meas.appendChild(d);});}
+        }else current.push(html);
+      });
+      if(current.length)pages.push(current);
+      document.body.removeChild(meas);
+      function render(i){
+        sidebar.innerHTML=pages[i].join('');
+        const nav=document.createElement('div');nav.className='nav-btns';
+        if(i>0){const b=document.createElement('button');b.textContent='⬅ Back';b.className='gb-btn back';b.onclick=()=>render(i-1);nav.appendChild(b);}
+        if(i<pages.length-1){const n=document.createElement('button');n.textContent='Next ➜';n.className='gb-btn next';n.onclick=()=>render(i+1);nav.appendChild(n);}
+        sidebar.appendChild(nav);
+        const frame=document.createElement('div');frame.className='character-frame';
+        frame.innerHTML='<img src="images/GlowBit3.png" alt="GlowBit buddy">';
+        sidebar.appendChild(frame);
+        const openBtn=document.getElementById('open-solution');
+        if(openBtn)openBtn.addEventListener('click',()=>showSolutionModal());
+      }
+      render(0);
+    }
+    paginate();
+    window.addEventListener('resize',()=>{paginate();if(lesson&&lesson.workspace)Blockly.svgResize(lesson.workspace);});
+
+    /* ---------- Modal ---------- */
+    const modal=document.getElementById('solutionModalP11B');
+    const wsDiv=document.getElementById('solutionWorkspaceP11B');
+    const closeBtns=[document.getElementById('solutionCloseP11B'),document.getElementById('solutionCloseBtnP11B')];
+    function showSolutionModal(){
+      modal.style.display='block';wsDiv.innerHTML='';
+      const ws=Blockly.inject(wsDiv,{readOnly:true,scrollbars:true});
+      Blockly.serialization.workspaces.load(window.solutionJson,ws);
+    }
+    closeBtns.forEach(b=>b.addEventListener('click',()=>modal.style.display='none'));
+
+    console.log('✅ Project 11B – Mia’s GlowBit Sound Guessing Challenge (music feedback version).');
+  })();
+  </script>
+</body>
+</html>
