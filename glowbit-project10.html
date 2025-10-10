@@ -5,7 +5,7 @@
   <title>(10) Mia’s GlowBit ChatBot</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Same required script order -->
+  <!-- Same required script order as P8/P9 -->
   <script src="lib/blockly_compressed.js"></script>
   <script src="lib/blocks_compressed.js"></script>
   <script src="lib/javascript_compressed.js"></script>
@@ -31,7 +31,7 @@
                          box-shadow:0 4px 12px rgba(0,0,0,0.25);object-fit:cover;}
     #glowbit-project10-editor{height:560px;min-height:560px;background:#fff;}
 
-    /* Compact Check-Your-Setup modal */
+    /* Compact Check-Your-Setup modal (same pattern as P8/P9) */
     #solutionModalP10{display:none;position:fixed;top:60px;right:20px;width:640px;max-width:42%;
       background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.28);
       z-index:12000;overflow:hidden;user-select:none;}
@@ -52,7 +52,7 @@
   <div class="gb-wrapper">
     <div class="gb-header">(10) Mia’s GlowBit ChatBot</div>
     <div class="gb-subhead">
-      Let’s make GlowBit welcome you! You’ll code GlowBit to display a welcome message, count from 1 to 10, and play a name tune — like a smart chatbot.
+      Let’s make GlowBit welcome you! You’ll code GlowBit to display a welcome message and count from 1 to 10 — like a smart chatbot.
     </div>
 
     <div id="glowbit-project10"></div>
@@ -72,78 +72,114 @@
   (function boot(){
     if(!(window.Glowbit && window.Blockly)) return setTimeout(boot,120);
 
-    /* Create standard two-column UI */
+    /* Standard two-column UI */
     const lesson = Glowbit.createLessonUI('glowbit-project10', {
       title:'',instructions:'',pixelSize:28,
       defaultJson:{blocks:{languageVersion:0,blocks:[]}}
     });
     if(lesson && lesson.workspace) lesson.workspace.clear();
 
-    /* Helper for pause-show-clear */
-    function seqPauseShowClear(ms=500,text){
-      return {
-        type:"pause_block",fields:{MS:ms},
-        next:{block:{type:"show_text",fields:{TEXT:text||"Hello"},
-        next:{block:{type:"clear_screen"}}}}
-      };
-    }
-
-    /* ✅ Correct Setup JSON */
+    /* ---------- Correct Answer JSON (matches your requested structure) ---------- */
+    const VAR_ID = "VAR_COUNT_ID_1"; // stable id for 'Count'
     const solutionJson = {
+      variables: [{name:"Count", id:VAR_ID}],
       blocks:{languageVersion:0,blocks:[
-        {type:"on_start",x:20,y:20,
-          inputs:{DO:{block:{type:"show_text",fields:{TEXT:"Welcome!"},next:{
-            block:{type:"show_number",inputs:{NUM:{shadow:{type:"math_number",fields:{NUM:1}}}},
-            next:{block:{type:"clear_screen"}}}}}}}},
-        {type:"on_button_pressed",fields:{BTN:"A"},x:20,y:160,
-          inputs:{DO:{block:{type:"show_number",
-          inputs:{NUM:{shadow:{type:"math_number",fields:{NUM:1}}}}}}}},
-        {type:"on_button_pressed",fields:{BTN:"B"},x:20,y:300,
-          inputs:{DO:{block:{type:"play_tone_note",
-          fields:{NOTE:"C4",BEATS:"0.5"}}}}}
+        {
+          type:"on_start", x:20, y:20,
+          inputs:{DO:{block:{
+            type:"show_text", fields:{TEXT:"Welcome!"},
+            next:{block:{
+              type:"variables_set", fields:{VAR:{id:VAR_ID,name:"Count"}},
+              inputs:{VALUE:{shadow:{type:"math_number",fields:{NUM:1}}}}
+            }}
+          }}}
+        },
+        {
+          type:"on_button_pressed", x:20, y:200, fields:{BTN:"A"},
+          inputs:{DO:{block:{
+            type:"controls_if",
+            extraState:{elseIfCount:0, hasElse:true},
+            inputs:{
+              IF0:{block:{
+                type:"logic_compare", fields:{OP:"LT"},
+                inputs:{
+                  A:{block:{type:"variables_get", fields:{VAR:{id:VAR_ID,name:"Count"}}}},
+                  B:{block:{type:"math_number", fields:{NUM:10}}}
+                }
+              }},
+              DO0:{block:{
+                /* Set Count to Count + 1 (explicit to avoid 'change' block id differences) */
+                type:"variables_set", fields:{VAR:{id:VAR_ID,name:"Count"}},
+                inputs:{VALUE:{block:{
+                  type:"math_arithmetic", fields:{OP:"ADD"},
+                  inputs:{
+                    A:{block:{type:"variables_get", fields:{VAR:{id:VAR_ID,name:"Count"}}}},
+                    B:{block:{type:"math_number", fields:{NUM:1}}}
+                  }
+                }}}
+              }},
+              ELSE:{block:{
+                /* Else: Set Count to 1, then Show Number 1 */
+                type:"variables_set", fields:{VAR:{id:VAR_ID,name:"Count"}},
+                inputs:{VALUE:{shadow:{type:"math_number",fields:{NUM:1}}}},
+                next:{block:{
+                  type:"show_number",
+                  inputs:{NUM:{shadow:{type:"math_number",fields:{NUM:1}}}}
+                }}
+              }}
+            }
+          }}}
+        }
       ]}
     };
     window.solutionJson = solutionJson;
 
-    /* Sidebar steps — same style as Projects 8 & 9 */
+    /* ---------- Sidebar slides (emoji bullets, explicit tabs, no music) ---------- */
     const stepCards = [
 
 `<h3 style="text-align:center;color:#be123c;">Step 1 — Show a Welcome Message</h3>
 <div class="callout">
-  1️⃣ 🧰 Go to the <strong>Basic</strong> tab and drag a <strong>show string</strong> block to the Workspace. Type <em>Welcome!</em> in the text field.<br>
-  2️⃣ 🚀 Drag an <strong>on start</strong> block and place <em>show string Welcome!</em> inside it.<br>
-  3️⃣ ▶️ Click the green <strong>Play</strong> button to see the message on the LED grid.<br>
-  💬 Mia: “GlowBit says hi!”<br><br>
+  🧰 Go to the <strong>Basic</strong> tab and drag a <strong>show text</strong> block to the Workspace. Type <em>Welcome!</em> in the text field.<br>
+  🚀 From <strong>Basic</strong>, drag <strong>on start</strong> and place <em>show text “Welcome!”</em> inside it.<br>
+  ▶️ Click <strong>Run</strong> to see the message on the LED grid.<br>
+  💬 Mia: “GlowBit says Welcome!”<br><br>
   4️⃣ 🧹 Remove the block from <em>on start</em> after testing.
 </div>`,
 
-`<h3 style="text-align:center;color:#be123c;">Step 2 — Show a Number</h3>
+`<h3 style="text-align:center;color:#be123c;">Step 2 — Show the Number 1</h3>
 <div class="callout">
-  1️⃣ 🧰 From the <strong>Basic</strong> tab, drag a <strong>show number</strong> block to the Workspace and set it to <code>1</code>.<br>
-  2️⃣ 🚀 Place it inside an <strong>on start</strong> block.<br>
-  3️⃣ ▶️ Press <strong>Play</strong> — GlowBit shows “1.”<br>
-  💬 Mia: “GlowBit’s counting!”<br><br>
-  4️⃣ 🧹 Remove it from <em>on start</em> after testing.
+  🧰 From the <strong>Basic</strong> tab, drag a <strong>show number</strong> block to the Workspace.<br>
+  🔢 From the <strong>Math</strong> tab, drag <strong>number</strong> (defaults to <code>0</code>), change it to <code>1</code>, and <em>snap it into</em> the <strong>show number</strong> block.<br>
+  🚀 From <strong>Basic</strong>, drag <strong>on start</strong> and place <em>show number (1)</em> inside it.<br>
+  ▶️ Click <strong>Run</strong> to see “1”.<br><br>
+  🧹 Remove it from <em>on start</em> after testing.
 </div>`,
 
-`<h3 style="text-align:center;color:#be123c;">Step 3 — Add Button Inputs</h3>
+`<h3 style="text-align:center;color:#be123c;">Step 3 — Add Button A</h3>
 <div class="callout">
-  1️⃣ 🔘 From <strong>Input</strong>, drag <strong>on button A pressed</strong> and place the <em>show number 1</em> block inside it.<br>
-  2️⃣ 🔘 From <strong>Input</strong>, drag <strong>on button B pressed</strong>.<br>
-  3️⃣ 🎵 From <strong>Music</strong>, drag <strong>play tone</strong> → choose <em>Middle C</em> for <em>½ beat</em>.<br>
-  💬 Mia: “GlowBit will play a tune!”<br><br>
-  ▶️ Click <strong>Play</strong>, press A to see the number, B to hear the tone.
+  1️⃣ 🔘 From <strong>Input</strong>, drag <strong>on button A pressed</strong> to the Workspace.<br>
+  2️⃣ (We’ll make it count in the next step.)
 </div>`,
 
-`<h3 style="text-align:center;color:#be123c;">Step 4 — Add Counting on Button A</h3>
+`<h3 style="text-align:center;color:#be123c;">Step 4 — Counting with a Variable</h3>
 <div class="callout">
-  1️⃣ 🔢 From <strong>Variables</strong>, click <strong>Make a Variable</strong> → name it <em>Count</em>.<br>
-  2️⃣ 🚀 From <strong>Basic</strong>, drag <strong>on start</strong> → add <strong>set Count to 1</strong>.<br>
-  3️⃣ 🔘 Add <strong>on button A pressed</strong> and inside it place an <strong>if then else</strong> block from <strong>Logic</strong>.<br>
-  4️⃣ ⚙️ Set the condition to <code>Count &lt; 10</code> (drag Count + “&lt;” from Logic + math number 10).<br>
-  5️⃣ ➕ In <em>then</em> area: add <strong>change Count by 1</strong> and <strong>show number Count</strong>.<br>
-  6️⃣ 🔁 In <em>else</em>: add <strong>set Count to 1</strong> and <strong>show number 1</strong>.<br>
-  ▶️ Click <strong>Play</strong>, press A repeatedly to count 1-10, then cycle back to 1.<br>
+  🔢 From <strong>Variables</strong>, click <strong>Make a Variable</strong> and name it <em>Count</em>.<br>
+  🚀 From <strong>Basic</strong>, drag <strong>on start</strong>.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;• From <strong>Variables</strong>, drag <strong>set Count to</strong> into <em>on start</em>.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;• From <strong>Math</strong>, drag <strong>number</strong>, set it to <code>1</code>, and snap it into <em>set Count to</em>.<br><br>
+  🔘 Select your <strong>on button A pressed</strong> block (from Step 3). Inside it, build this logic:<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;• From <strong>Logic</strong>, drag an <strong>if</strong> block. Click its ⚙️ wheel (mutator) and add an <strong>else</strong> piece.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;• In the <em>if</em> slot, place a <strong>compare</strong> block from <strong>Logic</strong> and change it to <strong>&lt;</strong> (less than).<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;• From <strong>Variables</strong>, drag <strong>Count</strong> (getter) into the left side (A).<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;• From <strong>Math</strong>, drag <strong>number</strong>, set it to <code>10</code>, and snap it into the right side (B).<br><br>
+  ✅ In the <em>then</em> area (Count &lt; 10):<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;• From <strong>Variables</strong>, drag <strong>set Count to</strong>.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;• From <strong>Math</strong>, drag <strong>arithmetic</strong>, set it to <strong>+</strong> (ADD).<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;• Put <strong>Count</strong> (getter) on the left (A) and <strong>number 1</strong> on the right (B).<br><br>
+  🔁 In the <em>else</em> area (when Count = 10):<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;• From <strong>Variables</strong>, drag <strong>set Count to</strong> and snap in <strong>number 1</strong> (from <strong>Math</strong>).<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;• From <strong>Basic</strong>, drag <strong>show number</strong> and snap in <strong>number 1</strong> (from <strong>Math</strong>).<br><br>
+  ▶️ Click <strong>Run</strong>, then tap <strong>Button A</strong> to count toward 10. At 10, it resets to 1 and shows “1”.<br>
   💬 Mia: “GlowBit counts with me!”
 </div>`,
 
@@ -153,16 +189,16 @@
 
 `<h3 style="text-align:center;color:#00A1D6;">Did You Know?</h3>
 <div class="callout">
-  • 🤖 Chatbots like Alexa and Siri respond with voices and animations — our GlowBit ChatBot shows text and numbers the same way!<br>
-  • 🔢 Smart devices use counters to track steps or messages; our variable “Count” acts the same way.<br>
-  • 🎵 Music and text combine in robot greetings to make interactions fun and friendly — just like GlowBit does here.
+  • 💬 <strong>Chatbots & devices</strong> often greet you with a welcome message on tiny displays — just like our Show Text block.<br>
+  • 🔢 <strong>Counters are everywhere</strong>: elevators show floor numbers, turnstiles count entries, and apps track steps — your <em>Count</em> variable works the same way!<br>
+  • 🧠 <strong>Reset-on-limit</strong> is common: scoreboards, timers, and click counters loop back to a start value after they reach a max.
 </div>
 <div class="callout">
-  <span class="tip">Try this</span> Change the tone for Button B and add a second note to make a short “name tune.”
+  <span class="tip">Try this</span> After each press, add <strong>show number Count</strong> (Variables → Count getter into Basic → show number) so GlowBit displays the current count every time.
 </div>`
     ];
 
-    /* Pagination (same as P8/P9) */
+    /* ---------- Sliding pagination (same as P8/P9) ---------- */
     function paginate(){
       const sidebar=document.querySelector('#glowbit-project10 .glowbit-left');
       if(!sidebar)return;
@@ -192,8 +228,10 @@
         if(i>0){const b=document.createElement('button');b.textContent='⬅ Back';b.className='gb-btn back';b.onclick=()=>render(i-1);nav.appendChild(b);}
         if(i<pages.length-1){const n=document.createElement('button');n.textContent='Next ➜';n.className='gb-btn next';n.onclick=()=>render(i+1);nav.appendChild(n);}
         sidebar.appendChild(nav);
+
         const frame=document.createElement('div');frame.className='character-frame';
         frame.innerHTML='<img src="images/GlowBit3.png" alt="GlowBit buddy">';sidebar.appendChild(frame);
+
         const openBtn=document.getElementById('open-solution');
         if(openBtn)openBtn.addEventListener('click',()=>showSolutionModal());
       }
@@ -202,7 +240,7 @@
     paginate();
     window.addEventListener('resize',()=>{paginate();if(lesson&&lesson.workspace)Blockly.svgResize(lesson.workspace);});
 
-    /* Modal behavior */
+    /* ---------- Compact modal behavior ---------- */
     const modal=document.getElementById('solutionModalP10');
     const wsDiv=document.getElementById('solutionWorkspaceP10');
     const closeBtns=[document.getElementById('solutionCloseP10'),document.getElementById('solutionCloseBtnP10')];
@@ -213,7 +251,7 @@
     }
     closeBtns.forEach(b=>b.addEventListener('click',()=>modal.style.display='none'));
 
-    console.log('✅ Project 10 – ChatBot ready: sidebar, pagination, compact modal.');
+    console.log('✅ Project 10 – ChatBot ready: corrected steps, variables logic, no music, sliding sidebar, compact modal.');
   })();
   </script>
 </body>
