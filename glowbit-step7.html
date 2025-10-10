@@ -160,40 +160,40 @@
 
     /* 🧩 Modal logic */
     const modal=document.getElementById('solutionModal7');
-    /* --- Universal draggable modal handler --- */
-function makeAllSolutionModalsDraggable(){
-  const modals = document.querySelectorAll('[id^="solutionModal"]');
+   /* --- Make the modal draggable --- */
+function makeDraggable(modalId, headerId){
+  const modalEl = document.getElementById(modalId);
+  const headerEl = document.getElementById(headerId);
+  if(!modalEl || !headerEl) return;
 
-  modals.forEach(modal => {
-    const modalId = modal.id;
-    const header = modal.querySelector('[id^="solutionHeader"]');
-    if (!header) return;
+  let isDown = false, startX = 0, startY = 0;
 
-    let isDown = false, startX = 0, startY = 0;
-
-    header.style.cursor = 'move';
-    header.addEventListener('mousedown', (e)=>{
-      isDown = true;
-      startX = e.clientX - modal.offsetLeft;
-      startY = e.clientY - modal.offsetTop;
-      document.addEventListener('mousemove', move);
-      document.addEventListener('mouseup', stop);
-    });
-
-    function move(e){
-      if (!isDown) return;
-      modal.style.left = (e.clientX - startX) + 'px';
-      modal.style.top  = (e.clientY - startY) + 'px';
-      modal.style.right = 'auto';
-    }
-
-    function stop(){
-      isDown = false;
-      document.removeEventListener('mousemove', move);
-      document.removeEventListener('mouseup', stop);
-    }
+  headerEl.style.cursor = 'move';
+  headerEl.addEventListener('mousedown', (e)=>{
+    isDown = true;
+    startX = e.clientX - modalEl.offsetLeft;
+    startY = e.clientY - modalEl.offsetTop;
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', stop);
   });
+
+  function move(e){
+    if(!isDown) return;
+    modalEl.style.left = (e.clientX - startX) + 'px';
+    modalEl.style.top = (e.clientY - startY) + 'px';
+    modalEl.style.right = 'auto';
+  }
+
+  function stop(){
+    isDown = false;
+    document.removeEventListener('mousemove', move);
+    document.removeEventListener('mouseup', stop);
+  }
 }
+
+/* ✅ Enable drag on Step 7 modal */
+makeDraggable('solutionModal7','solutionHeader7');
+
     document.addEventListener('click',e=>{
       if(e.target.id==='check-setup-btn7'){
         modal.style.display='block'; modal.setAttribute('aria-hidden','false');
