@@ -16,13 +16,13 @@
   <style>
     .gb-wrapper{max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
     .gb-header{text-align:center;background:#fef2f2;color:#be123c;font-size:22px;font-weight:800;
-               padding:10px 12px;border-radius:12px;margin:8px 0 6px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+      padding:10px 12px;border-radius:12px;margin:8px 0 6px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
     .gb-subhead{text-align:center;background:#fff7ed;color:#c2410c;font-size:16px;font-weight:700;
-                padding:8px 12px;border-radius:10px;margin:0 0 10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+      padding:8px 12px;border-radius:10px;margin:0 0 10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
     .callout{background:#f1f5f9;border-left:6px solid #64748b;padding:10px 12px;border-radius:10px;
-             color:#0f172a;margin:8px 0;}
+      color:#0f172a;margin:8px 0;}
     .tip{display:inline-block;background:#fde68a;color:#92400e;border:1px solid #f59e0b;border-radius:6px;
-         padding:2px 6px;font-size:12px;font-weight:800;}
+      padding:2px 6px;font-size:12px;font-weight:800;}
     .nav-btns{display:flex;justify-content:space-between;gap:8px;margin-top:10px;flex-wrap:wrap;}
     .gb-btn{padding:8px 14px;border:none;border-radius:8px;font-weight:700;cursor:pointer;flex:1;text-align:center;}
     .gb-btn.next{background:#00A1D6;color:#fff;}
@@ -30,7 +30,7 @@
     .gb-btn.cta{background:#16a34a;color:#fff;margin-top:8px;}
     .character-frame{text-align:center;margin-top:18px;}
     .character-frame img{width:85%;max-width:260px;height:auto;border-radius:12px;
-                         box-shadow:0 4px 12px rgba(0,0,0,0.25);object-fit:cover;}
+      box-shadow:0 4px 12px rgba(0,0,0,0.25);object-fit:cover;}
     #glowbit-project10-editor{height:560px;min-height:560px;background:#fff;}
 
     /* Compact Check-Your-Setup modal */
@@ -74,59 +74,109 @@
   (function boot(){
     if(!(window.Glowbit && window.Blockly)) return setTimeout(boot,120);
 
-    /* Standard two-column UI */
-    const lesson = Glowbit.createLessonUI('glowbit-project10',{
+    const lesson=Glowbit.createLessonUI('glowbit-project10',{
       title:'',instructions:'',pixelSize:28,
       defaultJson:{blocks:{languageVersion:0,blocks:[]}}
     });
     if(lesson && lesson.workspace) lesson.workspace.clear();
 
-    /* ---------- Correct Setup JSON ---------- */
+    /* ---------- Correct Setup JSON (flattened for GitHub) ---------- */
     const VAR_ID="VAR_COUNT_ID_1";
+    const numShadow=(n)=>({shadow:{type:"math_number",fields:{NUM:n}}});
+
     const solutionJson={
       variables:[{name:"Count",id:VAR_ID}],
-      blocks:{languageVersion:0,blocks:[
-        {type:"on_start",x:20,y:20,
-          inputs:{DO:{block:{
-            type:"show_text",fields:{TEXT:"Welcome!"},
-            next:{block:{
-              type:"variables_set",fields:{VAR:{id:VAR_ID,name:"Count"}},
-              inputs:{VALUE:{shadow:{type:"math_number",fields:{NUM:1}}}}
-            }}
-          }}}},
-        {type:"on_button_pressed",fields:{BTN:"A"},x:20,y:200,
-          inputs:{DO:{block:{
-            type:"controls_if",extraState:{elseIfCount:0,hasElse:true},
+      blocks:{
+        languageVersion:0,
+        blocks:[
+          {
+            type:"on_start",
+            x:20,y:20,
             inputs:{
-              IF0:{block:{
-                type:"logic_compare",fields:{OP:"LT"},
-                inputs:{
-                  A:{block:{type:"variables_get",fields:{VAR:{id:VAR_ID,name:"Count"}}}},
-                  B:{block:{type:"math_number",fields:{NUM:10}}}
-                }}},
-              DO0:{block:{
-                type:"variables_set",fields:{VAR:{id:VAR_ID,name:"Count"}},
-                inputs:{VALUE:{block:{
-                  type:"math_arithmetic",fields:{OP:"ADD"},
+              DO:{
+                block:{
+                  type:"show_text",fields:{TEXT:"Welcome!"},
+                  next:{
+                    block:{
+                      type:"variables_set",fields:{VAR:{id:VAR_ID,name:"Count"}},
+                      inputs:{VALUE:numShadow(1)}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            type:"on_button_pressed",
+            fields:{BTN:"A"},
+            x:20,y:200,
+            inputs:{
+              DO:{
+                block:{
+                  type:"controls_if",
+                  extraState:{elseIfCount:0,hasElse:true},
                   inputs:{
-                    A:{block:{type:"variables_get",fields:{VAR:{id:VAR_ID,name:"Count"}}}},
-                    B:{block:{type:"math_number",fields:{NUM:1}}}
-                  }}}},
-                next:{block:{
-                  type:"show_number",
-                  inputs:{NUM:{block:{type:"variables_get",fields:{VAR:{id:VAR_ID,name:"Count"}}}}}
-                }}
-              }},
-              ELSE:{block:{
-                type:"variables_set",fields:{VAR:{id:VAR_ID,name:"Count"}},
-                inputs:{VALUE:{shadow:{type:"math_number",fields:{NUM:1}}}},
-                next:{block:{
-                  type:"show_number",
-                  inputs:{NUM:{shadow:{type:"math_number",fields:{NUM:1}}}}
-                }}
-              }}
-            }}}}
-      ]}
+                    IF0:{
+                      block:{
+                        type:"logic_compare",
+                        fields:{OP:"LT"},
+                        inputs:{
+                          A:{block:{type:"variables_get",fields:{VAR:{id:VAR_ID,name:"Count"}}}},
+                          B:{block:{type:"math_number",fields:{NUM:10}}}
+                        }
+                      }
+                    },
+                    DO0:{
+                      block:{
+                        type:"variables_set",
+                        fields:{VAR:{id:VAR_ID,name:"Count"}},
+                        inputs:{
+                          VALUE:{
+                            block:{
+                              type:"math_arithmetic",
+                              fields:{OP:"ADD"},
+                              inputs:{
+                                A:{block:{type:"variables_get",fields:{VAR:{id:VAR_ID,name:"Count"}}}},
+                                B:{block:{type:"math_number",fields:{NUM:1}}}
+                              }
+                            }
+                          }
+                        },
+                        next:{
+                          block:{
+                            type:"show_number",
+                            inputs:{
+                              NUM:{
+                                block:{
+                                  type:"variables_get",
+                                  fields:{VAR:{id:VAR_ID,name:"Count"}}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    ELSE:{
+                      block:{
+                        type:"variables_set",
+                        fields:{VAR:{id:VAR_ID,name:"Count"}},
+                        inputs:{VALUE:numShadow(1)},
+                        next:{
+                          block:{
+                            type:"show_number",
+                            inputs:{NUM:numShadow(1)}
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
     };
     window.solutionJson=solutionJson;
 
@@ -135,7 +185,7 @@
 
 `<h3 style="text-align:center;color:#be123c;">Step 1 — Show a Welcome Message</h3>
 <div class="callout">
-  🧰 Go to the <strong>Basic</strong> tab and drag a <strong>show text</strong> block to the Workspace. Type <em>Welcome!</em> in the text field.<br>
+  🧰 Go to the <strong>Basic</strong> tab and drag a <strong>show text</strong> block. Type <em>Welcome!</em> in the text field.<br>
   🚀 From <strong>Basic</strong>, drag <strong>on start</strong> and place <em>show text “Welcome!”</em> inside it.<br>
   ▶️ Click <strong>Run</strong> to see the message on the LED grid.<br>
   💬 Mia: “GlowBit says Welcome!”<br><br>
@@ -171,7 +221,7 @@
   🔘 Select your <strong>on button A pressed</strong> block (from Step 3).<br>
   ⚙️ From <strong>Logic</strong>, drag an <strong>if then</strong> block, click the ⚙️ icon, and add an <strong>else</strong> piece.<br>
   💭 In the <em>if</em> slot:<br>
-  • From <strong>Logic</strong>, drag a <strong>compare</strong> block ( < ).<br>
+  • From <strong>Logic</strong>, drag a <strong>compare</strong> block (&lt;).<br>
   • From <strong>Variables</strong>, drag <strong>Count</strong> (getter) to the left side.<br>
   • From <strong>Math</strong>, drag <strong>number</strong> and set to <code>10</code> for the right side.<br><br>
   🧮 In the <em>then</em> area (Count &lt; 10):<br>
@@ -191,7 +241,7 @@
 
 `<h3 style="text-align:center;color:#00A1D6;">Did You Know?</h3>
 <div class="callout">
-  💬 <strong>Chatbots and devices</strong> often show a welcome message on tiny screens — our GlowBit does the same thing!<br>
+  💬 <strong>Chatbots and devices</strong> often show a welcome message on tiny screens — our GlowBit does the same!<br>
   🔢 <strong>Counters</strong> appear in everyday tech — elevators, apps, and games use variables like <em>Count</em> to keep track of numbers.<br>
   🧠 <strong>Reset on limit</strong> is common in timers and scores — just like how GlowBit resets after reaching 10.
 </div>
@@ -206,11 +256,9 @@
       if(!sidebar)return;
       const editor=document.getElementById('glowbit-project10-editor');
       const targetH=(editor&&editor.offsetHeight)?editor.offsetHeight:520;
-
       const meas=document.createElement('div');
       meas.style.visibility='hidden';meas.style.position='absolute';meas.style.left='-9999px';
       meas.style.width=(sidebar.clientWidth||320)+'px';document.body.appendChild(meas);
-
       const pages=[];let current=[];const reserve=56;
       stepCards.forEach(html=>{
         const c=document.createElement('div');c.innerHTML=html;meas.appendChild(c);
@@ -223,7 +271,6 @@
       });
       if(current.length)pages.push(current);
       document.body.removeChild(meas);
-
       function render(i){
         sidebar.innerHTML=pages[i].join('');
         const nav=document.createElement('div');nav.className='nav-btns';
@@ -231,8 +278,7 @@
         if(i<pages.length-1){const n=document.createElement('button');n.textContent='Next ➜';n.className='gb-btn next';n.onclick=()=>render(i+1);nav.appendChild(n);}
         sidebar.appendChild(nav);
         const frame=document.createElement('div');frame.className='character-frame';
-        frame.innerHTML='<img src="images/Mia5.png" alt="GlowBit buddy">';
-        sidebar.appendChild(frame);
+        frame.innerHTML='<img src="images/GlowBit3.png" alt="GlowBit buddy">';sidebar.appendChild(frame);
         const openBtn=document.getElementById('open-solution');
         if(openBtn)openBtn.addEventListener('click',()=>showSolutionModal());
       }
@@ -252,7 +298,7 @@
     }
     closeBtns.forEach(b=>b.addEventListener('click',()=>modal.style.display='none'));
 
-    console.log('✅ Project 10 – ChatBot ready with split Step 4, emojis, compact layout.');
+    console.log('✅ Project 10 – ChatBot ready, GitHub-safe, split Step 4, emojis, compact layout.');
   })();
   </script>
 </body>
