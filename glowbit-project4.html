@@ -15,11 +15,31 @@
 
   <style>
     .gb-wrapper{max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
-    .gb-header{text-align:center;background:#e6f9ff;color:#00A1D6;font-size:22px;font-weight:800;
-                padding:6px 10px;border-radius:8px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
-    .gb-header .highlight{color:#7B2CBF;}
-    .gb-intro{text-align:center;font-size:16px;line-height:1.5;margin:0 0 10px;color:#374151;
-               background:#e0f2fe;border-radius:6px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+   .gb-header {
+      text-align:center;
+      background:#e6f9ff;
+      color:#00A1D6;
+      font-size:22px;
+      font-weight:800;
+      padding:6px 10px;
+      border:3px solid #7dd3fc;
+      border-radius:8px;
+      margin-bottom:8px;
+      box-shadow:0 1px 4px rgba(0,0,0,0.08);
+    }
+    .gb-header .highlight { color:#991b1b; }
+    .gb-intro {
+  text-align:center;
+  font-size:18px;
+  line-height:1.5;
+  margin:0 0 12px;
+  color:#1e3a8a;
+  background:#e0f2fe;
+  border:1px solid #7dd3fc;
+  border-radius:10px;
+  padding:10px 14px;
+  font-weight:600;
+}
     .didyouknow{margin-top:18px;background:#fef9c3;border:2px solid #facc15;padding:10px 12px;
                 border-radius:12px;color:#713f12;font-size:15px;font-weight:600;position:relative;
                 box-shadow:0 2px 5px rgba(0,0,0,0.06);}
@@ -214,7 +234,7 @@
         if(i<pages.length-1){const n=document.createElement('button');n.textContent='Next ➜';n.className='gb-btn next';n.onclick=()=>render(i+1);nav.appendChild(n);}
         sidebar.appendChild(nav);
         const frame=document.createElement('div');frame.className='character-frame';
-        frame.innerHTML='<img src="images/Mia2.png" alt="Mia the Maker">';sidebar.appendChild(frame);
+        frame.innerHTML='<img src="images/P4.png" alt="Mia the Maker">';sidebar.appendChild(frame);
       }
       render(0);
     }
