@@ -15,31 +15,14 @@
 
   <style>
     .gb-wrapper{max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
-    .gb-header {
-      text-align:center;
-      background:#e6f9ff;
-      color:#00A1D6;
-      font-size:22px;
-      font-weight:800;
-      padding:6px 10px;
-      border:3px solid #7dd3fc;
-      border-radius:8px;
-      margin-bottom:8px;
-      box-shadow:0 1px 4px rgba(0,0,0,0.08);
+    .gb-header{
+      text-align:center;background:#eef2ff;color:#3730a3;font-size:22px;font-weight:800;
+      padding:10px 12px;border-radius:12px;margin:8px 0 6px;box-shadow:0 1px 4px rgba(0,0,0,0.08);
     }
-      .gb-header .highlight { color:#991b1b; }
     .gb-subhead{
-      text-align:center;
-  font-size:18px;
-  line-height:1.5;
-  margin:0 0 12px;
-  color:#1e3a8a;
-  background:#e0f2fe;
-  border:1px solid #7dd3fc;
-  border-radius:10px;
-  padding:10px 14px;
-  font-weight:600;
-}
+      text-align:center;background:#ecfeff;color:#0e7490;font-size:16px;font-weight:800;
+      padding:8px 12px;border-radius:10px;margin:0 0 10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);
+    }
     .callout{background:#f1f5f9;border-left:6px solid #64748b;padding:10px 12px;border-radius:10px;color:#0f172a;margin:8px 0;}
     .tip{display:inline-block;background:#fde68a;color:#92400e;border:1px solid #f59e0b;border-radius:6px;padding:2px 6px;font-size:12px;font-weight:800;}
 
@@ -77,8 +60,7 @@
 
 <body>
   <div class="gb-wrapper">
-    <div class="gb-header">
-     <span class="highlight">Project 9</span>: Liam’s GlowBit Direction Navigator - <span class="highlight">GlowBit Pointing to the Right Direction!</span>
+    <div class="gb-header">(9) Liam’s GlowBit Direction Navigator</div>
     <div class="gb-subhead">Let’s make GlowBit point arrows! You’ll code GlowBit to display arrow icons based on tilting up, down, left, or right, similar to a robot navigating. </div>
 
     <!-- Standard two-column UI from global.js -->
@@ -226,7 +208,7 @@ const stepCards = [
 
         /* Character image under sidebar */
         const frame=document.createElement('div');frame.className='character-frame';
-        frame.innerHTML='<img src="images/P9.png" alt="GlowBit buddy">';sidebar.appendChild(frame);
+        frame.innerHTML='<img src="images/Liam5.png" alt="GlowBit buddy">';sidebar.appendChild(frame);
 
         // Ensure the “Check” button (if present on this page) wires the modal
         const openBtn = document.getElementById('open-solution');
@@ -260,41 +242,6 @@ const stepCards = [
       Blockly.serialization.workspaces.load(window.solutionJson, ws);
     }
     [closeBtn, closeBtn2].forEach(b=>b.addEventListener('click',()=>modal.style.display='none'));
-
-    /* --- Make the modal draggable --- */
-function makeDraggable(modalId, headerId){
-  const modalEl = document.getElementById(modalId);
-  const headerEl = document.getElementById(headerId);
-  if(!modalEl || !headerEl) return;
-
-  let isDown = false, startX = 0, startY = 0;
-
-  headerEl.style.cursor = 'move';
-  headerEl.addEventListener('mousedown', (e)=>{
-    isDown = true;
-    startX = e.clientX - modalEl.offsetLeft;
-    startY = e.clientY - modalEl.offsetTop;
-    document.addEventListener('mousemove', move);
-    document.addEventListener('mouseup', stop);
-  });
-
-  function move(e){
-    if(!isDown) return;
-    modalEl.style.left = (e.clientX - startX) + 'px';
-    modalEl.style.top = (e.clientY - startY) + 'px';
-    modalEl.style.right = 'auto';
-  }
-
-  function stop(){
-    isDown = false;
-    document.removeEventListener('mousemove', move);
-    document.removeEventListener('mouseup', stop);
-  }
-}
-
-/* ✅ Enable drag on Project 9 modal */
-makeDraggable('solutionModalP9','solutionModalP9');
-
 
     console.log('✅ Project 9 – Tilt Navigator ready: sliding sidebar, emojis, Did You Know, GlowBit image, compact Check modal.');
   })();
