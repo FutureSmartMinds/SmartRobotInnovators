@@ -183,7 +183,13 @@
     .book__img{ width:100%; aspect-ratio:3/4; object-fit:cover; display:block; background:#eef2ff }
     .book__body{padding:12px}
     .book__title{ margin:0 0 6px; font-weight:800; color:var(--deep-blue); font-family:"Orbitron",sans-serif; font-size:16px }
-    .book__blurb{margin:0 0 10px; color:#1f2937; font-size:14px}
+    .book__blurb {
+  margin:0 0 10px;
+  color:#1f2937;
+  font-size:14px;
+  text-align:justify;        /* ← ADDED */
+  hyphens:auto;              /* ← optional: nicer wrapping */
+}
     .book__cta{ display:flex; justify-content:flex-end; gap:8px; padding:10px 12px; border-top:1px solid rgba(0,0,0,.08) }
     @media (max-width:1024px){.book{grid-column: span 6}}
     @media (max-width:680px){.books{gap:12px}.book{grid-column: span 12}.book__title{font-size:15px}}
@@ -321,7 +327,7 @@
           <img class="book__img" src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/FutureScientistCoverWebsite.png" alt="Cover of Future Scientist" />
           <div class="book__body">
             <h4 id="b-sci" class="book__title">Future Scientist</h4>
-            <p class="book__blurb">Prepare for an exciting journey into the world of science! Our book is designed to captivate young minds, ages 7 to 12, with engaging experiments that uncover the magic of scientific concepts. These experiments unravel unpredictable phenomena, demonstrating that science explains the unexplained.</p>
+            <p class="book__blurb">Prepare for an exciting journey into the world of science! Our book is designed to captivate young minds, ages 7 to 12, with engaging experiments that uncover the magic of scientific concepts. These experiments unravel unpredictable phenomena, demonstrating that science explains the unexplained. Science is all around us, and we've crafted mind-blowing experiments using everyday household items to demystify its wonders. These activities nurture analytical skills, critical thinking, and curiosity in physics, biology, chemistry, space, and technology.</p>
           </div>
           <div class="book__cta">
             <a class="btn btn--ghost" href="https://futuresmartminds.com/product/future-scientist/" target="_blank" rel="noopener">Learn More</a>
