@@ -119,7 +119,7 @@
        ========================= */
     .mast{
       display:grid; gap:12px;
-      grid-template-columns: auto 1fr auto;
+      grid-template-columns: auto 1fr;
       align-items:center;
       margin-top:18px;
       padding:14px;
@@ -131,7 +131,13 @@
     }
     .mast__left{display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:start}
     .mast__logo{height:180px; width:auto; border-radius:10px}
-    .mast__byline{margin:2px 0 0; color:var(--muted); font-weight:700}
+    .mast__byline{
+  margin:2px 0 0;
+  color:#fff;
+  font-weight:700;
+  font-size:1.05rem;   /* <— add this */
+  line-height:1.35;    /* <— optional but helps */
+}
     .mast__byline b{color:#fff}
     .mast__brand{color:#fff; text-decoration:underline; text-underline-offset:2px}
     .mast__headline{
@@ -262,15 +268,7 @@
           <b>Smart Robot Innovators Interactive Course</b> is built by
           <a class="mast__brand" href="https://futuresmartminds.com" target="_blank" rel="noopener">FutureSmartMinds.com</a>
         </p>
-      </div>
-
-      <!-- CENTER: Headline + subhead -->
-      <div>
-        <h1 class="mast__headline">Inspire the Next Generation of STEM and AI Leaders!</h1>
-        <p class="mast__sub">Explore fun, hands-on learning for ages 7–12 with our innovative series.</p>
-      </div>
-
-      <!-- RIGHT: Two-line CTA, styled like other .btn buttons -->
+        <!-- RIGHT: Two-line CTA, styled like other .btn buttons -->
       <div class="mast__right">
         <a
           class="btn btn--stacked"
@@ -283,6 +281,15 @@
           <small>Opens in new tab</small>
         </a>
       </div>
+  
+
+      <!-- CENTER: Headline + subhead -->
+      <div>
+        <h1 class="mast__headline">Inspire the Next Generation of STEM and AI Leaders!</h1>
+        <p class="mast__sub">Explore fun, hands-on learning for ages 7–12 with our innovative series.</p>
+      </div>
+
+      
     </section>
 
     <!-- =========================
