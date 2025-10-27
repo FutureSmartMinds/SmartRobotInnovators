@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Future Smart Minds — Series Bridge</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Fonts: Orbitron (headings) + Exo 2 (body). Poppins/System as fallback -->
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700&family=Orbitron:wght@700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========================
+       THEME VARIABLES (edit me)
+       ========================= */
+    :root{
+      --deep-blue: #0b2a49;     /* primary background start */
+      --teal: #0fb9b1;          /* gradient end / accents */
+      --purple: #7B2CBF;        /* playful accent */
+      --gold: #facc15;          /* highlight accent */
+      --ink: #0f172a;           /* dark text on light */
+      --paper: #ffffff;         /* card background */
+      --paper-90: rgba(255,255,255,.90);
+      --muted: rgba(255,255,255,.78);
+      --ring: #94f2ec;          /* focus ring */
+      --shadow: 0 10px 30px rgba(0,0,0,.18);
+      --radius-lg: 16px;
+      --radius-xl: 22px;
+      --maxw: 1120px;
+    }
+
+    /* =========================
+       GLOBAL RESET / BASE
+       ========================= */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Exo 2","Poppins",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:#fff;
+      background:
+        linear-gradient(135deg, var(--deep-blue) 10%, #0d3a66 40%, #0a556b 70%, var(--teal) 110%);
+      overflow-x:hidden;
+    }
+
+    /* Floating Icons Background (SVG data URI) */
+    .bg-icons{
+      position:relative;
+      isolation:isolate;
+    }
+    .bg-icons::before{
+      content:"";
+      position:fixed;
+      inset:-10vmax;
+      z-index:-1;
+      opacity:.20; /* subtle! */
+      background-image: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' width='800' height='800' viewBox='0 0 800 800'>\
+ <defs>\
+  <linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>\
+   <stop offset='0' stop-color='%23FFFFFF' stop-opacity='0.7'/>\
+   <stop offset='1' stop-color='%23D9FFFB' stop-opacity='0.7'/>\
+  </linearGradient>\
+ </defs>\
+ <g fill='url(%23g)'>\
+  <text x='40' y='120' font-family='Orbitron' font-size='64'>{} &lt; / &gt;</text>\
+  <text x='300' y='220' font-family='Orbitron' font-size='58'>∑</text>\
+  <text x='540' y='160' font-family='Orbitron' font-size='60'>π</text>\
+  <text x='150' y='360' font-family='Orbitron' font-size='62'>♟</text>\
+  <text x='420' y='380' font-family='Orbitron' font-size='62'>⚙</text>\
+  <text x='650' y='320' font-family='Orbitron' font-size='58'>🤖</text>\
+  <text x='90'  y='560' font-family='Orbitron' font-size='58'>AI</text>\
+  <text x='360' y='620' font-family='Orbitron' font-size='60'>∴</text>\
+  <text x='600' y='620' font-family='Orbitron' font-size='60'>□ ▷</text>\
+ </g>\
+</svg>");
+      background-size: 700px 700px;
+      background-repeat: repeat;
+      filter: blur(.5px);
+      pointer-events:none;
+    }
+    /* Lighter variant class if you reuse on lighter pages */
+    .bg--light::before{ opacity:.08; }
+
+    a{color:inherit}
+    .wrap{max-width:var(--maxw); margin-inline:auto; padding:24px;}
+
+    /* =========================
+       ACCESSIBILITY
+       ========================= */
+    :focus{outline:none}
+    :focus-visible{
+      outline:3px solid var(--ring);
+      outline-offset:3px;
+      border-radius:10px;
+    }
+
+    /* =========================
+       HEADER
+       ========================= */
+    .bar{
+      display:flex; align-items:center; gap:12px;
+      font-weight:700; letter-spacing:.3px;
+      font-family:"Orbitron",sans-serif;
+      background: linear-gradient(90deg, rgba(255,255,255,.12), rgba(255,255,255,.04));
+      padding:10px 14px; border-radius:12px;
+      box-shadow:0 2px 10px rgba(0,0,0,.18);
+    }
+    .bar__logo-space{
+      width:38px; height:28px; border-radius:8px;
+      border:2px dashed rgba(255,255,255,.35);
+      display:inline-block; flex:0 0 38px;
+    }
+    .bar__label{color:var(--muted)}
+    .bar__brand{color:#fff}
+
+    /* =========================
+       HERO
+       ========================= */
+    .hero{
+      margin-top:22px;
+      display:grid; gap:14px;
+      padding:18px 18px 20px;
+      background: radial-gradient(60% 120% at 10% 30%, rgba(255,255,255,.12), transparent 60%),
+                  radial-gradient(50% 90% at 90% 10%, rgba(255,255,255,.10), transparent 65%),
+                  rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:var(--radius-xl);
+      box-shadow: var(--shadow);
+    }
+    .hero__eyebrow{
+      font: 800 12px/1 "Orbitron",sans-serif;
+      letter-spacing:.18em; text-transform:uppercase;
+      color: var(--gold);
+    }
+    .hero__title{
+      font-family:"Orbitron",sans-serif;
+      font-weight:800; font-size:clamp(22px,3.2vw,34px);
+      line-height:1.15; margin:0;
+    }
+    .hero__lead{
+      margin:6px 0 2px;
+      color:var(--muted); font-weight:600;
+    }
+
+    /* =========================
+       GRID UTILS
+       ========================= */
+    .grid{
+      display:grid; gap:16px;
+      grid-template-columns: repeat(12,1fr);
+    }
+    .col-6{grid-column: span 6}
+    .col-4{grid-column: span 4}
+    .col-12{grid-column: span 12}
+
+    @media (max-width: 860px){
+      .col-6,.col-4{grid-column: span 12}
+    }
+
+    /* =========================
+       CARDS
+       ========================= */
+    .card{
+      background: var(--paper-90);
+      color: var(--ink);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,.06);
+      backdrop-filter: blur(3px);
+    }
+    .card h3{
+      font-family:"Orbitron",sans-serif;
+      margin:6px 0 8px; font-size:20px;
+      color: var(--deep-blue);
+    }
+    .card p{margin:0 0 12px; color:#1f2937}
+    .btn{
+      --btn-bg: linear-gradient(135deg, var(--purple), var(--teal));
+      --btn-bg-h: linear-gradient(135deg, var(--teal), var(--purple));
+      display:inline-block; border:none; cursor:pointer;
+      font-weight:800; letter-spacing:.2px;
+      padding:10px 14px; border-radius:12px;
+      color:#fff; background:var(--btn-bg);
+      box-shadow:0 8px 16px rgba(0,0,0,.18);
+      text-decoration:none;
+      transition: transform .06s ease, box-shadow .2s ease, background .2s ease;
+    }
+    .btn:hover{background:var(--btn-bg-h); transform: translateY(-1px)}
+    .btn:active{transform: translateY(0)}
+    .btn--ghost{
+      background:transparent; color:var(--deep-blue);
+      border:2px solid var(--deep-blue);
+    }
+
+    /* Series badges */
+    .series-tag{
+      display:inline-flex; align-items:center; gap:8px;
+      background: rgba(123,44,191,.12);
+      color:#3b0764; border:1px solid rgba(123,44,191,.25);
+      padding:6px 10px; border-radius:999px;
+      font: 700 12px/1 "Exo 2",sans-serif;
+    }
+
+    /* =========================
+       FEATURED BOOKS
+       ========================= */
+    .books{
+      display:grid; gap:14px;
+      grid-template-columns: repeat(12,1fr);
+    }
+    .book{
+      grid-column: span 4;
+      background: var(--paper-90); color:var(--ink);
+      border-radius: 14px; overflow:hidden;
+      border:1px solid rgba(0,0,0,.06); box-shadow: var(--shadow);
+      display:grid; grid-template-rows: auto 1fr auto;
+    }
+    .book__img{
+      width:100%; aspect-ratio: 3/4; object-fit:cover; display:block;
+      background:#eef2ff;
+    }
+    .book__body{padding:12px}
+    .book__title{
+      margin:0 0 6px; font-weight:800; color:var(--deep-blue);
+      font-family:"Orbitron",sans-serif; font-size:16px;
+    }
+    .book__blurb{margin:0 0 10px; color:#1f2937; font-size:14px}
+    .book__cta{
+      display:flex; justify-content:flex-end; gap:8px;
+      padding:10px 12px; border-top:1px solid rgba(0,0,0,.08);
+    }
+
+    @media (max-width:1024px){
+      .book{grid-column: span 6}
+    }
+    @media (max-width:680px){
+      .books{gap:12px}
+      .book{grid-column: span 12}
+      .book__title{font-size:15px}
+    }
+
+    /* =========================
+       RETURN BLOCK
+       ========================= */
+    .return{
+      margin-top:18px; padding:18px;
+      display:grid; gap:12px; justify-items:center; text-align:center;
+      background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.08));
+      border:1px solid rgba(255,255,255,.25);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+    }
+    .return__hint{color:var(--muted); font-weight:700}
+
+    /* =========================
+       FOOTER
+       ========================= */
+    footer{
+      margin:26px 0 10px;
+      color:var(--muted); font-size:13px;
+      text-align:center;
+    }
+    footer a{color:inherit; text-decoration:underline}
+  </style>
+</head>
+<body class="bg-icons"> <!-- add .bg--light for lighter pattern -->
+  <main class="wrap" role="main">
+    <!-- =========================
+         HEADER BAR (no logo embedded; box reserved)
+         ========================= -->
+    <div class="bar" aria-label="Built by FutureSmartMinds">
+      <span class="bar__logo-space" aria-hidden="true" title="Logo placeholder"></span>
+      <span class="bar__label">Built by</span>
+      <span class="bar__brand">FutureSmartMinds.com</span>
+    </div>
+
+    <!-- =========================
+         HERO / BRIDGE
+         ========================= -->
+    <section class="hero" aria-labelledby="t-hero">
+      <div class="hero__eyebrow">Smart Robot Innovators — Build, Code &amp; Play with GlowBit!</div>
+      <h1 id="t-hero" class="hero__title">Quick pit-stop! Discover more from Future Smart Minds</h1>
+      <p class="hero__lead">You’re doing great! Take 30 seconds to explore more learning from Future Smart Minds.</p>
+    </section>
+
+    <!-- =========================
+         SERIES CARDS
+         ========================= -->
+    <section class="grid" aria-label="Explore our book series" style="margin-top:16px">
+      <!-- STEM EXPLORER -->
+      <article class="card col-6" aria-labelledby="t-stem">
+        <span class="series-tag" aria-hidden="true">🧪 STEM Explorer</span>
+        <h3 id="t-stem">STEM Explorer Series</h3>
+        <p>Hands-on science, coding, and engineering adventures that build core STEM habits—curiosity, measurement, patterns, and problem-solving.</p>
+        <!-- Update URL here if needed -->
+        <a class="btn" href="https://futuresmartminds.com/stem-series/" target="_blank" rel="noopener">Explore STEM Series</a>
+      </article>
+
+      <!-- AI PIONEER -->
+      <article class="card col-6" aria-labelledby="t-ai">
+        <span class="series-tag" aria-hidden="true">🤖 AI Pioneer</span>
+        <h3 id="t-ai">AI Pioneer Series</h3>
+        <p>Friendly introductions to artificial intelligence—classification, patterns, logic, and decision-making—designed for young minds.</p>
+        <!-- Update URL here if needed -->
+        <a class="btn" href="https://futuresmartminds.com/ai-series/" target="_blank" rel="noopener">Explore AI Series</a>
+      </article>
+    </section>
+
+    <!-- =========================
+         FEATURED BOOKS (easy-swap images & links)
+         ========================= -->
+    <section style="margin-top:18px">
+      <div class="card" style="background:rgba(255,255,255,.14); color:#fff">
+        <h3 style="margin:0 0 6px; font-family:Orbitron, sans-serif; color:#fff">Featured Books</h3>
+        <p style="margin:0; color:var(--muted)">A few favorites to continue your journey:</p>
+      </div>
+
+      <div class="books" style="margin-top:12px" aria-label="Featured books">
+        <!-- BOOK 1 -->
+        <article class="book" aria-labelledby="b-math">
+          <!-- Swap cover paths below (currently pointing to /assets/...) -->
+          <img class="book__img" src="/assets/cover-future-mathematician.png" alt="Cover of Future Mathematician" />
+          <div class="book__body">
+            <h4 id="b-math" class="book__title">Future Mathematician</h4>
+            <p class="book__blurb">Make math meaningful and fun with real-world problem solving for ages 7–12.</p>
+          </div>
+          <div class="book__cta">
+            <a class="btn btn--ghost" href="https://futuresmartminds.com/product/future-mathematician/" target="_blank" rel="noopener">Learn More</a>
+          </div>
+        </article>
+
+        <!-- BOOK 2 -->
+        <article class="book" aria-labelledby="b-eng">
+          <img class="book__img" src="/assets/cover-future-engineer.png" alt="Cover of Future Engineer" />
+          <div class="book__body">
+            <h4 id="b-eng" class="book__title">Future Engineer</h4>
+            <p class="book__blurb">Hands-on builds and experiments that spark creativity and analytical thinking.</p>
+          </div>
+          <div class="book__cta">
+            <a class="btn btn--ghost" href="https://futuresmartminds.com/product/future-engineer/" target="_blank" rel="noopener">Learn More</a>
+          </div>
+        </article>
+
+        <!-- BOOK 3 -->
+        <article class="book" aria-labelledby="b-sci">
+          <img class="book__img" src="/assets/cover-future-scientist.png" alt="Cover of Future Scientist" />
+          <div class="book__body">
+            <h4 id="b-sci" class="book__title">Future Scientist</h4>
+            <p class="book__blurb">Engaging experiments that reveal the magic behind everyday phenomena.</p>
+          </div>
+          <div class="book__cta">
+            <a class="btn btn--ghost" href="https://futuresmartminds.com/product/future-scientist/" target="_blank" rel="noopener">Learn More</a>
+          </div>
+        </article>
+
+        <!-- BOOK 4 -->
+        <article class="book" aria-labelledby="b-chef">
+          <img class="book__img" src="/assets/cover-future-chef.png" alt="Cover of Future Chef" />
+          <div class="book__body">
+            <h4 id="b-chef" class="book__title">Future Chef</h4>
+            <p class="book__blurb">Where delicious recipes meet science—turn the kitchen into a lab.</p>
+          </div>
+          <div class="book__cta">
+            <a class="btn btn--ghost" href="https://futuresmartminds.com/product/future-chef/" target="_blank" rel="noopener">Learn More</a>
+          </div>
+        </article>
+
+        <!-- BOOK 5 -->
+        <article class="book" aria-labelledby="b-ai">
+          <img class="book__img" src="/assets/cover-future-ai-expert.png" alt="Cover of Future AI Expert" />
+          <div class="book__body">
+            <h4 id="b-ai" class="book__title">Future AI Expert</h4>
+            <p class="book__blurb">20 fun AI projects that introduce logic, patterns, and decision-making.</p>
+          </div>
+          <div class="book__cta">
+            <a class="btn btn--ghost" href="https://futuresmartminds.com/product/future-ai-expert/" target="_blank" rel="noopener">Learn More</a>
+          </div>
+        </article>
+
+        <!-- BOOK 6 -->
+        <article class="book" aria-labelledby="b-chess">
+          <img class="book__img" src="/assets/cover-future-chess-master.png" alt="Cover of Future Chess Master" />
+          <div class="book__body">
+            <h4 id="b-chess" class="book__title">Future Chess Master</h4>
+            <p class="book__blurb">Strategy, puzzles, and stories that build critical thinking and focus.</p>
+          </div>
+          <div class="book__cta">
+            <a class="btn btn--ghost" href="https://futuresmartminds.com/product/future-chess-master/" target="_blank" rel="noopener">Learn More</a>
+          </div>
+        </article>
+
+        <!-- BONUS: Smart Robot Innovators (AI Pioneer) -->
+        <article class="book" aria-labelledby="b-sri">
+          <img class="book__img" src="/assets/cover-smart-robot-innovators.png" alt="Cover of Smart Robot Innovators" />
+          <div class="book__body">
+            <h4 id="b-sri" class="book__title">Smart Robot Innovators</h4>
+            <p class="book__blurb">A playful path into coding, AI thinking, and GlowBit-powered creativity.</p>
+          </div>
+          <div class="book__cta">
+            <a class="btn btn--ghost" href="https://futuresmartminds.com/product/smart-robot-innovators/" target="_blank" rel="noopener">Learn More</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- =========================
+         WHY THIS MATTERS
+         ========================= -->
+    <section class="card" style="margin-top:18px">
+      <h3 style="margin-top:0">Why this matters</h3>
+      <p style="margin:0">
+        Our books and your course work together: <strong>STEM foundations</strong> build curiosity and skills,
+        <strong>AI thinking</strong> adds patterns, logic, and decision-making, and
+        <strong>creative engineering</strong> brings it all to life with robots and playful projects.
+      </p>
+    </section>
+
+    <!-- =========================
+         RETURN TO COURSE
+         ========================= -->
+    <section class="return" aria-labelledby="t-return">
+      <h3 id="t-return" style="margin:0; font-family:Orbitron,sans-serif">Ready to continue?</h3>
+
+      <!-- Add data-course-url below to hard-link back to the LW activity.
+           Example:
+           data-course-url="https://futuresmartminds.learnworlds.com/course/smart-robot-innovators?...">
+      -->
+      <button id="returnBtn" class="btn" type="button"
+              aria-describedby="returnHint"
+              data-course-url="">
+        ⬅ Return to Course
+      </button>
+      <div id="returnHint" class="return__hint" role="status" aria-live="polite"></div>
+    </section>
+
+    <!-- =========================
+         FOOTER
+         ========================= -->
+    <footer>
+      © <span id="year"></span> FutureSmartMinds ·
+      <a href="https://futuresmartminds.com/privacy-policy/" target="_blank" rel="noopener">Privacy &amp; Policy</a>
+    </footer>
+  </main>
+
+  <script>
+    // Footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Return behavior:
+    // 1) If data-course-url is present, go there in same tab (to keep LW context).
+    // 2) Else if this opened in a separate tab/window, try to close it.
+    // 3) Else show helper text to use "Next" in the course player.
+    (function(){
+      const btn = document.getElementById('returnBtn');
+      const hint = document.getElementById('returnHint');
+
+      btn.addEventListener('click', () => {
+        const url = btn.getAttribute('data-course-url');
+        if (url && url.trim().length > 0){
+          window.location.href = url; // Navigate within same tab.
+          return;
+        }
+
+        // Try to detect if we can safely close the window (opened as a popup/tab)
+        // If window.opener exists OR window was not directly opened by user, window.close() may work.
+        // We attempt and then fallback to hint.
+        const closed = (() => {
+          try {
+            window.close();
+            return true;
+          } catch(e){
+            return false;
+          }
+        })();
+
+        // If not closed, guide the learner.
+        setTimeout(() => {
+          if (!window.closed){
+            hint.textContent = 'Use “Next” in the course player to continue.';
+          }
+        }, 120);
+      });
+    })();
+
+    // Ensure all external links open in a new tab (defense-in-depth)
+    (function enforceExternalTargets(){
+      const here = location.host;
+      document.querySelectorAll('a[href]').forEach(a=>{
+        const href = a.getAttribute('href');
+        // Skip in-page anchors, javascript:, and same-origin links (unless already set)
+        if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+        const url = new URL(href, location.href);
+        if (url.host !== here){
+          a.setAttribute('target','_blank');
+          a.setAttribute('rel','noopener');
+        }
+      });
+    })();
+  </script>
+
+  <!--
+    🔧 QUICK EDIT NOTES
+    - Colors: tweak CSS variables at the top (deep blue, teal, purple, gold).
+    - Series URLs: search for "Explore STEM Series" and "Explore AI Series" buttons to change.
+    - Featured book covers: swap /assets/cover-*.png sources. Keep alt texts meaningful.
+    - Book links: update each "Learn More" href to your WooCommerce or series pages.
+    - Return button: add data-course-url on #returnBtn to hard-link back to the exact LW page.
+    - Background: remove .bg-icons or add .bg--light to body for a softer pattern.
+  -->
+</body>
+</html>
