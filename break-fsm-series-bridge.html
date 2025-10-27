@@ -139,6 +139,26 @@
       .mast__info{ align-items:center; margin-top:8px; }
       .mast__headline{ margin-top:6px; }
     }
+    /* ===== Series logos in cards ===== */
+:root{
+  /* change this to match your preferred logo height (e.g., 72px, 96px, or 180px to match the top logo) */
+  --series-logo-h: 72px;
+}
+.series-head{
+  display:grid;
+  grid-template-columns: auto 1fr;
+  gap:12px;
+  align-items:center;
+  margin-bottom:8px;
+}
+.series-logo{
+  height:var(--series-logo-h);
+  width:auto;
+  border-radius:10px;
+  object-fit:contain;
+  background:rgba(0,0,0,.04);
+  border:1px dashed rgba(0,0,0,.12);
+}
 
     /* Cards / grids (unchanged) */
     .grid{display:grid; gap:16px; grid-template-columns: repeat(12,1fr)}
@@ -222,20 +242,44 @@
          ========================= -->
     <section class="grid" aria-label="Explore our book series" style="margin-top:16px">
       <!-- STEM EXPLORER -->
-      <article class="card col-6" aria-labelledby="t-stem">
-        <span class="series-tag" aria-hidden="true">🧪 STEM Explorer</span>
-        <h3 id="t-stem">STEM Explorer Series</h3>
-        <p>Hands-on science, coding, and engineering adventures that build core STEM habits—curiosity, measurement, patterns, and problem-solving.</p>
-        <a class="btn" href="https://futuresmartminds.com/stem-series/" target="_blank" rel="noopener">Explore STEM Series</a>
-      </article>
+     <article class="card col-6" aria-labelledby="t-stem">
+  <div class="series-head">
+    <!-- ✳ EDIT SRC to your actual STEM series logo file -->
+    <img
+      class="series-logo"
+      src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/stem-series-logo.png"
+      alt="STEM Explorer Series logo"
+      onerror="this.style.display='none'"
+    />
+    <div>
+      <span class="series-tag" aria-hidden="true">🧪 STEM Explorer</span>
+      <h3 id="t-stem">STEM Explorer Series</h3>
+    </div>
+  </div>
+
+  <p>Hands-on science, coding, and engineering adventures that build core STEM habits—curiosity, measurement, patterns, and problem-solving.</p>
+  <a class="btn" href="https://futuresmartminds.com/stem-series/" target="_blank" rel="noopener">Explore STEM Series</a>
+</article>
 
       <!-- AI PIONEER -->
-      <article class="card col-6" aria-labelledby="t-ai">
-        <span class="series-tag" aria-hidden="true">🤖 AI Pioneer</span>
-        <h3 id="t-ai">AI Pioneer Series</h3>
-        <p>Friendly introductions to artificial intelligence—classification, patterns, logic, and decision-making—designed for young minds.</p>
-        <a class="btn" href="https://futuresmartminds.com/ai-series/" target="_blank" rel="noopener">Explore AI Series</a>
-      </article>
+     <article class="card col-6" aria-labelledby="t-ai">
+  <div class="series-head">
+    <!-- ✳ EDIT SRC to your actual AI series logo file -->
+    <img
+      class="series-logo"
+      src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/ai-pioneers-series-logo.png"
+      alt="AI Pioneer Series logo"
+      onerror="this.style.display='none'"
+    />
+    <div>
+      <span class="series-tag" aria-hidden="true">🤖 AI Pioneer</span>
+      <h3 id="t-ai">AI Pioneer Series</h3>
+    </div>
+  </div>
+
+  <p>Friendly introductions to artificial intelligence—classification, patterns, logic, and decision-making—designed for young minds.</p>
+  <a class="btn" href="https://futuresmartminds.com/ai-series/" target="_blank" rel="noopener">Explore AI Series</a>
+</article>
     </section>
 
     <!-- =========================
