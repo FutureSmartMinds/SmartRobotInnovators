@@ -94,52 +94,54 @@
     }
 
     /* =========================
-       HEADER
+       BUTTONS (existing) 
        ========================= */
-    .bar{
-      display:flex; align-items:center; gap:12px;
-      font-weight:700; letter-spacing:.3px;
-      font-family:"Orbitron",sans-serif;
-      background: linear-gradient(90deg, rgba(255,255,255,.12), rgba(255,255,255,.04));
+    .btn{
+      --btn-bg: linear-gradient(135deg, var(--purple), var(--teal));
+      --btn-bg-h: linear-gradient(135deg, var(--teal), var(--purple));
+      display:inline-block; border:none; cursor:pointer;
+      font-weight:800; letter-spacing:.2px;
       padding:10px 14px; border-radius:12px;
-      box-shadow:0 2px 10px rgba(0,0,0,.18);
+      color:#fff; background:var(--btn-bg);
+      box-shadow:0 8px 16px rgba(0,0,0,.18);
+      text-decoration:none;
+      transition: transform .06s ease, box-shadow .2s ease, background .2s ease;
     }
-    .bar__logo-space{
-      width:38px; height:28px; border-radius:8px;
-      border:2px dashed rgba(255,255,255,.35);
-      display:inline-block; flex:0 0 38px;
+    .btn:hover{background:var(--btn-bg-h); transform: translateY(-1px)}
+    .btn:active{transform: translateY(0)}
+    .btn--ghost{
+      background:transparent; color:var(--deep-blue);
+      border:2px solid var(--deep-blue);
     }
-    .bar__label{color:var(--muted)}
-    .bar__brand{color:#fff}
 
     /* =========================
-       HERO
+       NEW: MAST (replaces old bar + hero)
        ========================= */
-    .hero{
-      margin-top:22px;
-      display:grid; gap:14px;
-      padding:18px 18px 20px;
-      background: radial-gradient(60% 120% at 10% 30%, rgba(255,255,255,.12), transparent 60%),
-                  radial-gradient(50% 90% at 90% 10%, rgba(255,255,255,.10), transparent 65%),
+    .mast{
+      display:grid; gap:12px;
+      grid-template-columns: auto 1fr auto;
+      align-items:center;
+      margin-top:18px;
+      padding:14px;
+      background: radial-gradient(60% 120% at 10% 30%, rgba(255,255,255,.10), transparent 60%),
                   rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.16);
-      border-radius:var(--radius-xl);
+      border-radius: var(--radius-xl);
       box-shadow: var(--shadow);
     }
-    .hero__eyebrow{
-      font: 800 12px/1 "Orbitron",sans-serif;
-      letter-spacing:.18em; text-transform:uppercase;
-      color: var(--gold);
+    .mast__left{display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:start}
+    .mast__logo{height:180px; width:auto; border-radius:10px}
+    .mast__byline{margin:2px 0 0; color:var(--muted); font-weight:700}
+    .mast__byline b{color:#fff}
+    .mast__brand{color:#fff; text-decoration:underline; text-underline-offset:2px}
+    .mast__headline{
+      margin:0; font-family:"Orbitron",sans-serif;
+      font-weight:800; font-size:clamp(20px,2.4vw,28px); line-height:1.15;
     }
-    .hero__title{
-      font-family:"Orbitron",sans-serif;
-      font-weight:800; font-size:clamp(22px,3.2vw,34px);
-      line-height:1.15; margin:0;
-    }
-    .hero__lead{
-      margin:6px 0 2px;
-      color:var(--muted); font-weight:600;
-    }
+    .mast__sub{ margin:6px 0 0; color:var(--muted); font-weight:600 }
+    .mast__right{display:flex; align-items:center; justify-content:flex-end}
+    .btn--stacked{display:inline-flex; flex-direction:column; align-items:center; text-align:center; line-height:1.15}
+    .btn--stacked small{opacity:.92; font-weight:700; margin-top:2px}
 
     /* =========================
        GRID UTILS
@@ -154,6 +156,10 @@
 
     @media (max-width: 860px){
       .col-6,.col-4{grid-column: span 12}
+      .mast{grid-template-columns:1fr; text-align:center}
+      .mast__left{grid-template-columns:1fr; justify-items:center}
+      .mast__byline{margin-top:6px}
+      .mast__right{justify-content:center}
     }
 
     /* =========================
@@ -174,32 +180,6 @@
       color: var(--deep-blue);
     }
     .card p{margin:0 0 12px; color:#1f2937}
-    .btn{
-      --btn-bg: linear-gradient(135deg, var(--purple), var(--teal));
-      --btn-bg-h: linear-gradient(135deg, var(--teal), var(--purple));
-      display:inline-block; border:none; cursor:pointer;
-      font-weight:800; letter-spacing:.2px;
-      padding:10px 14px; border-radius:12px;
-      color:#fff; background:var(--btn-bg);
-      box-shadow:0 8px 16px rgba(0,0,0,.18);
-      text-decoration:none;
-      transition: transform .06s ease, box-shadow .2s ease, background .2s ease;
-    }
-    .btn:hover{background:var(--btn-bg-h); transform: translateY(-1px)}
-    .btn:active{transform: translateY(0)}
-    .btn--ghost{
-      background:transparent; color:var(--deep-blue);
-      border:2px solid var(--deep-blue);
-    }
-
-    /* Series badges */
-    .series-tag{
-      display:inline-flex; align-items:center; gap:8px;
-      background: rgba(123,44,191,.12);
-      color:#3b0764; border:1px solid rgba(123,44,191,.25);
-      padding:6px 10px; border-radius:999px;
-      font: 700 12px/1 "Exo 2",sans-serif;
-    }
 
     /* =========================
        FEATURED BOOKS
@@ -265,48 +245,44 @@
 </head>
 <body class="bg-icons"> <!-- add .bg--light for lighter pattern -->
   <main class="wrap" role="main">
-    <!-- =========================
-     HEADER BAR (with logo)
-     ========================= -->
-<div class="bar" aria-label="Built by FutureSmartMinds">
-  <!-- ✳ EDIT LOGO SRC BELOW -->
-  <img
-    src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/logo.png"
-    alt="Future Smart Minds logo"
-    style="height:180px; width:auto; border-radius:6px"
-  />
-
-  <span class="bar__label">Built by</span>
-  <span class="bar__brand">FutureSmartMinds.com</span>
-
-  <!-- ✳ NEW BUTTON (opens in new tab) -->
-  <a
-    href="https://futuresmartminds.com"
-    target="_blank"
-    rel="noopener"
-    style="
-      margin-left:auto;
-      font-weight:700;
-      padding:6px 12px;
-      border-radius:8px;
-      background:rgba(255,255,255,0.15);
-      color:white;
-      text-decoration:none;
-      font-family:'Exo 2', sans-serif;
-      box-shadow:0 2px 6px rgba(0,0,0,0.2);
-    "
-  >
-    Visit Future Smart Minds Website
-  </a>
-</div>
 
     <!-- =========================
-         HERO / BRIDGE
+         TOP MAST / HERO (redesigned)
          ========================= -->
-    <section class="hero" aria-labelledby="t-hero">
-      <div class="hero__eyebrow">Smart Robot Innovators — Build, Code &amp; Play with GlowBit!</div>
-      <h1 id="t-hero" class="hero__title">Quick pit-stop! Discover more from Future Smart Minds</h1>
-      <p class="hero__lead">You’re doing great! Take 30 seconds to explore more learning from Future Smart Minds.</p>
+    <section class="mast" aria-label="Future Smart Minds header">
+      <!-- LEFT: Logo + byline aligned with top of logo -->
+      <div class="mast__left">
+        <!-- ✳ LOGO: keep same image location -->
+        <img
+          class="mast__logo"
+          src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/logo.png"
+          alt="Future Smart Minds logo"
+        />
+        <p class="mast__byline">
+          <b>Smart Robot Innovators Interactive Course</b> is built by
+          <a class="mast__brand" href="https://futuresmartminds.com" target="_blank" rel="noopener">FutureSmartMinds.com</a>
+        </p>
+      </div>
+
+      <!-- CENTER: Headline + subhead -->
+      <div>
+        <h1 class="mast__headline">Inspire the Next Generation of STEM and AI Leaders!</h1>
+        <p class="mast__sub">Explore fun, hands-on learning for ages 7–12 with our innovative series.</p>
+      </div>
+
+      <!-- RIGHT: Two-line CTA, styled like other .btn buttons -->
+      <div class="mast__right">
+        <a
+          class="btn btn--stacked"
+          href="https://futuresmartminds.com"
+          target="_blank"
+          rel="noopener"
+          title="Opens in a new tab"
+        >
+          <span>Visit Future Smart Minds Website</span>
+          <small>Opens in new tab</small>
+        </a>
+      </div>
     </section>
 
     <!-- =========================
@@ -318,7 +294,6 @@
         <span class="series-tag" aria-hidden="true">🧪 STEM Explorer</span>
         <h3 id="t-stem">STEM Explorer Series</h3>
         <p>Hands-on science, coding, and engineering adventures that build core STEM habits—curiosity, measurement, patterns, and problem-solving.</p>
-        <!-- Update URL here if needed -->
         <a class="btn" href="https://futuresmartminds.com/stem-series/" target="_blank" rel="noopener">Explore STEM Series</a>
       </article>
 
@@ -327,7 +302,6 @@
         <span class="series-tag" aria-hidden="true">🤖 AI Pioneer</span>
         <h3 id="t-ai">AI Pioneer Series</h3>
         <p>Friendly introductions to artificial intelligence—classification, patterns, logic, and decision-making—designed for young minds.</p>
-        <!-- Update URL here if needed -->
         <a class="btn" href="https://futuresmartminds.com/ai-series/" target="_blank" rel="noopener">Explore AI Series</a>
       </article>
     </section>
@@ -344,7 +318,6 @@
       <div class="books" style="margin-top:12px" aria-label="Featured books">
         <!-- BOOK 1 -->
         <article class="book" aria-labelledby="b-math">
-          <!-- Swap cover paths below (currently pointing to /assets/...) -->
           <img class="book__img" src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/FutureMathematicianCoverWebsite.png" alt="Cover of Future Mathematician" />
           <div class="book__body">
             <h4 id="b-math" class="book__title">Future Mathematician</h4>
@@ -381,7 +354,7 @@
 
         <!-- BOOK 4 -->
         <article class="book" aria-labelledby="b-chef">
-          <img class="book__img" src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/FutureChefCoverWebsite.png" />
+          <img class="book__img" src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/FutureChefCoverWebsite.png" alt="Cover of Future Chef" />
           <div class="book__body">
             <h4 id="b-chef" class="book__title">Future Chef</h4>
             <p class="book__blurb">Where delicious recipes meet science—turn the kitchen into a lab.</p>
@@ -528,7 +501,7 @@
     🔧 QUICK EDIT NOTES
     - Colors: tweak CSS variables at the top (deep blue, teal, purple, gold).
     - Series URLs: search for "Explore STEM Series" and "Explore AI Series" buttons to change.
-    - Featured book covers: swap /assets/cover-*.png sources. Keep alt texts meaningful.
+    - Featured book covers: keep current URLs; swap if needed in /images/Covers/.
     - Book links: update each "Learn More" href to your WooCommerce or series pages.
     - Return button: add data-course-url on #returnBtn to hard-link back to the exact LW page.
     - Background: remove .bg-icons or add .bg--light to body for a softer pattern.
