@@ -287,16 +287,34 @@
   <a class="btn" href="https://futuresmartminds.com/ai-series/" target="_blank" rel="noopener">Explore AI Series</a>
 </article>
     </section>
-    <!-- =========================
-     INTERACTIVE HUB CARD
+   <!-- =========================
+     INTERACTIVE HUB (full width card)
      ========================= -->
-<section style="margin-top:16px; display:flex; justify-content:center;">
-  <article class="card col-6" style="max-width:720px;" aria-labelledby="t-hub">
-    <h3 id="t-hub" style="font-family:Orbitron,sans-serif; margin-top:0;">
-      Where Learning Comes to Life!
-    </h3>
+<section class="grid" style="margin-top:16px">
+  <article class="card col-12" aria-labelledby="t-hub-series">
 
-    <p style="margin:0 0 12px; color:#1f2937; text-align:justify; line-height:1.45;">
+    <!-- Header row with logo + title (same pattern as book series cards) -->
+    <div class="series-head">
+      <!-- ✳ REPLACE SRC with your Interactive Hub logo when uploaded -->
+      <img
+        class="series-logo"
+        src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/interactive-hub-logo.png"
+        alt="Interactive Hub logo"
+        onerror="this.style.display='none'"
+      />
+      <div>
+        <span class="series-tag" aria-hidden="true">💡 Interactive</span>
+        <h3 id="t-hub-series">Interactive Hub</h3>
+      </div>
+    </div>
+
+    <!-- Main heading -->
+    <h4 style="font-family:Orbitron,sans-serif; margin:0 0 8px; color:var(--deep-blue);">
+      Where Learning Comes to Life!
+    </h4>
+
+    <!-- Description -->
+    <p style="margin:0 0 12px; color:#1f2937; line-height:1.5; text-align:justify;">
       Future Smart Minds is thrilled to introduce the Interactive Learning Hub,
       an exciting online platform for children aged 7–12. This hub brings the
       STEM Explorers Series and AI Pioneers Series to life with:
@@ -308,12 +326,11 @@
       <li><b>Community Challenges</b> — Fun tasks to spark creativity & collaboration.</li>
     </ul>
 
-    <p style="margin:0 0 18px; color:#1f2937; text-align:justify; line-height:1.45;">
+    <p style="margin:0 0 18px; color:#1f2937; line-height:1.45; text-align:justify;">
       Expect vibrant visuals, step-by-step guides, and a space for kids to connect!
     </p>
 
-    <a class="btn" href="https://futuresmartminds.com/interactive-hub/" 
-       target="_blank" rel="noopener">
+    <a class="btn" href="https://futuresmartminds.com/interactive-hub/" target="_blank" rel="noopener">
       Visit Interactive Hub
     </a>
   </article>
