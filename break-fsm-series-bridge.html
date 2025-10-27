@@ -42,24 +42,15 @@
     }
 
     /* Floating Icons Background (SVG data URI) */
-    .bg-icons{
-      position:relative;
-      isolation:isolate;
-    }
+    .bg-icons{ position:relative; isolation:isolate; }
     .bg-icons::before{
-      content:"";
-      position:fixed;
-      inset:-10vmax;
-      z-index:-1;
-      opacity:.20; /* subtle! */
+      content:""; position:fixed; inset:-10vmax; z-index:-1; opacity:.20;
       background-image: url("data:image/svg+xml;utf8,\
 <svg xmlns='http://www.w3.org/2000/svg' width='800' height='800' viewBox='0 0 800 800'>\
- <defs>\
-  <linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>\
+ <defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>\
    <stop offset='0' stop-color='%23FFFFFF' stop-opacity='0.7'/>\
    <stop offset='1' stop-color='%23D9FFFB' stop-opacity='0.7'/>\
-  </linearGradient>\
- </defs>\
+ </linearGradient></defs>\
  <g fill='url(%23g)'>\
   <text x='40' y='120' font-family='Orbitron' font-size='64'>{} &lt; / &gt;</text>\
   <text x='300' y='220' font-family='Orbitron' font-size='58'>∑</text>\
@@ -70,32 +61,19 @@
   <text x='90'  y='560' font-family='Orbitron' font-size='58'>AI</text>\
   <text x='360' y='620' font-family='Orbitron' font-size='60'>∴</text>\
   <text x='600' y='620' font-family='Orbitron' font-size='60'>□ ▷</text>\
- </g>\
-</svg>");
-      background-size: 700px 700px;
-      background-repeat: repeat;
-      filter: blur(.5px);
-      pointer-events:none;
+ </g></svg>");
+      background-size: 700px 700px; background-repeat: repeat; filter: blur(.5px); pointer-events:none;
     }
-    /* Lighter variant class if you reuse on lighter pages */
     .bg--light::before{ opacity:.08; }
 
     a{color:inherit}
     .wrap{max-width:var(--maxw); margin-inline:auto; padding:24px;}
 
-    /* =========================
-       ACCESSIBILITY
-       ========================= */
+    /* Accessibility */
     :focus{outline:none}
-    :focus-visible{
-      outline:3px solid var(--ring);
-      outline-offset:3px;
-      border-radius:10px;
-    }
+    :focus-visible{outline:3px solid var(--ring); outline-offset:3px; border-radius:10px}
 
-    /* =========================
-       BUTTONS (existing) 
-       ========================= */
+    /* Buttons */
     .btn{
       --btn-bg: linear-gradient(135deg, var(--purple), var(--teal));
       --btn-bg-h: linear-gradient(135deg, var(--teal), var(--purple));
@@ -109,167 +87,117 @@
     }
     .btn:hover{background:var(--btn-bg-h); transform: translateY(-1px)}
     .btn:active{transform: translateY(0)}
-    .btn--ghost{
-      background:transparent; color:var(--deep-blue);
-      border:2px solid var(--deep-blue);
-    }
+    .btn--ghost{ background:transparent; color:var(--deep-blue); border:2px solid var(--deep-blue); }
 
     /* =========================
-       NEW: MAST (replaces old bar + hero)
+       MAST (three columns: logo | info | headline)
        ========================= */
     .mast{
-      display:grid; gap:12px;
-      grid-template-columns: auto 1fr;
+      display:grid; gap:16px;
+      grid-template-columns: auto auto 1fr;  /* ⬅️ logo | byline+button | headline */
       align-items:center;
       margin-top:18px;
-      padding:14px;
+      padding:18px;
       background: radial-gradient(60% 120% at 10% 30%, rgba(255,255,255,.10), transparent 60%),
                   rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.16);
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow);
     }
-    .mast__left{display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:start}
+
     .mast__logo{height:180px; width:auto; border-radius:10px}
-    .mast__byline{
-  margin:2px 0 0;
-  color:#fff;
-  font-weight:700;
-  font-size:1.05rem;   /* <— add this */
-  line-height:1.35;    /* <— optional but helps */
-}
-    .mast__byline b{color:#fff}
-    .mast__brand{color:#fff; text-decoration:underline; text-underline-offset:2px}
-    .mast__headline{
-      margin:0; font-family:"Orbitron",sans-serif;
-      font-weight:800; font-size:clamp(20px,2.4vw,28px); line-height:1.15;
+
+    .mast__info{
+      display:flex; flex-direction:column; align-items:flex-start; gap:12px;
+      min-width:300px; max-width:480px;
     }
-    .mast__sub{ margin:6px 0 0; color:var(--muted); font-weight:600 }
-    .mast__right{display:flex; align-items:center; justify-content:flex-end}
+    .mast__byline{
+      margin:2px 0 0;
+      color:#fff;                 /* brighter for readability */
+      font-weight:800;
+      font-size:1.12rem;          /* ⬆ bigger */
+      line-height:1.35;
+    }
+    .mast__brand{color:#fff; text-decoration:underline; text-underline-offset:2px}
+
     .btn--stacked{display:inline-flex; flex-direction:column; align-items:center; text-align:center; line-height:1.15}
     .btn--stacked small{opacity:.92; font-weight:700; margin-top:2px}
 
-    /* =========================
-       GRID UTILS
-       ========================= */
-    .grid{
-      display:grid; gap:16px;
-      grid-template-columns: repeat(12,1fr);
+    .mast__headline{
+      margin:0; font-family:"Orbitron",sans-serif;
+      font-weight:800; font-size:clamp(22px,3vw,34px); line-height:1.15;
     }
-    .col-6{grid-column: span 6}
-    .col-4{grid-column: span 4}
-    .col-12{grid-column: span 12}
+    .mast__sub{ margin:6px 0 0; color:var(--muted); font-weight:600 }
 
-    @media (max-width: 860px){
-      .col-6,.col-4{grid-column: span 12}
-      .mast{grid-template-columns:1fr; text-align:center}
-      .mast__left{grid-template-columns:1fr; justify-items:center}
-      .mast__byline{margin-top:6px}
-      .mast__right{justify-content:center}
+    /* Responsive */
+    @media (max-width:980px){
+      .mast{ grid-template-columns: auto 1fr; }
+      .mast__headline{ font-size:clamp(20px,2.6vw,30px); }
+    }
+    @media (max-width:760px){
+      .mast{ grid-template-columns: 1fr; text-align:center; }
+      .mast__info{ align-items:center; margin-top:8px; }
+      .mast__headline{ margin-top:6px; }
     }
 
-    /* =========================
-       CARDS
-       ========================= */
+    /* Cards / grids (unchanged) */
+    .grid{display:grid; gap:16px; grid-template-columns: repeat(12,1fr)}
+    .col-6{grid-column: span 6}.col-4{grid-column: span 4}.col-12{grid-column: span 12}
+    @media (max-width: 860px){ .col-6,.col-4{grid-column: span 12} }
+
     .card{
-      background: var(--paper-90);
-      color: var(--ink);
-      border-radius: var(--radius-lg);
-      padding: 16px;
-      box-shadow: var(--shadow);
-      border: 1px solid rgba(0,0,0,.06);
+      background: var(--paper-90); color: var(--ink);
+      border-radius: var(--radius-lg); padding: 16px;
+      box-shadow: var(--shadow); border: 1px solid rgba(0,0,0,.06);
       backdrop-filter: blur(3px);
     }
-    .card h3{
-      font-family:"Orbitron",sans-serif;
-      margin:6px 0 8px; font-size:20px;
-      color: var(--deep-blue);
-    }
+    .card h3{font-family:"Orbitron",sans-serif; margin:6px 0 8px; font-size:20px; color: var(--deep-blue)}
     .card p{margin:0 0 12px; color:#1f2937}
 
-    /* =========================
-       FEATURED BOOKS
-       ========================= */
-    .books{
-      display:grid; gap:14px;
-      grid-template-columns: repeat(12,1fr);
-    }
+    .books{display:grid; gap:14px; grid-template-columns: repeat(12,1fr)}
     .book{
-      grid-column: span 4;
-      background: var(--paper-90); color:var(--ink);
-      border-radius: 14px; overflow:hidden;
-      border:1px solid rgba(0,0,0,.06); box-shadow: var(--shadow);
+      grid-column: span 4; background: var(--paper-90); color:var(--ink);
+      border-radius: 14px; overflow:hidden; border:1px solid rgba(0,0,0,.06); box-shadow: var(--shadow);
       display:grid; grid-template-rows: auto 1fr auto;
     }
-    .book__img{
-      width:100%; aspect-ratio: 3/4; object-fit:cover; display:block;
-      background:#eef2ff;
-    }
+    .book__img{ width:100%; aspect-ratio:3/4; object-fit:cover; display:block; background:#eef2ff }
     .book__body{padding:12px}
-    .book__title{
-      margin:0 0 6px; font-weight:800; color:var(--deep-blue);
-      font-family:"Orbitron",sans-serif; font-size:16px;
-    }
+    .book__title{ margin:0 0 6px; font-weight:800; color:var(--deep-blue); font-family:"Orbitron",sans-serif; font-size:16px }
     .book__blurb{margin:0 0 10px; color:#1f2937; font-size:14px}
-    .book__cta{
-      display:flex; justify-content:flex-end; gap:8px;
-      padding:10px 12px; border-top:1px solid rgba(0,0,0,.08);
-    }
+    .book__cta{ display:flex; justify-content:flex-end; gap:8px; padding:10px 12px; border-top:1px solid rgba(0,0,0,.08) }
+    @media (max-width:1024px){.book{grid-column: span 6}}
+    @media (max-width:680px){.books{gap:12px}.book{grid-column: span 12}.book__title{font-size:15px}}
 
-    @media (max-width:1024px){
-      .book{grid-column: span 6}
-    }
-    @media (max-width:680px){
-      .books{gap:12px}
-      .book{grid-column: span 12}
-      .book__title{font-size:15px}
-    }
-
-    /* =========================
-       RETURN BLOCK
-       ========================= */
-    .return{
-      margin-top:18px; padding:18px;
-      display:grid; gap:12px; justify-items:center; text-align:center;
+    .return{ margin-top:18px; padding:18px; display:grid; gap:12px; justify-items:center; text-align:center;
       background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.08));
-      border:1px solid rgba(255,255,255,.25);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
-    }
+      border:1px solid rgba(255,255,255,.25); border-radius: var(--radius-xl); box-shadow: var(--shadow) }
     .return__hint{color:var(--muted); font-weight:700}
 
-    /* =========================
-       FOOTER
-       ========================= */
-    footer{
-      margin:26px 0 10px;
-      color:var(--muted); font-size:13px;
-      text-align:center;
-    }
-    footer a{color:inherit; text-decoration:underline}
+    footer{ margin:26px 0 10px; color:var(--muted); font-size:13px; text-align:center }
+    footer a{ color:inherit; text-decoration:underline }
   </style>
 </head>
-<body class="bg-icons"> <!-- add .bg--light for lighter pattern -->
+<body class="bg-icons">
   <main class="wrap" role="main">
 
     <!-- =========================
-         TOP MAST / HERO (redesigned)
+         TOP MAST (logo | byline+button | headline)
          ========================= -->
     <section class="mast" aria-label="Future Smart Minds header">
-      <!-- LEFT: Logo + byline aligned with top of logo -->
-      <div class="mast__left">
-        <!-- ✳ LOGO: keep same image location -->
-        <img
-          class="mast__logo"
-          src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/logo.png"
-          alt="Future Smart Minds logo"
-        />
+      <!-- Left: Logo (keep same path) -->
+      <img
+        class="mast__logo"
+        src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/logo.png"
+        alt="Future Smart Minds logo"
+      />
+
+      <!-- Center: Byline + button UNDER it -->
+      <div class="mast__info">
         <p class="mast__byline">
           <b>Smart Robot Innovators Interactive Course</b> is built by
           <a class="mast__brand" href="https://futuresmartminds.com" target="_blank" rel="noopener">FutureSmartMinds.com</a>
         </p>
-        <!-- RIGHT: Two-line CTA, styled like other .btn buttons -->
-      <div class="mast__right">
+
         <a
           class="btn btn--stacked"
           href="https://futuresmartminds.com"
@@ -281,15 +209,12 @@
           <small>Opens in new tab</small>
         </a>
       </div>
-  
 
-      <!-- CENTER: Headline + subhead -->
+      <!-- Right: Headline + subhead can expand -->
       <div>
         <h1 class="mast__headline">Inspire the Next Generation of STEM and AI Leaders!</h1>
         <p class="mast__sub">Explore fun, hands-on learning for ages 7–12 with our innovative series.</p>
       </div>
-
-      
     </section>
 
     <!-- =========================
@@ -314,7 +239,7 @@
     </section>
 
     <!-- =========================
-         FEATURED BOOKS (easy-swap images & links)
+         FEATURED BOOKS
          ========================= -->
     <section style="margin-top:18px">
       <div class="card" style="background:rgba(255,255,255,.14); color:#fff">
@@ -431,9 +356,7 @@
            Example:
            data-course-url="https://futuresmartminds.learnworlds.com/course/smart-robot-innovators?...">
       -->
-      <button id="returnBtn" class="btn" type="button"
-              aria-describedby="returnHint"
-              data-course-url="">
+      <button id="returnBtn" class="btn" type="button" aria-describedby="returnHint" data-course-url="">
         ⬅ Return to Course
       </button>
       <div id="returnHint" class="return__hint" role="status" aria-live="polite"></div>
@@ -452,66 +375,35 @@
     // Footer year
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Return behavior:
-    // 1) If data-course-url is present, go there in same tab (to keep LW context).
-    // 2) Else if this opened in a separate tab/window, try to close it.
-    // 3) Else show helper text to use "Next" in the course player.
+    // Return behavior
     (function(){
       const btn = document.getElementById('returnBtn');
       const hint = document.getElementById('returnHint');
-
       btn.addEventListener('click', () => {
         const url = btn.getAttribute('data-course-url');
-        if (url && url.trim().length > 0){
-          window.location.href = url; // Navigate within same tab.
-          return;
-        }
-
-        // Try to detect if we can safely close the window (opened as a popup/tab)
-        // If window.opener exists OR window was not directly opened by user, window.close() may work.
-        // We attempt and then fallback to hint.
-        const closed = (() => {
-          try {
-            window.close();
-            return true;
-          } catch(e){
-            return false;
-          }
-        })();
-
-        // If not closed, guide the learner.
-        setTimeout(() => {
-          if (!window.closed){
-            hint.textContent = 'Use “Next” in the course player to continue.';
-          }
-        }, 120);
+        if (url && url.trim().length){ window.location.href = url; return; }
+        try{ window.close(); }catch(e){}
+        setTimeout(()=>{ if (!window.closed){ hint.textContent = 'Use “Next” in the course player to continue.'; } }, 120);
       });
     })();
 
-    // Ensure all external links open in a new tab (defense-in-depth)
+    // Ensure all external links open in a new tab
     (function enforceExternalTargets(){
       const here = location.host;
       document.querySelectorAll('a[href]').forEach(a=>{
         const href = a.getAttribute('href');
-        // Skip in-page anchors, javascript:, and same-origin links (unless already set)
         if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
         const url = new URL(href, location.href);
-        if (url.host !== here){
-          a.setAttribute('target','_blank');
-          a.setAttribute('rel','noopener');
-        }
+        if (url.host !== here){ a.setAttribute('target','_blank'); a.setAttribute('rel','noopener'); }
       });
     })();
   </script>
 
   <!--
     🔧 QUICK EDIT NOTES
-    - Colors: tweak CSS variables at the top (deep blue, teal, purple, gold).
-    - Series URLs: search for "Explore STEM Series" and "Explore AI Series" buttons to change.
-    - Featured book covers: keep current URLs; swap if needed in /images/Covers/.
-    - Book links: update each "Learn More" href to your WooCommerce or series pages.
-    - Return button: add data-course-url on #returnBtn to hard-link back to the exact LW page.
-    - Background: remove .bg-icons or add .bg--light to body for a softer pattern.
+    - Fine-tune layout by adjusting .mast grid columns or .mast__logo height.
+    - Button & byline are inside the center column (.mast__info) under the logo line.
+    - All image paths kept as provided. Swap covers in /images/Covers/ when ready.
   -->
 </body>
 </html>
