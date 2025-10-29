@@ -4,30 +4,20 @@
   <meta charset="utf-8" />
   <title>Future Smart Minds — Break 3 (Final Bridge)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Fonts -->
+  <!-- Fonts: Orbitron (headings) + Exo 2 (body). Poppins/System as fallback -->
   <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700&family=Orbitron:wght@700;800&display=swap" rel="stylesheet">
 
   <style>
     /* =========================
-       THEME VARIABLES
+       THEME VARIABLES (kept from Break 1)
        ========================= */
     :root{
-      --deep-blue: #0b2a49;
-      --teal: #0fb9b1;
-      --purple: #7B2CBF;
-      --gold: #facc15;
-      --ink: #0f172a;
-      --paper: #ffffff;
-      --paper-90: rgba(255,255,255,.90);
-      --muted: rgba(255,255,255,.78);
-      --ring: #94f2ec;
-      --shadow: 0 10px 30px rgba(0,0,0,.18);
-      --radius-lg: 16px;
-      --radius-xl: 22px;
-      --maxw: 1120px;
-
-      /* Card logo height */
-      --series-logo-h: 96px;  /* set 180px to match top logo size if preferred */
+      --deep-blue:#0b2a49; --teal:#0fb9b1; --purple:#7B2CBF; --gold:#facc15;
+      --ink:#0f172a; --paper:#ffffff; --paper-90:rgba(255,255,255,.90);
+      --muted:rgba(255,255,255,.78); --ring:#94f2ec; --shadow:0 10px 30px rgba(0,0,0,.18);
+      --radius-lg:16px; --radius-xl:22px; --maxw:1120px;
+      /* Card logos height (you can change to 72/96/180) */
+      --series-logo-h:96px;
     }
 
     /* =========================
@@ -39,22 +29,22 @@
       margin:0;
       font-family:"Exo 2","Poppins",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       color:#fff;
-      background: linear-gradient(135deg, var(--deep-blue) 10%, #0d3a66 40%, #0a556b 70%, var(--teal) 110%);
+      background:linear-gradient(135deg,var(--deep-blue) 10%,#0d3a66 40%,#0a556b 70%,var(--teal) 110%);
       overflow-x:hidden;
     }
     a{color:inherit}
-    .wrap{max-width:var(--maxw); margin-inline:auto; padding:24px;}
-    .sr-only{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
 
-    /* Floating Icons Background */
+    .wrap{max-width:var(--maxw); margin-inline:auto; padding:24px;}
+
+    /* Floating Icons Background (same vibe as course) */
     .bg-icons{position:relative; isolation:isolate}
     .bg-icons::before{
       content:""; position:fixed; inset:-10vmax; z-index:-1; opacity:.20;
       background-image:url("data:image/svg+xml;utf8,\
 <svg xmlns='http://www.w3.org/2000/svg' width='800' height='800' viewBox='0 0 800 800'>\
  <defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>\
- <stop offset='0' stop-color='%23FFFFFF' stop-opacity='0.7'/>\
- <stop offset='1' stop-color='%23D9FFFB' stop-opacity='0.7'/>\
+   <stop offset='0' stop-color='%23FFFFFF' stop-opacity='0.7'/>\
+   <stop offset='1' stop-color='%23D9FFFB' stop-opacity='0.7'/>\
  </linearGradient></defs>\
  <g fill='url(%23g)'>\
   <text x='40' y='120' font-family='Orbitron' font-size='64'>{} &lt; / &gt;</text>\
@@ -69,6 +59,7 @@
  </g></svg>");
       background-size:700px 700px; background-repeat:repeat; filter:blur(.5px); pointer-events:none;
     }
+    .bg--light::before{opacity:.08}
 
     /* Accessibility */
     :focus{outline:none}
@@ -76,15 +67,15 @@
 
     /* Buttons */
     .btn{
-      --btn-bg: linear-gradient(135deg, var(--purple), var(--teal));
-      --btn-bg-h: linear-gradient(135deg, var(--teal), var(--purple));
+      --btn-bg:linear-gradient(135deg,var(--purple),var(--teal));
+      --btn-bg-h:linear-gradient(135deg,var(--teal),var(--purple));
       display:inline-block; border:none; cursor:pointer;
       font-weight:800; letter-spacing:.2px;
       padding:10px 14px; border-radius:12px;
       color:#fff; background:var(--btn-bg);
       box-shadow:0 8px 16px rgba(0,0,0,.18);
       text-decoration:none;
-      transition: transform .06s ease, box-shadow .2s ease, background .2s ease;
+      transition:transform .06s ease, box-shadow .2s ease, background .2s ease;
     }
     .btn:hover{background:var(--btn-bg-h); transform:translateY(-1px)}
     .btn:active{transform:translateY(0)}
@@ -96,15 +87,12 @@
        ========================= */
     .mast{
       display:grid; gap:16px;
-      grid-template-columns: auto auto 1fr;
+      grid-template-columns:auto auto 1fr; /* logo | info | headline */
       align-items:center;
-      margin-top:18px;
-      padding:18px;
-      background: radial-gradient(60% 120% at 10% 30%, rgba(255,255,255,.10), transparent 60%),
-                  rgba(255,255,255,.06);
+      margin-top:18px; padding:18px;
+      background:radial-gradient(60% 120% at 10% 30%, rgba(255,255,255,.10), transparent 60%), rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.16);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
+      border-radius:var(--radius-xl); box-shadow:var(--shadow);
     }
     .mast__logo{height:180px; width:auto; border-radius:10px}
     .mast__info{display:flex; flex-direction:column; align-items:flex-start; gap:10px; min-width:300px; max-width:480px;}
@@ -113,12 +101,10 @@
     .mast__headline{margin:0; font-family:"Orbitron",sans-serif; font-weight:800; font-size:clamp(22px,3vw,34px); line-height:1.15}
     .mast__sub{margin:8px 0 0; color:var(--muted); font-weight:700}
 
-    @media (max-width:980px){
-      .mast{ grid-template-columns:auto 1fr; }
-    }
+    @media (max-width:980px){ .mast{grid-template-columns:auto 1fr} }
     @media (max-width:760px){
-      .mast{ grid-template-columns:1fr; text-align:center }
-      .mast__info{ align-items:center }
+      .mast{grid-template-columns:1fr; text-align:center}
+      .mast__info{align-items:center}
     }
 
     /* =========================
@@ -126,6 +112,8 @@
        ========================= */
     .grid{display:grid; gap:16px; grid-template-columns:repeat(12,1fr)}
     .col-12{grid-column:span 12}
+    .col-6{grid-column:span 6}
+    @media (max-width:860px){ .col-6{grid-column:span 12} }
 
     .card{
       background:var(--paper-90); color:var(--ink);
@@ -136,10 +124,25 @@
     .card h3{font-family:"Orbitron",sans-serif;margin:6px 0 8px;font-size:20px;color:var(--deep-blue)}
     .card p{margin:0 0 12px; color:#1f2937}
 
-    /* Logos inside cards */
+    /* Series/Hub logos in cards */
     .series-head{display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:center; margin-bottom:8px}
     .series-logo{height:var(--series-logo-h); width:auto; border-radius:10px; object-fit:contain; background:rgba(0,0,0,.04); border:1px dashed rgba(0,0,0,.12)}
-    .series-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(123,44,191,.12);color:#3b0764;border:1px solid rgba(123,44,191,.25);padding:6px 10px;border-radius:999px;font:700 12px/1 "Exo 2",sans-serif}
+    .series-tag{display:inline-flex; align-items:center; gap:8px; background:rgba(123,44,191,.12); color:#3b0764; border:1px solid rgba(123,44,191,.25); padding:6px 10px; border-radius:999px; font:700 12px/1 "Exo 2",sans-serif}
+
+    /* Books grid */
+    .books{display:grid; gap:14px; grid-template-columns:repeat(12,1fr)}
+    .book{
+      grid-column:span 4; background:var(--paper-90); color:var(--ink);
+      border-radius:14px; overflow:hidden; border:1px solid rgba(0,0,0,.06); box-shadow:var(--shadow);
+      display:grid; grid-template-rows:auto 1fr auto;
+    }
+    .book__img{width:100%; aspect-ratio:3/4; object-fit:cover; display:block; background:#eef2ff}
+    .book__body{padding:12px}
+    .book__title{margin:0 0 6px; font-weight:800; color:var(--deep-blue); font-family:"Orbitron",sans-serif; font-size:16px}
+    .book__blurb{margin:0 0 10px; color:#1f2937; font-size:14px; text-align:justify; hyphens:auto; white-space:normal; word-break:break-word}
+    .book__cta{display:flex; justify-content:flex-end; gap:8px; padding:10px 12px; border-top:1px solid rgba(0,0,0,.08)}
+    @media (max-width:1024px){ .book{grid-column:span 6} }
+    @media (max-width:680px){ .books{gap:12px} .book{grid-column:span 12} .book__title{font-size:15px} }
 
     /* Return block */
     .return{margin-top:18px; padding:18px; display:grid; gap:12px; justify-items:center; text-align:center; background:linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.08)); border:1px solid rgba(255,255,255,.25); border-radius:var(--radius-xl); box-shadow:var(--shadow)}
@@ -153,7 +156,7 @@
          MAST — Final milestone & next steps
          ========================= -->
     <section class="mast" aria-label="Final break header">
-      <!-- Left: Logo -->
+      <!-- Left: Logo (kept path) -->
       <img
         class="mast__logo"
         src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/logo.png"
@@ -167,12 +170,11 @@
           <a class="mast__brand" href="https://futuresmartminds.com" target="_blank" rel="noopener">FutureSmartMinds.com</a>
         </p>
 
-        <a class="btn btn--stacked" href="https://futuresmartminds.com" target="_blank" rel="noopener">
+        <a class="btn btn--stacked" href="https://futuresmartminds.com" target="_blank" rel="noopener" title="Opens in a new tab">
           <span>Visit Future Smart Minds Website</span>
           <small>Opens in new tab</small>
         </a>
 
-        <!-- 30-second message under the button -->
         <p style="margin:8px 0 0; color:var(--muted); font-weight:600; max-width:32ch;">
           Quick 30-second break to celebrate your completion and show what’s next!
         </p>
@@ -181,42 +183,19 @@
       <!-- Right: Celebration headline + sub -->
       <div>
         <h1 class="mast__headline">You did it! All projects complete — what’s next?</h1>
-        <p class="mast__sub">Keep growing with our upcoming AI Innovator courses. Head to the Interactive Hub to enroll.</p>
+        <p class="mast__sub">Keep growing with our interactive courses and STEM/AI book series. Head to the Interactive Hub to enroll.</p>
       </div>
     </section>
 
     <!-- =========================
-         AI INNOVATOR SERIES — Coming Soon
+         MAIN NEXT STEP HEADING (covers Hub + Books)
          ========================= -->
-    <section class="grid" style="margin-top:16px">
-      <article class="card col-12" aria-labelledby="t-ai-series">
-        <div class="series-head">
-          <!-- ✳ Replace with your AI Innovator series logo when uploaded -->
-          <img
-            class="series-logo"
-            src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/ai-innovators-series-logo.png"
-            alt="AI Innovator Series logo"
-            onerror="this.style.display='none'"
-          />
-          <div>
-            <span class="series-tag" aria-hidden="true">🚀 Coming Soon</span>
-            <h3 id="t-ai-series">AI Innovator Series (Coming Soon)</h3>
-          </div>
-        </div>
-
-        <ul style="margin:0 0 14px 22px; padding:0; color:#1f2937; line-height:1.5;">
-          <li><b>AI Innovator: Composing Smart Music</b> — Make music come alive with AI and MakeCode! Craft a melody triggered by light levels and explore sound creativity.</li>
-          <li><b>AI Innovator: Crafting Smart Games</b> — Dive into fun with AI-powered games using MakeCode! Design a reaction game that challenges your speed and enjoy interactive play.</li>
-          <li><b>AI Innovator: Designing Smart Art</b> — Unleash your artistic side with AI-led LED art using MakeCode! Animate a heart pattern that changes with tilt and prepare for more.</li>
-          <li><b>AI Innovator: Building Smart IoT Devices</b> — Connect the world with AI and MakeCode IoT projects! Build a weather station that shows temperature and stay informed.</li>
-        </ul>
-      </article>
-    </section>
+    <h2 style="margin:34px 0 10px; font-family:Orbitron,sans-serif;">What is your next step after completing this course?</h2>
 
     <!-- =========================
-         INTERACTIVE HUB — Enroll & Explore
+         INTERACTIVE HUB — one full-width card
          ========================= -->
-    <section class="grid" style="margin-top:16px">
+    <section class="grid" style="margin-top:8px">
       <article class="card col-12" aria-labelledby="t-hub">
         <div class="series-head">
           <img
@@ -231,14 +210,156 @@
           </div>
         </div>
 
-        <p style="margin:0 0 14px; color:#1f2937; line-height:1.5; text-align:justify;">
-          Continue your journey with live coding, virtual experiments, and community challenges made for ages 7–12. New AI Innovator courses will appear here—be first to try them!
+        <p style="margin:0 0 12px; color:#1f2937; line-height:1.5; text-align:justify;">
+          The Interactive Hub is continuously updated with new AI and STEM interactive courses for curious young learners.
         </p>
 
-        <a class="btn" href="https://futuresmartminds.com/interactive-hub/" target="_blank" rel="noopener">
-          Explore Interactive Hub
-        </a>
+        <!-- No heading requested above the list -->
+        <ul style="margin:0 0 14px 22px; padding:0; color:#1f2937; line-height:1.5;">
+          <li><b>Smart Robot Innovators</b> — Build, code, and play with GlowBit through 11 interactive projects that teach AI logic, problem-solving, and creative robotics.</li>
+          <li><b>Composing Smart Music</b> — Make music come alive with AI! Craft a reactive melody triggered by light levels and explore sound creativity.</li>
+          <li><b>Crafting Smart Games</b> — Dive into fun with AI-powered games! Design a reaction game that challenges your speed and sparks playful logic.</li>
+          <li><b>Designing Smart Art</b> — Unleash AI-led creative art! Animate LED patterns that change with tilt and movement for expressive tech-art.</li>
+          <li><b>Building Smart IoT Devices</b> — Connect the world with AI! Build a smart weather station that senses and displays live data.</li>
+        </ul>
+
+        <a class="btn" href="https://futuresmartminds.com/interactive-hub/" target="_blank" rel="noopener">Visit Interactive Hub</a>
       </article>
+    </section>
+
+    <!-- =========================
+         SERIES CARDS (same style as Break 2)
+         ========================= -->
+    <section class="grid" aria-label="Explore our book series" style="margin-top:16px">
+      <!-- STEM Explorer -->
+      <article class="card col-6" aria-labelledby="t-stem">
+        <div class="series-head">
+          <img
+            class="series-logo"
+            src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/stem-series-logo.png"
+            alt="STEM Explorer Series logo"
+            onerror="this.style.display='none'"
+          />
+          <div>
+            <span class="series-tag" aria-hidden="true">🧪 STEM Explorer</span>
+            <h3 id="t-stem">STEM Explorer Series</h3>
+          </div>
+        </div>
+        <p>Hands-on science, math, and engineering adventures that build core STEM thinking.</p>
+        <a class="btn" href="https://futuresmartminds.com/stem-series/" target="_blank" rel="noopener">Explore STEM Series</a>
+      </article>
+
+      <!-- AI Pioneer -->
+      <article class="card col-6" aria-labelledby="t-ai">
+        <div class="series-head">
+          <img
+            class="series-logo"
+            src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/ai-pioneers-series-logo.png"
+            alt="AI Pioneer Series logo"
+            onerror="this.style.display='none'"
+          />
+          <div>
+            <span class="series-tag" aria-hidden="true">🤖 AI Pioneer</span>
+            <h3 id="t-ai">AI Pioneer Series</h3>
+          </div>
+        </div>
+        <p>Friendly AI foundations — patterns, logic, and decision thinking for young learners.</p>
+        <a class="btn" href="https://futuresmartminds.com/ai-series/" target="_blank" rel="noopener">Explore AI Series</a>
+      </article>
+    </section>
+
+    <!-- =========================
+         BOOKS — full 7-book grid (short blurbs)
+         ========================= -->
+    <section style="margin-top:26px">
+      <h3 style="font-family:Orbitron,sans-serif; margin:0 0 10px;">Strengthen your STEM &amp; AI learning with our book series</h3>
+      <p style="margin:0 0 16px; color:#1f2937">Perfect for home or classroom — build mastery beyond the course.</p>
+
+      <div class="books" aria-label="Books">
+        <!-- 1. Future Mathematician -->
+        <article class="book" aria-labelledby="b-math">
+          <img class="book__img" src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/FutureMathematicianCoverWebsite.png" alt="Cover of Future Mathematician" />
+          <div class="book__body">
+            <h4 id="b-math" class="book__title">Future Mathematician</h4>
+            <p class="book__blurb">Turns math into real-world adventures with hands-on puzzles and problem-solving for ages 7–12.</p>
+          </div>
+          <div class="book__cta">
+            <a class="btn btn--ghost" href="https://futuresmartminds.com/product/future-mathematician/" target="_blank" rel="noopener">Learn More</a>
+          </div>
+        </article>
+
+        <!-- 2. Future Engineer -->
+        <article class="book" aria-labelledby="b-eng">
+          <img class="book__img" src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/FutureEngineerCoverWebsite.png" alt="Cover of Future Engineer" />
+          <div class="book__body">
+            <h4 id="b-eng" class="book__title">Future Engineer</h4>
+            <p class="book__blurb">Everyday engineering experiments that ignite creativity, critical thinking, and design skills.</p>
+          </div>
+          <div class="book__cta">
+            <a class="btn btn--ghost" href="https://futuresmartminds.com/product/future-engineer/" target="_blank" rel="noopener">Learn More</a>
+          </div>
+        </article>
+
+        <!-- 3. Future Scientist -->
+        <article class="book" aria-labelledby="b-sci">
+          <img class="book__img" src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/FutureScientistCoverWebsite.png" alt="Cover of Future Scientist" />
+          <div class="book__body">
+            <h4 id="b-sci" class="book__title">Future Scientist</h4>
+            <p class="book__blurb">Engaging experiments reveal the magic of science while building curiosity and analytical skills.</p>
+          </div>
+          <div class="book__cta">
+            <a class="btn btn--ghost" href="https://futuresmartminds.com/product/future-scientist/" target="_blank" rel="noopener">Learn More</a>
+          </div>
+        </article>
+
+        <!-- 4. Future Chef -->
+        <article class="book" aria-labelledby="b-chef">
+          <img class="book__img" src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/FutureChefCoverWebsite.png" alt="Cover of Future Chef" />
+          <div class="book__body">
+            <h4 id="b-chef" class="book__title">Future Chef</h4>
+            <p class="book__blurb">Tasty cooking experiments turn your kitchen into a science lab—fun, safe, and skill-building.</p>
+          </div>
+          <div class="book__cta">
+            <a class="btn btn--ghost" href="https://futuresmartminds.com/product/future-chef/" target="_blank" rel="noopener">Learn More</a>
+          </div>
+        </article>
+
+        <!-- 5. Future AI Expert -->
+        <article class="book" aria-labelledby="b-ai">
+          <img class="book__img" src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/FutureAICoverWebsite.png" alt="Cover of Future AI Expert" />
+          <div class="book__body">
+            <h4 id="b-ai" class="book__title">Future AI Expert</h4>
+            <p class="book__blurb">A friendly launchpad into artificial intelligence with creative projects that spark discovery.</p>
+          </div>
+          <div class="book__cta">
+            <a class="btn btn--ghost" href="https://futuresmartminds.com/product/future-ai-expert/" target="_blank" rel="noopener">Learn More</a>
+          </div>
+        </article>
+
+        <!-- 6. Future Chess Master -->
+        <article class="book" aria-labelledby="b-chess">
+          <img class="book__img" src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/FutureChessMasterCoverWebsite.png" alt="Cover of Future Chess Master" />
+          <div class="book__body">
+            <h4 id="b-chess" class="book__title">Future Chess Master</h4>
+            <p class="book__blurb">Step-by-step lessons, stories, and puzzles grow strategy, focus, and confident problem-solving.</p>
+          </div>
+          <div class="book__cta">
+            <a class="btn btn--ghost" href="https://futuresmartminds.com/product/future-chess-master/" target="_blank" rel="noopener">Learn More</a>
+          </div>
+        </article>
+
+        <!-- 7. Smart Robot Innovators -->
+        <article class="book" aria-labelledby="b-sri">
+          <img class="book__img" src="https://futuresmartminds.github.io/SmartRobotInnovators/images/Covers/Robot InnovatorsCoverWebsite.png" alt="Cover of Smart Robot Innovators" />
+          <div class="book__body">
+            <h4 id="b-sri" class="book__title">Smart Robot Innovators</h4>
+            <p class="book__blurb">A hands-on AI robotics journey with build-and-code projects that inspire creativity and engineering thinking.</p>
+          </div>
+          <div class="book__cta">
+            <a class="btn btn--ghost" href="https://futuresmartminds.com/product/smart-robot-innovators/" target="_blank" rel="noopener">Learn More</a>
+          </div>
+        </article>
+      </div>
     </section>
 
     <!-- =========================
@@ -294,11 +415,9 @@
 
   <!--
     QUICK EDIT NOTES
-    - Upload logos to: /SmartRobotInnovators/images/Covers/
-        ai-innovators-series-logo.png
-        interactive-hub-logo.png
-    - Adjust logo height via :root { --series-logo-h: 96px; }
-    - Set #returnBtn data-course-url to the LearnWorlds final/completion page URL if you want a direct jump back.
+    - Logo/image paths kept as in your repo.
+    - Adjust card logo size via :root { --series-logo-h: 96px; } (e.g., 72/180).
+    - Set data-course-url on the Return button to jump back into LearnWorlds.
   -->
 </body>
 </html>
