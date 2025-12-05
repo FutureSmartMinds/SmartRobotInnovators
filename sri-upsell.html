@@ -5,7 +5,7 @@
   <title>Unlock Smart Robot Innovators – Full Course Upsell</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Brand fonts (optional but recommended) -->
+  <!-- Brand fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -58,26 +58,29 @@
     }
 
     .sri-eyebrow {
-      display: inline-flex;
+      display: flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
-      padding: 4px 12px;
+      padding: 6px 18px;
       border-radius: 999px;
       background: rgba(124, 77, 255, 0.08);
       color: var(--deep-purple);
-      font-size: 13px;
+      font-size: 0.9rem;
       font-weight: 500;
-      margin-bottom: 10px;
+      margin: 0 auto 14px;
+      text-align: center;
+      max-width: 360px;
     }
 
     .sri-eyebrow span.icon {
-      font-size: 14px;
+      font-size: 1.1rem;
     }
 
     h1.sri-title {
       margin: 0 0 10px;
       font-family: "Orbitron", "Poppins", system-ui, sans-serif;
-      font-size: 1.55rem;
+      font-size: 1.6rem;
       line-height: 1.2;
       color: var(--deep-purple);
       letter-spacing: 0.01em;
@@ -86,13 +89,13 @@
 
     @media (min-width: 768px) {
       h1.sri-title {
-        font-size: 1.9rem;
+        font-size: 1.95rem;
       }
     }
 
     .sri-subtitle {
       margin: 0 auto 20px;
-      max-width: 680px;
+      max-width: 720px;
       font-size: 0.95rem;
       line-height: 1.5;
       text-align: center;
@@ -100,16 +103,18 @@
     }
 
     .sri-price-pill {
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 5px 14px;
+      padding: 6px 16px;
       border-radius: 999px;
       background: rgba(255, 152, 0, 0.09);
       color: var(--deep-purple);
       font-size: 0.9rem;
       margin: 0 auto 14px;
+      text-align: center;
+      max-width: 420px;
     }
 
     .sri-price-pill strong {
@@ -154,6 +159,32 @@
       box-shadow: 0 16px 30px rgba(255, 152, 0, 0.36);
     }
 
+    .sri-btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 20px;
+      border-radius: 999px;
+      border: 1px solid rgba(43, 30, 90, 0.25);
+      background: rgba(248, 245, 255, 0.9);
+      color: var(--deep-purple);
+      font-size: 0.86rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background 0.08s ease-out, border-color 0.08s ease-out;
+    }
+
+    .sri-btn-secondary span.icon {
+      font-size: 1rem;
+    }
+
+    .sri-btn-secondary:hover,
+    .sri-btn-secondary:focus-visible {
+      background: #FFFFFF;
+      border-color: rgba(43, 30, 90, 0.45);
+    }
+
     .sri-guarantee {
       display: flex;
       flex-direction: column;
@@ -161,7 +192,6 @@
       gap: 4px;
       font-size: 0.86rem;
       color: var(--text-muted);
-      margin-bottom: 18px;
       text-align: center;
     }
 
@@ -188,7 +218,7 @@
       display: grid;
       grid-template-columns: 1fr;
       gap: 18px;
-      margin-top: 8px;
+      margin-top: 10px;
     }
 
     @media (min-width: 840px) {
@@ -275,13 +305,12 @@
       </h1>
 
       <p class="sri-subtitle">
-        Turn today’s mini project into a complete STEM adventure. Give your child
-        <strong>5 levels</strong>, <strong>11 hands-on robot projects</strong>, and a
-        <strong>FREE “Future AI Expert” digital book</strong> — all inside the browser, with no hardware required.
+        You’ve seen what’s possible with one GlowBit™ robot. Now turn it into a full STEM adventure for your child — with
+        projects that feel like play for kids and build real logic, creativity, and problem-solving skills parents care about.
       </p>
 
       <div class="sri-price-pill">
-        🎁 <span><strong>Holiday Special:</strong> Unlock everything for <strong>$29</strong> (normally $99) — one-time payment.</span>
+        🎁 <span><strong>Special Offer:</strong> Unlock everything for <strong>$49</strong> — one-time payment, lifetime access.</span>
       </div>
 
       <div class="sri-cta-group">
@@ -292,7 +321,7 @@
           rel="noopener noreferrer"
         >
           <span class="icon">🚀</span>
-          <span>Unlock Full Course + FREE AI Book — Just $29</span>
+          <span>Unlock Full Course + FREE AI Book — $49</span>
         </a>
 
         <div class="sri-guarantee">
@@ -302,55 +331,85 @@
           </span>
           <span>Secure checkout · Lifetime access · No subscriptions</span>
         </div>
+
+        <a
+          class="sri-btn-secondary"
+          href="https://futuresmartminds.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="icon">📚</span>
+          <span>Explore more STEM &amp; AI books and activities</span>
+        </a>
       </div>
 
       <div class="sri-grid">
-        <!-- Left panel: what they unlock -->
+        <!-- Left panel: what they unlock / school value -->
         <div class="sri-panel">
           <h2><span class="icon">📚</span>What Your Child Unlocks</h2>
+          <p>
+            Smart Robot Innovators turns screen time into a guided playground where every session builds skills your child
+            will actually use in class.
+          </p>
           <ul class="sri-list">
             <li>
-              <span class="bullet">⭐</span>
-              <span><strong>5-Level learning journey</strong> — from Discovery to Smart Robot Innovator.</span>
+              <span class="bullet">⚡</span>
+              <span><strong>Logic &amp; problem-solving</strong> — the same step-by-step thinking used in math and science.</span>
+            </li>
+            <li>
+              <span class="bullet">🧊</span>
+              <span><strong>Creativity &amp; engineering thinking</strong> — turning ideas into working mini-robots on screen.</span>
+            </li>
+            <li>
+              <span class="bullet">🧩</span>
+              <span><strong>Planning, sequencing &amp; debugging</strong> — foundations for multi-step tasks and projects.</span>
             </li>
             <li>
               <span class="bullet">🤖</span>
-              <span><strong>11 GlowBit™ robot projects</strong> — messages, reactions, mini-games, music effects &amp; more.</span>
+              <span><strong>Understanding how technology works</strong> — not just tapping apps, but building behaviors and systems.</span>
             </li>
             <li>
               <span class="bullet">🧠</span>
-              <span><strong>Real STEM skills</strong> — logic, loops, events, variables, and creative problem-solving.</span>
+              <span><strong>Problem-solving confidence</strong> — kids see their code work and feel ready to tackle harder work in class.</span>
             </li>
             <li>
-              <span class="bullet">📄</span>
-              <span><strong>Printable worksheets &amp; quizzes</strong> to check understanding and build confidence.</span>
+              <span class="bullet">🎯</span>
+              <span><strong>Better focus &amp; persistence</strong> — sticking with quizzes, homework, and longer assignments instead of giving up.</span>
             </li>
           </ul>
 
           <div class="sri-highlight">
-            🎁 <strong>Bonus:</strong> Instant download of the
-            <em>Future AI Expert</em> book for kids (PDF) when you enroll in the full course.
+            Research shows early exposure to coding boosts performance in math, analytical thinking, and overall STEM
+            achievement — this course delivers that practice in a format kids actually enjoy, not “extra work.”
           </div>
         </div>
 
-        <!-- Right panel: how it works for parents -->
+        <!-- Right panel: course journey & logistics -->
         <div class="sri-panel">
-          <h2><span class="icon">👨‍👩‍👧</span>Built for Busy Parents</h2>
+          <h2><span class="icon">🤖</span>Fun for Kids, Clear Structure for Parents</h2>
           <p>
-            Kids follow step-by-step guided challenges with Mia, Liam &amp; GlowBit. Each project runs in the browser —
-            no kits, no installs, no extra hardware.
+            Kids continue with Mia, Liam &amp; GlowBit through a 5-level journey — from playful discovery to building smart robot
+            behaviors.
           </p>
           <ul class="sri-list">
             <li>
-              <span class="bullet">✅</span>
-              <span>Self-paced lessons — perfect for after-school or weekends.</span>
+              <span class="bullet">⭐</span>
+              <span><strong>5 skill levels &amp; 11 robot projects</strong> — glowing messages, smart reactions, mini-games, music effects &amp; more.</span>
+            </li>
+            <li>
+              <span class="bullet">📄</span>
+              <span><strong>Guided lessons, quizzes &amp; printable worksheets</strong> that support independent learning or co-learning with a parent.</span>
+            </li>
+            <li>
+              <span class="bullet">💻</span>
+              <span><strong>100% browser-based</strong> — start in minutes, with no kits or hardware required.</span>
             </li>
             <li>
               <span class="bullet">✅</span>
-              <span>Ethical, kid-friendly approach to AI &amp; robotics.</span>
+              <span>Ethical, kid-friendly approach to AI &amp; robotics — designed for ages 7–12.</span>
             </li>
             <li>
-              <span class="bullet">✅</span>
+              <span class="bullet">🔓</span>
               <span>One-time payment — your family keeps access forever.</span>
             </li>
           </ul>
