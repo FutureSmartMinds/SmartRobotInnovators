@@ -1,1 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Make GlowBit Talk: Your Friendly Robot Buddy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- Blockly + Glowbit core -->
+  <script src="lib/blockly_compressed.js"></script>
+  <script src="lib/blocks_compressed.js"></script>
+  <script src="lib/javascript_compressed.js"></script>
+  <script src="lib/msg/en.js"></script>
+  <script src="assets/global.js"></script>
+  <script src="lib/blockly_xml_patch.js"></script>
+
+  <style>
+    .gb-wrapper{max-width:1100px;margin:0 auto;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
+   .gb-header {
+      text-align:center;
+      background:#e6f9ff;
+      color:#00A1D6;
+      font-size:22px;
+      font-weight:800;
+      padding:6px 10px;
+      border:3px solid #7dd3fc;
+      border-radius:8px;
+      margin-bottom:8px;
+      box-shadow:0 1px 4px rgba(0,0,0,0.08);
+    }
+    .gb-header .highlight { color:#991b1b; }
+    .gb-intro {
+  text-align:center;
+  font-size:18px;
+  line-height:1.5;
+  margin:0 0 12px;
+  color:#1e3a8a;
+  background:#e0f2fe;
+  border:1px solid #7dd3fc;
+  border-radius:10px;
+  padding:10px 14px;
+  font-weight:600;
+}
+    .didyouknow{margin-top:18px;background:#fef9c3;border:2px solid #facc15;padding:10px 12px;
+                border-radius:12px;color:#713f12;font-size:15px;font-weight:600;position:relative;
+                box-shadow:0 2px 5px rgba(0,0,0,0.06);}
+    .didyouknow::before{content:"";position:absolute;top:-10px;left:20px;border-width:0 10px 10px 10px;
+                         border-style:solid;border-color:transparent transparent #fef9c3 transparent;}
+    .didyouknow p{text-align:justify;margin:6px 0;}
+    .nav-btns{display:flex;justify-content:space-between;gap:8px;margin-top:10px;flex-wrap:wrap;}
+    .gb-btn{padding:8px 14px;border:none;border-radius:6px;font-weight:700;cursor:pointer;flex:1;text-align:center;}
+    .gb-btn.next{background:#00A1D6;color:#fff;}
+    .gb-btn.back{background:#6B7280;color:#fff;}
+    .gb-btn.check{background:#10B981;color:#fff;display:block;margin:12px auto 0;}
+    #solutionModalP4{display:none;position:fixed;top:60px;right:20px;width:640px;max-width:42%;
+                     background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.28);
+                     z-index:12000;overflow:hidden;user-select:none;}
+    #solutionHeaderP4{cursor:move;padding:10px 12px;background:#00A1D6;color:#fff;font-weight:700;
+                      text-align:left;border-radius:10px 10px 0 0;display:flex;justify-content:space-between;align-items:center;}
+    #solutionWorkspaceP4{height:360px;width:100%;border-top:1px solid #eee;background:#fafafa;}
+    #solutionFooterP4{text-align:center;padding:12px;background:#fff;}
+    #solutionFooterP4 button{background:#00A1D6;color:#fff;border:none;border-radius:8px;
+                              padding:8px 18px;cursor:pointer;font-weight:700;}
+    @media(max-width:900px){
+      #solutionModalP4{left:10px;right:10px;width:auto;max-width:calc(100% - 20px);top:40px;}
+      #solutionWorkspaceP4{height:260px;}
+    }
+    .character-frame{text-align:center;margin-top:18px;}
+    .character-frame img{width:85%;max-width:260px;height:auto;border-radius:12px;
+                         box-shadow:0 4px 12px rgba(0,0,0,0.25);object-fit:cover;}
+    .character-name{margin-top:8px;font-weight:700;color:#374151;font-size:15px;}
+  </style>
+</head>
+
+<body>
+  <div class="gb-wrapper">
+    <div class="gb-header">
+      🌟 <span class="highlight">Starter Project 1</span>: Mia’s GlowBit Talking Buddy — 
+      <span class="highlight">Make GlowBit welcome you like a friendly robot!</span>
+    </div>
+
+    <p class="gb-intro">
+      You’ll code GlowBit to display two scrolling messages — “HI” and your name — one after another when you press Button A. Let’s make GlowBit chat like Mia’s robotic buddy!
+    </p>
+
+    <div id="glowbit-project4-step1"></div>
+  </div>
+
+  <!-- Solution Modal -->
+  <div id="solutionModalP4" aria-hidden="true" role="dialog">
+    <div id="solutionHeaderP4">
+      <div>✅ Correct Setup — GlowBit Talking Buddy</div>
+      <button id="solutionCloseP4" title="Close">✕</button>
+    </div>
+    <div id="solutionWorkspaceP4" aria-label="Correct solution workspace"></div>
+    <div id="solutionFooterP4"><button id="solutionCloseBtnP4">Close</button></div>
+  </div>
+
+  <script>
+  (function waitForGlow(){
+    if(!(window.Glowbit && window.Blockly)) return setTimeout(waitForGlow,120);
+
+    /* --- Build the Correct Answer JSON --- */
+    // on_button_pressed(A)
+    //   clear_screen
+    //   pause(500)
+    //   show_text "HI"
+    //   pause(500)
+    //   show_text "Mia"
+    //   pause(500)
+    const solutionJson = {
+      blocks: {
+        languageVersion: 0,
+        blocks: [
+          {
+            type: "on_button_pressed",
+            fields: { BTN: "A" },
+            x: 20,
+            y: 20,
+            inputs: {
+              DO: {
+                block: {
+                  type: "clear_screen",
+                  next: {
+                    block: {
+                      type: "pause_block",
+                      fields: { MS: 500 },
+                      next: {
+                        block: {
+                          type: "show_text",
+                          fields: { TEXT: "HI" },
+                          next: {
+                            block: {
+                              type: "pause_block",
+                              fields: { MS: 500 },
+                              next: {
+                                block: {
+                                  type: "show_text",
+                                  fields: { TEXT: "Mia" },
+                                  next: {
+                                    block: {
+                                      type: "pause_block",
+                                      fields: { MS: 500 }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    };
+
+    /* --- Lesson UI setup --- */
+    const lesson = Glowbit.createLessonUI('glowbit-project4-step1',{title:'',instructions:'',pixelSize:28,defaultJson:null});
+    if(lesson && lesson.workspace) lesson.workspace.clear();
+
+    /* --- Sidebar content --- */
+    const stepCards = [
+`<h3 style="text-align:center;color:#00A1D6;">Step 1: Make GlowBit Say “HI”</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#0284C7;color:#fff;">
+ • Go to the <strong>Basic</strong> tab and drag a <strong>show text</strong> block.<br>
+ • Click inside the text field and type <code>HI</code> to make GlowBit’s first message.<br>
+ • Drag an <strong>on start</strong> block from the <strong>Basic</strong> tab and place the <strong>show text HI</strong> inside it.<br>
+ • Don’t forget to start with a <strong>Clear Screen</strong> block<br> from the <strong>Basic</strong> tab!
+ • Click <strong>Run</strong> to see “HI” scroll across the LED grid.<br>
+ 💬 Mia cheers, “GlowBit’s saying hi to you!”<br><br>
+ 🧩 After testing, remove the <strong>show text</strong> block — we’ll use it later with Button A.</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Step 2: Add a Second Message, “Mia” (or your name!)</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#7B2CBF;color:#fff;">
+ • Drag another <strong>show text</strong> block from <strong>Basic</strong> and change the text to <code>Mia</code> (or your name!).<br>
+ • To test, use an <strong>on start</strong> block and place the <strong>show text</strong> inside it after a <strong>Clear Screen</strong> block.<br>
+ • Click <strong>Run</strong> to watch GlowBit display your name.<br>
+ 💬 Mia smiles, “GlowBit’s telling everyone my name!”<br><br>
+ 🧩 After testing, remove it — we’ll add it into our talking loop next!</div>`,
+
+`<h3 style="text-align:center;color:#00A1D6;">Step 3: Make GlowBit Talk in a Loop</h3>
+ <div style="margin:10px 0;padding:10px;border-radius:8px;background:#00A1D6;color:#fff;">
+ • Drag an <strong>on button A pressed</strong> block from <strong>Input</strong>.<br>
+ • Inside it, add these blocks in order:<br>
+ &nbsp;&nbsp;① <strong>Clear Screen</strong><br>
+ &nbsp;&nbsp;② <strong>pause (500 ms)</strong><br>
+ &nbsp;&nbsp;③ <strong>show text “HI”</strong><br>
+ &nbsp;&nbsp;④ <strong>pause (500 ms)</strong><br>
+ &nbsp;&nbsp;⑤ <strong>show text “Mia”</strong><br>
+ &nbsp;&nbsp;⑥ <strong>pause (500 ms)</strong><br>
+ • Click <strong>Run</strong>, then press <strong>Button A</strong> — GlowBit says “HI Mia” in a friendly loop!<br>
+ 💬 Mia giggles, “GlowBit’s talking like my best buddy!”<br><br>
+ 🪄 Try faster or slower chats by changing the pause time.</div>`,
+
+`<button id="check-setup-btnP4" class="gb-btn check">✅ Check Your Setup</button>
+ <div class="didyouknow">
+   💡 <strong>Did you know?</strong>
+   <p>💬 The first talking robots were built in the 1960s — they used lights and sounds to “speak,” just like GlowBit!</p>
+   <p>📱 Your phone’s screen scrolls text using LEDs and pixels — you’ve just programmed a mini version of that!</p>
+   <p>🎙️ Some robots use text-to-speech software to say words aloud. GlowBit shows messages visually — a perfect start to robotics communication!</p>
+   <p>⚙️ In real life, scrolling LED signs on buses, shops, and stadiums work on the same logic you just coded!</p>
+ </div>`
+    ];
+
+    /* --- Sidebar auto-pagination --- */
+    function paginate(){
+      const sidebar=document.querySelector('#glowbit-project4-step1 .glowbit-left');
+      if(!sidebar)return;
+      const editor=document.getElementById('glowbit-project4-step1-editor');
+      const targetH=(editor&&editor.offsetHeight)?editor.offsetHeight:520;
+      const meas=document.createElement('div');
+      meas.style.visibility='hidden';meas.style.position='absolute';meas.style.left='-9999px';meas.style.top='-9999px';
+      meas.style.width=(sidebar.clientWidth||320)+'px';document.body.appendChild(meas);
+      const pages=[];let current=[];const reserve=56;
+      stepCards.forEach(html=>{
+        const c=document.createElement('div');c.innerHTML=html;meas.appendChild(c);
+        const tooTall=meas.scrollHeight>(targetH-reserve);
+        if(tooTall){
+          if(current.length===0){pages.push([html]);meas.innerHTML='';}
+          else{pages.push([...current]);current=[html];meas.innerHTML='';
+            current.forEach(h=>{const d=document.createElement('div');d.innerHTML=h;meas.appendChild(d);});}
+        }else current.push(html);
+      });
+      if(current.length)pages.push(current);
+      document.body.removeChild(meas);
+      function render(i){
+        sidebar.innerHTML=pages[i].join('');
+        const nav=document.createElement('div');nav.className='nav-btns';
+        if(i>0){const b=document.createElement('button');b.textContent='⬅ Back';b.className='gb-btn back';b.onclick=()=>render(i-1);nav.appendChild(b);}
+        if(i<pages.length-1){const n=document.createElement('button');n.textContent='Next ➜';n.className='gb-btn next';n.onclick=()=>render(i+1);nav.appendChild(n);}
+        sidebar.appendChild(nav);
+        const frame=document.createElement('div');frame.className='character-frame';
+        frame.innerHTML='<img src="images/P4.png" alt="Mia the Maker">';sidebar.appendChild(frame);
+      }
+      render(0);
+    }
+    paginate();let _rt=null;
+    window.addEventListener('resize',()=>{clearTimeout(_rt);_rt=setTimeout(paginate,150);});
+
+    /* --- Modal logic --- */
+    const modal=document.getElementById('solutionModalP4');
+    /* --- Make the modal draggable --- */
+function makeDraggable(modalId, headerId){
+  const modalEl = document.getElementById(modalId);
+  const headerEl = document.getElementById(headerId);
+  if(!modalEl || !headerEl) return;
+
+  let isDown = false, startX = 0, startY = 0;
+
+  headerEl.style.cursor = 'move';
+  headerEl.addEventListener('mousedown', (e)=>{
+    isDown = true;
+    startX = e.clientX - modalEl.offsetLeft;
+    startY = e.clientY - modalEl.offsetTop;
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', stop);
+  });
+
+  function move(e){
+    if(!isDown) return;
+    modalEl.style.left = (e.clientX - startX) + 'px';
+    modalEl.style.top = (e.clientY - startY) + 'px';
+    modalEl.style.right = 'auto';
+  }
+
+  function stop(){
+    isDown = false;
+    document.removeEventListener('mousemove', move);
+    document.removeEventListener('mouseup', stop);
+  }
+}
+
+/* ✅ Enable drag on Project 4 modal */
+makeDraggable('solutionModalP4','solutionModalP4');
+
+    document.addEventListener('click',function(e){
+      if(e.target&&e.target.id==='check-setup-btnP4'){
+        modal.style.display='block';
+        modal.setAttribute('aria-hidden','false');
+        if(!window._solutionWorkspaceP4){
+          const ws=document.getElementById('solutionWorkspaceP4');
+          window._solutionWorkspaceP4=Blockly.inject(ws,{readOnly:true,scrollbars:true,toolbox:null});
+          Blockly.serialization.workspaces.load(solutionJson,window._solutionWorkspaceP4);
+        }
+      }
+      if(e.target&&(e.target.id==='solutionCloseP4'||e.target.id==='solutionCloseBtnP4')){
+        modal.style.display='none';modal.setAttribute('aria-hidden','true');
+      }
+    });
+
+    console.log('✅ Project 4 – Talking Buddy ready.');
+  })();
+  </script>
+</body>
+</html>
